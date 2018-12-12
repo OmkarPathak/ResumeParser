@@ -11,7 +11,8 @@ class ResumeParse(object):
         self.__details = {
             'name'         : None,
             'email'        : None,
-            'mobile_number': None
+            'mobile_number': None,
+            'skills'       : None
         }
         self.__resume = resume
         self.__text   = utils.extract_text(self.__resume)
@@ -27,18 +28,21 @@ class ResumeParse(object):
         name   = utils.extract_name(self.__nlp, matcher=self.__matcher)
         email  = utils.extract_email(self.__text)
         mobile = utils.extract_mobile_number(self.__text)
+        skills = utils.extract_skills(self.__nlp)
         self.__details['name'] = name
         self.__details['email'] = email
         self.__details['mobile_number'] = mobile
+        self.__details['skills'] = skills
         return
 
 if __name__ == '__main__':
-    directory = os.listdir('resumes')
     resumes = []
-    os.chdir('resumes')
-    for file in directory:
-        if os.path.splitext(file)[1] == '.pdf':
-            resumes.append(file)
+    for root, directories, filenames in os.walk('resumes'):
+        for filename in filenames:
+            file = os.path.join(root, filename)
+            if os.path.splitext(file)[1] == '.pdf':
+                resumes.append(file)
+
     for resume in resumes:
         obj = ResumeParse(resume)
         print(obj)

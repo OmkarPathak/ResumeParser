@@ -1,6 +1,7 @@
 import io
 import re
 import spacy
+import pandas as pd
 import constants as cs
 from spacy.matcher import Matcher
 from pdfminer.converter import TextConverter
@@ -43,15 +44,15 @@ def extract_email(email):
         except IndexError:
             return None
 
-def extract_name(doc, matcher):
+def extract_name(nlp_text, matcher):
     pattern = [cs.NAME_PATTERN]
     
     matcher.add('NAME', None, *pattern)
     
-    matches = matcher(doc)
+    matches = matcher(nlp_text)
     
     for match_id, start, end in matches:
-        span = doc[start:end]
+        span = nlp_text[start:end]
         return span.text
 
 def extract_mobile_number(text):
@@ -59,6 +60,16 @@ def extract_mobile_number(text):
     phone = re.findall(re.compile(r'(?:(?:\+?([1-9]|[0-9][0-9]|[0-9][0-9][0-9])\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([0-9][1-9]|[0-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?'), text)
     if phone:
         return ''.join(phone[0])
+
+def extract_skills(nlp_text):
+    tokens = [token.text for token in nlp_text if not token.is_stop]
+    data = pd.read_csv("skills.csv") 
+    skills = list(data.columns.values)
+    skillset = []
+    for token in tokens:
+        if token.lower() in skills:
+            skillset.append(token)
+    return [i.capitalize() for i in set([i.lower() for i in skillset])]
 
 def cleanup(token, lower = True):
     if lower:
@@ -71,10 +82,10 @@ if __name__ == '__main__':
 
     # extraced_doc = extract_text('Brendan_Herger_Resume.pdf')
     # extraced_doc = extract_text('atulsharma.pdf')
-    extraced_doc = extract_text('anjali_resume.pdf')
+    extraced_doc = extract_text('resumes/anjali_resume.pdf')
     extraced_doc = ' '.join(extraced_doc.split())
     doc = nlp(extraced_doc)
-
+    
     # POS
     # for i in doc:
     #     print(i, '=>', i.ent_)
@@ -99,7 +110,7 @@ if __name__ == '__main__':
     #     print(ent.text, ent.label_)
 
     # print(extraced_doc)
-    print(extract_name(doc))
+    print(extract_name(doc, matcher))
     # print(extract_mobile_number(extraced_doc))
 
     # print(extract_email('Brendan HergerHergertarian.com'))
