@@ -65,13 +65,20 @@ def extract_mobile_number(text):
         else:
             return number
 
-def extract_skills(nlp_text):
+def extract_skills(nlp_text, noun_chunks):
     tokens = [token.text for token in nlp_text if not token.is_stop]
     data = pd.read_csv("skills.csv") 
     skills = list(data.columns.values)
     skillset = []
+    # check for one-grams
     for token in tokens:
         if token.lower() in skills:
+            skillset.append(token)
+    
+    # check for bi-grams and tri-grams
+    for token in noun_chunks:
+        token = token.text.lower().strip()
+        if token in skills:
             skillset.append(token)
     return [i.capitalize() for i in set([i.lower() for i in skillset])]
 

@@ -14,10 +14,11 @@ class ResumeParse(object):
             'mobile_number': None,
             'skills'       : None
         }
-        self.__resume = resume
-        self.__text   = utils.extract_text(self.__resume)
-        self.__text   = ' '.join(self.__text.split())
-        self.__nlp    = nlp(self.__text)
+        self.__resume      = resume
+        self.__text        = utils.extract_text(self.__resume)
+        self.__text        = ' '.join(self.__text.split())
+        self.__nlp         = nlp(self.__text)
+        self.__noun_chunks = list(self.__nlp.noun_chunks)
         self.__get_basic_details()
 
     def __repr__(self):
@@ -28,7 +29,7 @@ class ResumeParse(object):
         name   = utils.extract_name(self.__nlp, matcher=self.__matcher)
         email  = utils.extract_email(self.__text)
         mobile = utils.extract_mobile_number(self.__text)
-        skills = utils.extract_skills(self.__nlp)
+        skills = utils.extract_skills(self.__nlp, self.__noun_chunks)
         self.__details['name'] = name
         self.__details['email'] = email
         self.__details['mobile_number'] = mobile
