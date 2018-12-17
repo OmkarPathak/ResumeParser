@@ -87,6 +87,43 @@ def cleanup(token, lower = True):
        token = token.lower()
     return token.strip()
 
+def extract_education(nlp_text):
+    edu = {}
+    # Extract education degree
+    for index, text in enumerate(nlp_text):
+        for tex in text.split():
+            tex = re.sub(r'[?|$|.|!|,]', r'', tex)
+            if tex.upper() in cs.EDUCATION and tex not in cs.STOPWORDS:
+                edu[tex] = text + nlp_text[index + 1]
+
+    # Extract year
+    education = []
+    for key in edu.keys():
+        year = re.search(re.compile(cs.YEAR), edu[key])
+        if year:
+            education.append((key, ''.join(year[0])))
+        else:
+            education.append(key)
+    return education
+
+# def extract_education(nlp_text):
+#     edu = {}
+#     # Extract education degree
+#     for text in nlp_text:
+#         for tex in text.split():
+#             tex = re.sub(r'[?|$|.|!|,]', r'', tex)
+#             if tex.upper() in cs.EDUCATION and tex not in cs.STOPWORDS:
+#                 edu[tex] = text
+#     print(edu)
+#     # Extract year
+#     education = []
+#     for key in edu.keys():
+#         try:
+#             education.append((key, parse(edu[key], fuzzy=True).strftime('%B-%Y')))
+#         except ValueError:
+#             education.append((key))
+#     return education
+
 if __name__ == '__main__':
     nlp = spacy.load('en_core_web_sm')
     matcher = Matcher(nlp.vocab)
@@ -96,17 +133,17 @@ if __name__ == '__main__':
     extraced_doc = extract_text('resumes/anjali_resume.pdf')
     extraced_doc = ' '.join(extraced_doc.split())
     doc = nlp(extraced_doc)
-    
+    print(extract_education([sent.string.strip() for sent in doc.sents]))
     # POS
     # for i in doc:
     #     print(i, '=>', i.ent_)
 
     # Entities
-    # labels = set([w.label_ for w in doc.ents]) 
-    # for label in labels: 
-    #     entities = [cleanup(e.string, lower=False) for e in doc.ents if label==e.label_] 
-    #     entities = list(set(entities)) 
-    #     print(label,entities)
+    labels = set([w.label_ for w in doc.ents]) 
+    for label in labels: 
+        entities = [cleanup(e.string, lower=False) for e in doc.ents if label==e.label_] 
+        entities = list(set(entities)) 
+        print(label,entities)
 
     # Noun Chunks
     # for idx, sentence in enumerate(doc.sents):
@@ -121,7 +158,7 @@ if __name__ == '__main__':
     #     print(ent.text, ent.label_)
 
     # print(extraced_doc)
-    print(extract_name(doc, matcher))
+    # print(extract_name(doc, matcher))
     # print(extract_mobile_number(extraced_doc))
 
     # print(extract_email('Brendan HergerHergertarian.com'))
