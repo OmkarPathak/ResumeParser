@@ -29,6 +29,8 @@ python -m nltk nltk.download('words')
 
 - Place all the resumes that you want to parse in `resumes/` directory
 
+- Run `resume_parser.py`
+
 # References that helped me get here
 
 - [https://www.kaggle.com/nirant/hitchhiker-s-guide-to-nlp-in-spacy](https://www.kaggle.com/nirant/hitchhiker-s-guide-to-nlp-in-spacy)

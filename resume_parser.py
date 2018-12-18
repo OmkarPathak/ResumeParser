@@ -22,9 +22,8 @@ class ResumeParse(object):
         self.__noun_chunks = list(self.__nlp.noun_chunks)
         self.__get_basic_details()
 
-    def __repr__(self):
-        pprint.pprint(self.__details)
-        return 'Done'
+    def get_extracted_data(self):
+        return self.__details
 
     def __get_basic_details(self):
         name   = utils.extract_name(self.__nlp, matcher=self.__matcher)
@@ -41,6 +40,7 @@ class ResumeParse(object):
 
 if __name__ == '__main__':
     resumes = []
+    data = []
     for root, directories, filenames in os.walk('resumes'):
         for filename in filenames:
             file = os.path.join(root, filename)
@@ -48,5 +48,7 @@ if __name__ == '__main__':
 
     for resume in resumes:
         obj = ResumeParse(resume)
-        print(obj)
+        data.append(obj.get_extracted_data())
         del obj
+
+    pprint.pprint(data)
