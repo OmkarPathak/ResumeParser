@@ -109,7 +109,7 @@ def extract_education(nlp_text):
     for key in edu.keys():
         year = re.search(re.compile(cs.YEAR), edu[key])
         if year:
-            education.append((key, ''.join(year[0])))
+            education.append((key, ''.join(year.group(0))))
         else:
             education.append(key)
     return education
