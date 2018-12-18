@@ -16,7 +16,7 @@ class ResumeParse(object):
             'education'    : None,
         }
         self.__resume      = resume
-        self.__text        = utils.extract_text(self.__resume)
+        self.__text        = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
         self.__text        = ' '.join(self.__text.split())
         self.__nlp         = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
@@ -44,8 +44,7 @@ if __name__ == '__main__':
     for root, directories, filenames in os.walk('resumes'):
         for filename in filenames:
             file = os.path.join(root, filename)
-            if os.path.splitext(file)[1] == '.pdf':
-                resumes.append(file)
+            resumes.append(file)
 
     for resume in resumes:
         obj = ResumeParse(resume)

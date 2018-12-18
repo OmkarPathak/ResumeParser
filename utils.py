@@ -2,6 +2,7 @@ import io
 import re
 import spacy
 import pandas as pd
+import docx2txt
 import constants as cs
 from spacy.matcher import Matcher
 from pdfminer.converter import TextConverter
@@ -10,7 +11,7 @@ from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
  
-def extract_text_by_page(pdf_path):
+def extract_text_from_pdf(pdf_path):
 # https://www.blog.pythonlibrary.org/2018/05/03/exporting-data-from-pdfs-with-python/
     with open(pdf_path, 'rb') as fh:
         for page in PDFPage.get_pages(fh, 
@@ -29,11 +30,18 @@ def extract_text_by_page(pdf_path):
             converter.close()
             fake_file_handle.close()
 
-def extract_text(pdf_path):
-    text = ''
-    for page in extract_text_by_page(pdf_path):
-        text += ' ' + page
+def extract_text_from_doc(doc_path):
+    temp = docx2txt.process("resumes/Chinmaya_Kaundanya_Resume.docx")
+    text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
+    return ' '.join(text)
 
+def extract_text(file_path, extension):
+    text = ''
+    if extension == '.pdf':
+        for page in extract_text_from_pdf(file_path):
+            text += ' ' + page
+    elif extension == '.docx' or extension == '.doc':
+        text = extract_text_from_doc(file_path)
     return text
 
 def extract_email(email):
