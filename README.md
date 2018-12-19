@@ -31,6 +31,45 @@ python -m nltk nltk.download('words')
 
 - Run `resume_parser.py`
 
+# Result
+
+The module would return a list of dictionary objects with result as follows:
+
+```
+[
+    {
+        'education': [('BE', '2014')],
+        'email': 'omkarpathak27@gmail.com',
+        'mobile_number': '8087996634',
+        'name': 'Omkar Pathak',
+        'skills': [
+            'Flask',
+            'Django',
+            'Mysql',
+            'C',
+            'Css',
+            'Html',
+            'Js',
+            'Machine learning',
+            'C++',
+            'Algorithms',
+            'Github',
+            'Php',
+            'Python',
+            'Opencv'
+        ]
+    }
+]
+```
+
+# To DO
+
+- [] Extracting Projects
+- [] Extracting hobbies
+- [] Extracting universities
+- [] Extracting month of passing
+- [] Extracting Awards/ Achievements/ Recognition
+
 # References that helped me get here
 
 - [https://www.kaggle.com/nirant/hitchhiker-s-guide-to-nlp-in-spacy](https://www.kaggle.com/nirant/hitchhiker-s-guide-to-nlp-in-spacy)
