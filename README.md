@@ -64,11 +64,11 @@ The module would return a list of dictionary objects with result as follows:
 
 # To DO
 
-- [] Extracting Projects
-- [] Extracting hobbies
-- [] Extracting universities
-- [] Extracting month of passing
-- [] Extracting Awards/ Achievements/ Recognition
+- [ ] Extracting Projects
+- [ ] Extracting hobbies
+- [ ] Extracting universities
+- [ ] Extracting month of passing
+- [ ] Extracting Awards/ Achievements/ Recognition
 
 # References that helped me get here
 
