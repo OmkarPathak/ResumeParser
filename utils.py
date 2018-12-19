@@ -31,7 +31,7 @@ def extract_text_from_pdf(pdf_path):
             fake_file_handle.close()
 
 def extract_text_from_doc(doc_path):
-    temp = docx2txt.process("resumes/Chinmaya_Kaundanya_Resume.docx")
+    temp = docx2txt.process(doc_path)
     text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
     return ' '.join(text)
 
@@ -109,7 +109,7 @@ def extract_education(nlp_text):
     for key in edu.keys():
         year = re.search(re.compile(cs.YEAR), edu[key])
         if year:
-            education.append((key, ''.join(year[0])))
+            education.append((key, ''.join(year.group(0))))
         else:
             education.append(key)
     return education
