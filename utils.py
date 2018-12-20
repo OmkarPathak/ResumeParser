@@ -65,13 +65,10 @@ def extract_name(nlp_text, matcher):
 
 def extract_mobile_number(text):
     # Found this complicated regex on : https://zapier.com/blog/extract-links-email-phone-regex/
-    phone = re.findall(re.compile(r'(?:(?:\+?([1-9]|[0-9][0-9]|[0-9][0-9][0-9])\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([0-9][1-9]|[0-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?'), text)
+    phone = re.findall(re.compile(r'(?:(?:\()?\+([0-9]*)(?:\))?((?:[\s-]*[0-9]+)+))'), text)
     if phone:
         number = ''.join(phone[0])
-        if len(number) > 10:
-            return '+' + number
-        else:
-            return number
+        return number
 
 def extract_skills(nlp_text, noun_chunks):
     tokens = [token.text for token in nlp_text if not token.is_stop]
