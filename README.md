@@ -1,5 +1,5 @@
 # ResumeParser
-A simple resume parser used for extracting information from resumes
+A simple resume parser used for extracting information from resumes. Currently supports .doc .dox and .pdf.
 
 # Installation
 
