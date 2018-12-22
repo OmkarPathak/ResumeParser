@@ -23,6 +23,12 @@ pip install nltk
 python -m nltk nltk.download('words')
 ```
 
+- For extracting other supporting dependencies, execute:
+
+```bash
+pip install -r requirements.txt
+```
+
 - Modify `skills.csv` as per your requirements
 
 - Modify `Education Degrees` as per you requirements in [constants.py](https://github.com/OmkarPathak/ResumeParser/blob/master/constants.py)
