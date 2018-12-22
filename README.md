@@ -31,6 +31,31 @@ python -m nltk nltk.download('words')
 
 - Run `resume_parser.py`
 
+# CLI
+
+For running the resume extractor you can also use the `cli` provided
+
+```bash
+usage: cli.py [-h] [-f FILE] [-d DIRECTORY]
+
+optional arguments:
+  -h, --help                            show this help message and exit
+  -f FILE, --file FILE                  resume file to be extracted
+  -d DIRECTORY, --directory DIRECTORY   directory containing all the resumes to be extracted
+```
+
+For extracting data from a single resume file, use
+
+```bash
+python cli.py -f <resume_file_path>
+```
+
+For extracting data from several resumes, place them in a directory and then execute
+
+```bash
+python cli.py -d <resume_directory_path>
+```
+
 # Result
 
 The module would return a list of dictionary objects with result as follows:
