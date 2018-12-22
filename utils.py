@@ -1,3 +1,5 @@
+# Author: Omkar Pathak
+
 import io
 import re
 import spacy
@@ -12,7 +14,13 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
  
 def extract_text_from_pdf(pdf_path):
-# https://www.blog.pythonlibrary.org/2018/05/03/exporting-data-from-pdfs-with-python/
+    '''
+    Helper function to extract the plain text from .pdf files
+
+    :param pdf_path: path to PDF file to be extracted
+    :return: iterator of string of extracted text
+    '''
+    # https://www.blog.pythonlibrary.org/2018/05/03/exporting-data-from-pdfs-with-python/
     with open(pdf_path, 'rb') as fh:
         for page in PDFPage.get_pages(fh, 
                                       caching=True,
@@ -31,11 +39,23 @@ def extract_text_from_pdf(pdf_path):
             fake_file_handle.close()
 
 def extract_text_from_doc(doc_path):
+    '''
+    Helper function to extract plain text from .doc or .docx files
+
+    :param doc_path: path to .doc or .docx file to be extracted
+    :return: string of extracted text
+    '''
     temp = docx2txt.process(doc_path)
     text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
     return ' '.join(text)
 
 def extract_text(file_path, extension):
+    '''
+    Wrapper function to detect the file extension and call text extraction function accordingly
+
+    :param file_path: path of file of which text is to be extracted
+    :param extension: extension of file `file_name`
+    '''
     text = ''
     if extension == '.pdf':
         for page in extract_text_from_pdf(file_path):
@@ -44,8 +64,13 @@ def extract_text(file_path, extension):
         text = extract_text_from_doc(file_path)
     return text
 
-def extract_email(email):
-    email = re.findall("([^@|\s]+@[^@]+\.[^@|\s]+)", email)
+def extract_email(text):
+    '''
+    Helper function to extract email id from text
+
+    :param text: plain text extracted from resume file
+    '''
+    email = re.findall("([^@|\s]+@[^@]+\.[^@|\s]+)", text)
     if email:
         try:
             return email[0].split()[0].strip(';')
@@ -53,6 +78,13 @@ def extract_email(email):
             return None
 
 def extract_name(nlp_text, matcher):
+    '''
+    Helper function to extract name from spacy nlp text
+
+    :param nlp_text: object of `spacy.tokens.doc.Doc`
+    :param matcher: object of `spacy.matcher.Matcher`
+    :return: string of full name
+    '''
     pattern = [cs.NAME_PATTERN]
     
     matcher.add('NAME', None, *pattern)
@@ -64,6 +96,12 @@ def extract_name(nlp_text, matcher):
         return span.text
 
 def extract_mobile_number(text):
+    '''
+    Helper function to extract mobile number from text
+
+    :param text: plain text extracted from resume file
+    :return: string of extracted mobile numbers
+    '''
     # Found this complicated regex on : https://zapier.com/blog/extract-links-email-phone-regex/
     phone = re.findall(re.compile(r'(?:(?:\+?([1-9]|[0-9][0-9]|[0-9][0-9][0-9])\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([0-9][1-9]|[0-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?'), text)
     if phone:
@@ -74,6 +112,13 @@ def extract_mobile_number(text):
             return number
 
 def extract_skills(nlp_text, noun_chunks):
+    '''
+    Helper function to extract skills from spacy nlp text
+
+    :param nlp_text: object of `spacy.tokens.doc.Doc`
+    :param noun_chunks: noun chunks extracted from nlp text
+    :return: list of skills extracted
+    '''
     tokens = [token.text for token in nlp_text if not token.is_stop]
     data = pd.read_csv("skills.csv") 
     skills = list(data.columns.values)
@@ -96,6 +141,12 @@ def cleanup(token, lower = True):
     return token.strip()
 
 def extract_education(nlp_text):
+    '''
+    Helper function to extract education from spacy nlp text
+
+    :param nlp_text: object of `spacy.tokens.doc.Doc`
+    :return: tuple of education degree and year if year if found else only returns education degree
+    '''
     edu = {}
     # Extract education degree
     for index, text in enumerate(nlp_text):
@@ -113,60 +164,3 @@ def extract_education(nlp_text):
         else:
             education.append(key)
     return education
-
-# def extract_education(nlp_text):
-#     edu = {}
-#     # Extract education degree
-#     for text in nlp_text:
-#         for tex in text.split():
-#             tex = re.sub(r'[?|$|.|!|,]', r'', tex)
-#             if tex.upper() in cs.EDUCATION and tex not in cs.STOPWORDS:
-#                 edu[tex] = text
-#     print(edu)
-#     # Extract year
-#     education = []
-#     for key in edu.keys():
-#         try:
-#             education.append((key, parse(edu[key], fuzzy=True).strftime('%B-%Y')))
-#         except ValueError:
-#             education.append((key))
-#     return education
-
-if __name__ == '__main__':
-    nlp = spacy.load('en_core_web_sm')
-    matcher = Matcher(nlp.vocab)
-
-    # extraced_doc = extract_text('Brendan_Herger_Resume.pdf')
-    # extraced_doc = extract_text('atulsharma.pdf')
-    extraced_doc = extract_text('resumes/anjali_resume.pdf')
-    extraced_doc = ' '.join(extraced_doc.split())
-    doc = nlp(extraced_doc)
-    print(extract_education([sent.string.strip() for sent in doc.sents]))
-    # POS
-    # for i in doc:
-    #     print(i, '=>', i.ent_)
-
-    # Entities
-    labels = set([w.label_ for w in doc.ents]) 
-    for label in labels: 
-        entities = [cleanup(e.string, lower=False) for e in doc.ents if label==e.label_] 
-        entities = list(set(entities)) 
-        print(label,entities)
-
-    # Noun Chunks
-    # for idx, sentence in enumerate(doc.sents):
-    #     for noun in sentence.noun_chunks:
-    #         print(f"sentence {idx+1} has noun chunk '{noun}'")
-
-    # for ent in doc.ents:
-    #     if ent.label_ == 'ORG':
-    #         email = extract_email(ent.text)
-    #         if email:
-    #             print(email)
-    #     print(ent.text, ent.label_)
-
-    # print(extraced_doc)
-    # print(extract_name(doc, matcher))
-    # print(extract_mobile_number(extraced_doc))
-
-    # print(extract_email('Brendan HergerHergertarian.com'))

@@ -1,13 +1,15 @@
+# Author: Omkar Pathak
+
 import os
 import utils
 import spacy
 import pprint
 from spacy.matcher import Matcher
 
-class ResumeParse(object):
+class ResumeParser(object):
     def __init__(self, resume):
         nlp = spacy.load('en_core_web_sm')
-        self.__matcher = matcher = Matcher(nlp.vocab)
+        self.__matcher = Matcher(nlp.vocab)
         self.__details = {
             'name'         : None,
             'email'        : None,
@@ -47,7 +49,7 @@ if __name__ == '__main__':
             resumes.append(file)
 
     for resume in resumes:
-        obj = ResumeParse(resume)
+        obj = ResumeParser(resume)
         data.append(obj.get_extracted_data())
         del obj
 
