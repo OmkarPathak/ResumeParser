@@ -3,7 +3,7 @@
 import os
 import argparse
 from pprint import pprint
-from resume_parser import ResumeParser
+from resume_parser.resume_parser import ResumeParser
 
 class ResumeParserCli(object):
     def __init__(self):     

@@ -1,6 +1,7 @@
 # Author: Omkar Pathak
 
 import io
+import os
 import re
 import spacy
 import pandas as pd
@@ -120,7 +121,7 @@ def extract_skills(nlp_text, noun_chunks):
     :return: list of skills extracted
     '''
     tokens = [token.text for token in nlp_text if not token.is_stop]
-    data = pd.read_csv("skills.csv") 
+    data = pd.read_csv(os.path.join(os.path.dirname(__file__), 'skills.csv')) 
     skills = list(data.columns.values)
     skillset = []
     # check for one-grams

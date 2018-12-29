@@ -1,0 +1,17 @@
+{% load static %}
+<nav class="navbar navbar-expand-md navbar-dark bg-dark sidebarNavigation" data-sidebarClass="navbar-dark bg-dark">
+    <a class="navbar-brand" href="{% url 'homepage' %}">
+        Resume Parser
+    </a>
+    <button class="navbar-toggler leftNavbarToggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item {% if request.resolver_match.url_name == 'login' %} active {% endif %}">
+                <a class="nav-link" href="{% url 'homepage'%}">Homepage</a>
+            </li>
+        </ul>
+    </div>
+</nav>

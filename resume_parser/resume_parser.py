@@ -1,7 +1,7 @@
 # Author: Omkar Pathak
 
 import os
-import utils
+from . import utils
 import spacy
 import pprint
 from spacy.matcher import Matcher
