@@ -34,48 +34,63 @@
     <link rel="shortcut icon" href="{% static 'images/logomarkv2.ico' %}">
     <title>{% block title %}{% endblock %}</title>
   </head>
-  <body style="font-family: 'Poppins', sans-serif;" class="container">
+  <body style="font-family: 'Poppins', sans-serif;">
     {% include 'navbar.html' %}
 
-    {% include 'messages.html' %}
+    <div class="container-fluid">
+      {% include 'messages.html' %}
     
-    {% if form %}
-    <div class="row">
-      <div class="col-lg-5 col-md-5"></div>
-      <div class="col-lg-6 col-md-6">
-        <form method="POST" enctype="multipart/form-data" action="{% url 'homepage' %}" style="margin-top: 2%; margin-bottom: 3%">
-          {% csrf_token %}
-          {{ form|crispy }}
-          <button type="submit" id="import" name="import" class="btn btn-success" style="margin-top: 2%; border-radius: 0">Upload</button>
-        </form>
+      {% if form %}
+      <div class="row">
+        <div class="col-lg-5 col-md-5"></div>
+        <div class="col-lg-6 col-md-6">
+          <form method="POST" enctype="multipart/form-data" action="{% url 'homepage' %}" style="margin-top: 2%; margin-bottom: 3%">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" id="import" name="import" class="btn btn-success" style="margin-top: 2%; border-radius: 0">Upload</button>
+          </form>
+        </div>
       </div>
-    </div>
-    {% elif resumes %}
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>File</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Mobile Number</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for resume in resumes %}
+      {% elif resumes %}
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <a href="{% url 'homepage' %}">
+              <button class="btn btn-success" style="margin-bottom: 10px; border-radius: 0;">Upload More</button>
+            </a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <table class="table table-bordered table-striped table-responsive">
+            <thead>
               <tr>
-                <td>{{resume.resume.name}}</td>
-                <td>{{resume.name}}</td>
-                <td>{{resume.email}}</td>
-                <td>{{resume.mobile_number}}</td>
+                <th>#</th>
+                <th>Resume File</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile Number</th>
+                <th>Education</th>
+                <th>Skills</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for resume in resumes %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url}}</a></td>
+                  <td>{{resume.name}}</td>
+                  <td>{{resume.email}}</td>
+                  <td>{{resume.mobile_number}}</td>
+                  <td>{{resume.education}}</td>
+                  <td>{{resume.skills}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
+      {% endif %}
     </div>
-    {% endif %}
   
   </body>
 </html>

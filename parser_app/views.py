@@ -4,6 +4,7 @@ from .models import Resume, UploadResumeModelForm
 from django.contrib import messages
 from django.conf import settings
 from django.db import IntegrityError
+from django.http import HttpResponse, FileResponse, Http404
 import os
 
 def homepage(request):
@@ -26,6 +27,9 @@ def homepage(request):
                     resume.name          = data.get('name')
                     resume.email         = data.get('email')
                     resume.mobile_number = data.get('mobile_number')
+                    resume.education     = get_education(data.get('education'))
+                    resume.skills        = ', '.join(data.get('skills'))
+                    print(resume.skills)
                     resume.save()
                 except IntegrityError:
                     messages.warning(request, 'Duplicate resume found:', file.name)
@@ -36,3 +40,12 @@ def homepage(request):
     else:
         form = UploadResumeModelForm()
     return render(request, 'base.html', {'form': form})
+
+def get_education(education):
+    '''
+    Helper function to display the education in human readable format
+    '''
+    education_string = ''
+    for edu in education:
+        education_string += edu[0] + ' (' + str(edu[1]) + '), '
+    return education_string.rstrip(', ')
