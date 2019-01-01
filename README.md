@@ -62,6 +62,24 @@ For extracting data from several resumes, place them in a directory and then exe
 python cli.py -d <resume_directory_path>
 ```
 
+# GUI
+
+- Django used
+- Easy extraction and interpretation using GUI
+- For running GUI execute:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
+
+- Visit `127.0.0.1` to view the GUI
+
+# Working:
+
+![Working](results/resume_parser_result.png)
+
 # Result
 
 The module would return a list of dictionary objects with result as follows:
