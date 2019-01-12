@@ -71,18 +71,20 @@
                 <th>Mobile Number</th>
                 <th>Education</th>
                 <th>Skills</th>
+                <th>Experience</th>
               </tr>
             </thead>
             <tbody>
               {% for resume in resumes %}
                 <tr>
                   <td>{{forloop.counter}}</td>
-                  <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url}}</a></td>
+                  <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url|truncatechars:20}}</a></td>
                   <td>{{resume.name}}</td>
                   <td>{{resume.email}}</td>
                   <td>{{resume.mobile_number}}</td>
                   <td>{{resume.education}}</td>
-                  <td>{{resume.skills}}</td>
+                  <td>{{resume.skills|truncatechars:50}}</td>
+                  <td>{{resume.experience}}</td>
                 </tr>
               {% endfor %}
             </tbody>

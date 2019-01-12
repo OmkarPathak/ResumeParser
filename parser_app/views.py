@@ -29,7 +29,7 @@ def homepage(request):
                     resume.mobile_number = data.get('mobile_number')
                     resume.education     = get_education(data.get('education'))
                     resume.skills        = ', '.join(data.get('skills'))
-                    print(resume.skills)
+                    resume.experience    = ', '.join(data.get('experience'))
                     resume.save()
                 except IntegrityError:
                     messages.warning(request, 'Duplicate resume found:', file.name)

@@ -3,6 +3,7 @@
 import io
 import os
 import re
+import nltk
 import spacy
 import pandas as pd
 import docx2txt
@@ -13,7 +14,9 @@ from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
- 
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords 
+
 def extract_text_from_pdf(pdf_path):
     '''
     Helper function to extract the plain text from .pdf files
@@ -165,3 +168,36 @@ def extract_education(nlp_text):
         else:
             education.append(key)
     return education
+
+def extract_experience(resume_text):
+    '''
+    Helper function to extract experience from resume text
+
+    :param resume_text: Plain resume text
+    :return: list of experience
+    '''
+    wordnet_lemmatizer = WordNetLemmatizer()
+    stop_words = set(stopwords.words('english'))
+
+    # word tokenization 
+    word_tokens = nltk.word_tokenize(resume_text)
+
+    # remove stop words and lemmatize  
+    filtered_sentence = [w for w in word_tokens if not w in stop_words and wordnet_lemmatizer.lemmatize(w) not in stop_words] 
+    sent = nltk.pos_tag(filtered_sentence)
+
+    # parse regex
+    cp = nltk.RegexpParser('P: {<NNP>+}')
+    cs = cp.parse(sent)
+    
+    # for i in cs.subtrees(filter=lambda x: x.label() == 'P'):
+    #     print(i)
+    
+    test = []
+    
+    for vp in list(cs.subtrees(filter=lambda x: x.label()=='P')):
+        test.append(" ".join([i[0] for i in vp.leaves() if len(vp.leaves()) >= 2]))
+
+    # Search the word 'experience' in the chunk and then print out the text after it
+    x = [x[x.lower().index('experience') + 10:] for i, x in enumerate(test) if x and 'experience' in x.lower()]
+    return x
