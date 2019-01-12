@@ -113,6 +113,7 @@ The module would return a list of dictionary objects with result as follows:
 
 # To DO
 
+- [x] Extracting Experience
 - [ ] Extracting Projects
 - [ ] Extracting hobbies
 - [ ] Extracting universities
