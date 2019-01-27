@@ -5,6 +5,7 @@ from . import utils
 import spacy
 import pprint
 from spacy.matcher import Matcher
+import multiprocessing as mp
 
 class ResumeParser(object):
     def __init__(self, resume):
@@ -43,8 +44,13 @@ class ResumeParser(object):
         self.__details['experience'] = experience
         return
 
+def resume_result_wrapper(resume):
+        parser = ResumeParser(resume)
+        return parser.get_extracted_data()
 
 if __name__ == '__main__':
+    pool = mp.Pool(mp.cpu_count())
+
     resumes = []
     data = []
     for root, directories, filenames in os.walk('resumes'):
@@ -52,9 +58,8 @@ if __name__ == '__main__':
             file = os.path.join(root, filename)
             resumes.append(file)
 
-    for resume in resumes:
-        obj = ResumeParser(resume)
-        data.append(obj.get_extracted_data())
-        del obj
+    results = [pool.apply_async(resume_result_wrapper, args=(x,)) for x in resumes]
 
-    pprint.pprint(data)
+    results = [p.get() for p in results]
+
+    pprint.pprint(results)

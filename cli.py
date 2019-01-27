@@ -4,6 +4,7 @@ import os
 import argparse
 from pprint import pprint
 from resume_parser.resume_parser import ResumeParser
+import multiprocessing as mp
 
 class ResumeParserCli(object):
     def __init__(self):     
@@ -31,22 +32,26 @@ class ResumeParserCli(object):
 
     def __extract_from_directory(self, directory):
         if os.path.exists(directory):
+            pool = mp.Pool(mp.cpu_count())
+
             resumes = []
             data = []
             for root, directories, filenames in os.walk(directory):
                 for filename in filenames:
                     file = os.path.join(root, filename)
                     resumes.append(file)
-            
-            for resume in resumes:
-                print('Extracting data from: ', resume)
-                obj = ResumeParser(resume)
-                data.append(obj.get_extracted_data())
-                del obj
-            
-            return data
+
+            results = pool.map(resume_result_wrapper, resumes)
+            pool.close()
+            pool.join()
+
+            return results
         else:
             return 'Directory not found. Please provide a valid directory.'
+
+def resume_result_wrapper(resume):
+        parser = ResumeParser(resume)
+        return parser.get_extracted_data()
 
 if __name__ == '__main__':
     cli_obj = ResumeParserCli()
