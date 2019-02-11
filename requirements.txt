@@ -6,7 +6,7 @@ cycler==0.10.0
 cymem==2.0.2
 cytoolz==0.9.0.1
 dill==0.2.8.2
-Django==2.1.4
+Django==2.1.5
 django-crispy-forms==1.7.2
 docx2txt==0.6
 EbookLib==0.15

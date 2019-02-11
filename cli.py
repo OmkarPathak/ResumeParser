@@ -6,6 +6,9 @@ from pprint import pprint
 from resume_parser.resume_parser import ResumeParser
 import multiprocessing as mp
 
+def print_cyan(text):
+    print("\033[96m {}\033[00m" .format(text))
+
 class ResumeParserCli(object):
     def __init__(self):     
         self.__parser = argparse.ArgumentParser()
@@ -25,6 +28,7 @@ class ResumeParserCli(object):
 
     def __extract_from_file(self, file):
         if os.path.exists(file):
+            print_cyan('Extracting data from: {}'.format(file))
             resume_parser = ResumeParser(file)
             return [resume_parser.get_extracted_data()]
         else:
@@ -50,8 +54,9 @@ class ResumeParserCli(object):
             return 'Directory not found. Please provide a valid directory.'
 
 def resume_result_wrapper(resume):
-        parser = ResumeParser(resume)
-        return parser.get_extracted_data()
+    print_cyan('Extracting data from: {}'.format(resume))
+    parser = ResumeParser(resume)
+    return parser.get_extracted_data()
 
 if __name__ == '__main__':
     cli_obj = ResumeParserCli()
