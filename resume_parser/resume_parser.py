@@ -20,8 +20,8 @@ class ResumeParser(object):
             'experience'   : None,
         }
         self.__resume      = resume
-        self.__text        = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
-        self.__text        = ' '.join(self.__text.split())
+        self.__text_raw    = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
+        self.__text        = ' '.join(self.__text_raw.split())
         self.__nlp         = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
         self.__get_basic_details()
@@ -36,11 +36,12 @@ class ResumeParser(object):
         skills     = utils.extract_skills(self.__nlp, self.__noun_chunks)
         edu        = utils.extract_education([sent.string.strip() for sent in self.__nlp.sents])
         experience = utils.extract_experience(self.__text)
+        entities   = utils.extract_entity_sections(self.__text_raw)
         self.__details['name'] = name
         self.__details['email'] = email
         self.__details['mobile_number'] = mobile
         self.__details['skills'] = skills
-        self.__details['education'] = edu
+        self.__details['education'] = entities['education']
         self.__details['experience'] = experience
         return
 

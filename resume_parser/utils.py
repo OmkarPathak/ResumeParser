@@ -68,6 +68,43 @@ def extract_text(file_path, extension):
         text = extract_text_from_doc(file_path)
     return text
 
+def extract_entity_sections(text):
+    '''
+    Helper function to extract all the raw text from sections of resume
+
+    :param text: Raw text of resume
+    :return: dictionary of entities
+    '''
+    text_split = [i.strip() for i in text.split('\n')]
+    # sections_in_resume = [i for i in text_split if i.lower() in sections]
+    entities = {}
+    key = False
+    for phrase in text_split:
+        if phrase.lower() in cs.RESUME_SECTIONS:
+            entities[phrase.lower()] = []
+            key = phrase.lower()
+        elif key and phrase.strip():
+            entities[key].append(phrase)
+    
+    # entity_key = False
+    # for entity in entities.keys():
+    #     sub_entities = {}
+    #     for entry in entities[entity]:
+    #         if u'\u2022' not in entry:
+    #             sub_entities[entry] = []
+    #             entity_key = entry
+    #         elif entity_key:
+    #             sub_entities[entity_key].append(entry)
+    #     entities[entity] = sub_entities
+
+    # pprint.pprint(entities)
+
+    # make entities that are not found None
+    # for entity in cs.RESUME_SECTIONS:
+    #     if entity not in entities.keys():
+    #         entities[entity] = None 
+    return entities
+
 def extract_email(text):
     '''
     Helper function to extract email id from text

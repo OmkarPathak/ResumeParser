@@ -20,3 +20,5 @@ MONTH             = r'(' + MONTHS_SHORT + r'|' + MONTHS_LONG + r')'
 YEAR              = r'(((20|19)(\d{2})))'
 
 STOPWORDS         = set(stopwords.words('english'))
+
+RESUME_SECTIONS = ['experience', 'education', 'projects', 'skills', 'professional experience']
