@@ -10,7 +10,6 @@ Django==2.1.5
 django-crispy-forms==1.7.2
 docx2txt==0.6
 EbookLib==0.15
-en-core-web-sm==2.0.0
 idna==2.7
 kiwisolver==1.0.1
 lxml==4.2.5
