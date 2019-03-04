@@ -21,4 +21,13 @@ YEAR              = r'(((20|19)(\d{2})))'
 
 STOPWORDS         = set(stopwords.words('english'))
 
-RESUME_SECTIONS = ['experience', 'education', 'projects', 'skills', 'professional experience']
+RESUME_SECTIONS = [
+                    'accomplishments',
+                    'experience',
+                    'education',
+                    'interests',
+                    'projects',
+                    'professional experience',
+                    'publications',
+                    'skills',
+                ]

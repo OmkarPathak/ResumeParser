@@ -41,7 +41,8 @@ class ResumeParser(object):
         self.__details['email'] = email
         self.__details['mobile_number'] = mobile
         self.__details['skills'] = skills
-        self.__details['education'] = entities['education']
+        # self.__details['education'] = entities['education']
+        self.__details['education'] = edu
         self.__details['experience'] = experience
         return
 
