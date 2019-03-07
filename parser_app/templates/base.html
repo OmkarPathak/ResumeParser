@@ -69,6 +69,7 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Mobile Number</th>
+                <th>Competencies</th>
                 <th>Education</th>
                 <th>Skills</th>
                 <th>Experience</th>
@@ -82,6 +83,27 @@
                   <td>{{resume.name}}</td>
                   <td>{{resume.email}}</td>
                   <td>{{resume.mobile_number}}</td>
+                  <td>
+                    {% with t=competencies|index:forloop.counter0 %}
+                    <b>Teamwork</b>({{t.teamwork|length}}): {{t.teamwork}}
+                    {% endwith %}
+                    <br><br>
+                    {% with t=competencies|index:forloop.counter0 %}
+                    <b>Analytical</b>({{t.analytical|length}}): {{t.analytical}}
+                    {% endwith %}
+                    <br><br>
+                    {% with t=competencies|index:forloop.counter0 %}
+                    <b>Result Driven</b>({{t.result_driven|length}}): {{t.result_driven}}
+                    {% endwith %}
+                    <br><br>
+                    {% with t=competencies|index:forloop.counter0 %}
+                    <b>Leadership</b>({{t.leadership|length}}): {{t.leadership}}
+                    {% endwith %}
+                    <br><br>
+                    {% with t=competencies|index:forloop.counter0 %}
+                    <b>Communication</b>({{t.communication|length}}): {{t.communication}}
+                    {% endwith %}
+                  </td>
                   <td>{{resume.education}}</td>
                   <td>{{resume.skills}}</td>
                   <td>{{resume.experience}}</td>

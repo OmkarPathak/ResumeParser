@@ -18,6 +18,7 @@ class ResumeParser(object):
             'skills'       : None,
             'education'    : None,
             'experience'   : None,
+            'competencies' : None
         }
         self.__resume      = resume
         self.__text_raw    = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
@@ -44,6 +45,10 @@ class ResumeParser(object):
         # self.__details['education'] = entities['education']
         self.__details['education'] = edu
         self.__details['experience'] = experience
+        try:
+            self.__details['competencies'] = utils.extract_competencies(self.__text_raw, entities['experience'])
+        except KeyError:
+            self.__details['competencies'] = []
         return
 
 def resume_result_wrapper(resume):

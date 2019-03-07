@@ -13,6 +13,7 @@ def homepage(request):
         file_form = UploadResumeModelForm(request.POST, request.FILES)
         files = request.FILES.getlist('resume')
         resumes_data = []
+        competencies = []
         if file_form.is_valid():
             for file in files:
                 try:
@@ -31,13 +32,25 @@ def homepage(request):
                     resume.education     = get_education(data.get('education'))
                     resume.skills        = ', '.join(data.get('skills'))
                     resume.experience    = ', '.join(data.get('experience'))
+                    competencies.append(data.get('competencies'))
                     resume.save()
                 except IntegrityError:
+                    competencies = []
                     messages.warning(request, 'Duplicate resume found:', file.name)
                     return redirect('homepage')
             resumes = Resume.objects.all()
             messages.success(request, 'Resumes uploaded!')
-            return render(request, 'base.html', {'resumes': resumes})
+            if competencies:
+                context = {
+                    'resumes': resumes,
+                    'competencies': competencies
+                    }
+            else:
+                context = {
+                    'resumes': resumes,
+                    'competencies': []
+                    }
+            return render(request, 'base.html', context)
     else:
         form = UploadResumeModelForm()
     return render(request, 'base.html', {'form': form})

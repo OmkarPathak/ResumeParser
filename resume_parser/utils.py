@@ -80,9 +80,17 @@ def extract_entity_sections(text):
     entities = {}
     key = False
     for phrase in text_split:
-        if phrase.lower() in cs.RESUME_SECTIONS:
-            entities[phrase.lower()] = []
-            key = phrase.lower()
+        if len(phrase) == 1:
+            p_key = phrase
+        else:
+            p_key = set(phrase.lower().split()) & set(cs.RESUME_SECTIONS)
+        try:
+            p_key = list(p_key)[0]
+        except IndexError:
+            pass
+        if p_key in cs.RESUME_SECTIONS:
+            entities[p_key] = []
+            key = p_key
         elif key and phrase.strip():
             entities[key].append(phrase)
     
@@ -238,3 +246,18 @@ def extract_experience(resume_text):
     # Search the word 'experience' in the chunk and then print out the text after it
     x = [x[x.lower().index('experience') + 10:] for i, x in enumerate(test) if x and 'experience' in x.lower()]
     return x
+
+def extract_competencies(text, experience_list):
+    experience_text = ' '.join(experience_list)
+
+    competency_dict = {}
+
+    for competency in cs.COMPETENCIES.keys():
+        for item in cs.COMPETENCIES[competency]:
+            if item in experience_text:
+                if competency not in competency_dict.keys():
+                    competency_dict[competency] = [item]
+                else:
+                    competency_dict[competency].append(item)
+    
+    return competency_dict
