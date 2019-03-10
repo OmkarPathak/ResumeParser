@@ -12,13 +12,14 @@ class ResumeParser(object):
         nlp = spacy.load('en_core_web_sm')
         self.__matcher = Matcher(nlp.vocab)
         self.__details = {
-            'name'         : None,
-            'email'        : None,
-            'mobile_number': None,
-            'skills'       : None,
-            'education'    : None,
-            'experience'   : None,
-            'competencies' : None
+            'name'              : None,
+            'email'             : None,
+            'mobile_number'     : None,
+            'skills'            : None,
+            'education'         : None,
+            'experience'        : None,
+            'competencies'      : None,
+            'measurable_results': None
         }
         self.__resume      = resume
         self.__text_raw    = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
@@ -47,8 +48,10 @@ class ResumeParser(object):
         self.__details['experience'] = experience
         try:
             self.__details['competencies'] = utils.extract_competencies(self.__text_raw, entities['experience'])
+            self.__details['measurable_results'] = utils.extract_measurable_results(self.__text_raw, entities['experience'])
         except KeyError:
             self.__details['competencies'] = []
+            self.__details['measurable_results'] = []
         return
 
 def resume_result_wrapper(resume):

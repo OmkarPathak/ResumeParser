@@ -248,8 +248,13 @@ def extract_experience(resume_text):
     return x
 
 def extract_competencies(text, experience_list):
-    experience_text = ' '.join(experience_list)
+    '''
+    Helper function to extract competencies from resume text
 
+    :param resume_text: Plain resume text
+    :return: dictionary of competencies
+    '''
+    experience_text = ' '.join(experience_list)
     competency_dict = {}
 
     for competency in cs.COMPETENCIES.keys():
@@ -261,3 +266,25 @@ def extract_competencies(text, experience_list):
                     competency_dict[competency].append(item)
     
     return competency_dict
+
+def extract_measurable_results(text, experience_list):
+    '''
+    Helper function to extract measurable results from resume text
+
+    :param resume_text: Plain resume text
+    :return: dictionary of measurable results
+    '''
+
+    # we scan for measurable results only in first half of each sentence
+    experience_text = ' '.join([text[:len(text) // 2 - 1] for text in experience_list])
+    mr_dict = {}
+
+    for mr in cs.MEASURABLE_RESULTS.keys():
+        for item in cs.MEASURABLE_RESULTS[mr]:
+            if item in experience_text:
+                if mr not in mr_dict.keys():
+                    mr_dict[mr] = [item]
+                else:
+                    mr_dict[mr].append(item)
+    
+    return mr_dict
