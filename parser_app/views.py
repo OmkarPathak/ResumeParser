@@ -14,6 +14,7 @@ def homepage(request):
         files = request.FILES.getlist('resume')
         resumes_data = []
         competencies = []
+        measurable_results = []
         if file_form.is_valid():
             for file in files:
                 try:
@@ -33,9 +34,9 @@ def homepage(request):
                     resume.skills        = ', '.join(data.get('skills'))
                     resume.experience    = ', '.join(data.get('experience'))
                     competencies.append(data.get('competencies'))
+                    measurable_results.append(data.get('measurable_results'))
                     resume.save()
                 except IntegrityError:
-                    competencies = []
                     messages.warning(request, 'Duplicate resume found:', file.name)
                     return redirect('homepage')
             resumes = Resume.objects.all()
@@ -43,12 +44,14 @@ def homepage(request):
             if competencies:
                 context = {
                     'resumes': resumes,
-                    'competencies': competencies
+                    'competencies': competencies,
+                    'measurable_results': measurable_results,
                     }
             else:
                 context = {
                     'resumes': resumes,
-                    'competencies': []
+                    'competencies': [],
+                    'measurable_results': []
                     }
             return render(request, 'base.html', context)
     else:
