@@ -94,7 +94,7 @@
                     {% endwith %}
                     <br><br>
                     {% with t=competencies|index:forloop.counter0 %}
-                    <b>Weak Words </b>({{t.weak_words|length}}): {{t.weak_words}}
+                    <b>Result Driven </b>({{t.result_driven|length}}): {{t.result_driven}}
                     {% endwith %}
                     <br><br>
                     {% with t=competencies|index:forloop.counter0 %}
@@ -116,7 +116,7 @@
                     {% endwith %}
                     <br><br>
                     {% with t=measurable_results|index:forloop.counter0 %}
-                    <b>Result Driven </b>({{t.result_driven|length}}): {{t.result_driven}}
+                    <b>Weak Words </b>({{t.weak_words|length}}): {{t.weak_words}}
                     {% endwith %}
                   </td>
                   <td>{{resume.education}}</td>
