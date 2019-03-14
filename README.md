@@ -3,12 +3,11 @@ A simple resume parser used for extracting information from resumes
 
 # Installation
 
-- For extracting text from various documents we use [pdfminer](https://github.com/euske/pdfminer) and [doc2text](https://github.com/ankushshah89/python-docx2txt) modules. Install them using:
+- For extracting text from various documents we use [pdfminer](https://github.com/euske/pdfminer) and [docx2text](https://github.com/ankushshah89/python-docx2txt) modules. Install them using:
 
 ```bash
 pip install pdfminer        # python 2
 pip install pdfminer.six    # python 3
-pip install doc2text
 pip install docx2txt
 ```
 
