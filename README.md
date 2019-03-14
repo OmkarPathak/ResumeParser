@@ -27,6 +27,9 @@ python -m nltk nltk.download('words')
 
 ```bash
 pip install -r requirements.txt
+
+# and then execute
+python pre_requisites.py
 ```
 
 - Modify `skills.csv` as per your requirements
