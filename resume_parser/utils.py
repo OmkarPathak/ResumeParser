@@ -259,7 +259,7 @@ def extract_competencies(text, experience_list):
 
     for competency in cs.COMPETENCIES.keys():
         for item in cs.COMPETENCIES[competency]:
-            if item in experience_text:
+            if string_found(item, experience_text):
                 if competency not in competency_dict.keys():
                     competency_dict[competency] = [item]
                 else:
@@ -281,10 +281,15 @@ def extract_measurable_results(text, experience_list):
 
     for mr in cs.MEASURABLE_RESULTS.keys():
         for item in cs.MEASURABLE_RESULTS[mr]:
-            if item in experience_text:
+            if string_found(item, experience_text):
                 if mr not in mr_dict.keys():
                     mr_dict[mr] = [item]
                 else:
                     mr_dict[mr].append(item)
     
     return mr_dict
+
+def string_found(string1, string2):
+    if re.search(r"\b" + re.escape(string1) + r"\b", string2):
+        return True
+    return False
