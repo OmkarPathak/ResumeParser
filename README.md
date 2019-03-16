@@ -40,6 +40,16 @@ python resume_parser/pre_requisites.py
 
 - Run `resume_parser/resume_parser/resume_parser.py`
 
+# Docker Installation
+
+- For running the whole app in docker just run the following command fromm the root of the project
+
+```bash
+docker-compose up -d build
+```
+
+- Once all the installations are done, visit `0.0.0.0` in your broswer to use the app
+
 # CLI
 
 For running the resume extractor you can also use the `cli` provided
