@@ -1,12 +1,12 @@
 argcomplete==1.8.2
 beautifulsoup4==4.5.3
 certifi==2018.10.15
-chardet==2.3.0
+chardet==3.0.2
 cycler==0.10.0
 cymem==2.0.2
 cytoolz==0.9.0.1
 dill==0.2.8.2
-Django==2.1.5
+Django==2.1.6
 django-crispy-forms==1.7.2
 docx2txt==0.6
 EbookLib==0.15
