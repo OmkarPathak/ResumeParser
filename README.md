@@ -26,19 +26,19 @@ python -m nltk nltk.download('words')
 - For extracting other supporting dependencies, execute:
 
 ```bash
-pip install -r requirements.txt
+pip install -r resume_parser/requirements.txt
 
 # and then execute
-python pre_requisites.py
+python resume_parser/pre_requisites.py
 ```
 
-- Modify `skills.csv` as per your requirements
+- Modify `resume_parser/resume_parser/skills.csv` as per your requirements
 
-- Modify `Education Degrees` as per you requirements in [constants.py](https://github.com/OmkarPathak/ResumeParser/blob/master/constants.py)
+- Modify `Education Degrees` as per you requirements in [resume_parser/resume_parser/constants.py](https://github.com/OmkarPathak/ResumeParser/blob/master/constants.py)
 
-- Place all the resumes that you want to parse in `resumes/` directory
+- Place all the resumes that you want to parse in `resume_parser/resumes/` directory
 
-- Run `resume_parser.py`
+- Run `resume_parser/resume_parser/resume_parser.py`
 
 # CLI
 
@@ -56,13 +56,13 @@ optional arguments:
 For extracting data from a single resume file, use
 
 ```bash
-python cli.py -f <resume_file_path>
+python resume_parser/cli.py -f <resume_file_path>
 ```
 
 For extracting data from several resumes, place them in a directory and then execute
 
 ```bash
-python cli.py -d <resume_directory_path>
+python resume_parser/cli.py -d <resume_directory_path>
 ```
 
 # GUI
@@ -72,9 +72,9 @@ python cli.py -d <resume_directory_path>
 - For running GUI execute:
 
 ```bash
-python manage.py makemigrations
-python manage.py migrate
-python manage.py runserver
+python resume_parser/manage.py makemigrations
+python resume_parser/manage.py migrate
+python resume_parser/manage.py runserver
 ```
 
 - Visit `127.0.0.1` to view the GUI

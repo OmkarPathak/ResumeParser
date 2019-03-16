@@ -25,7 +25,7 @@ SECRET_KEY = 'fa^pq*c1#+6_(6jgxxr&2o-9bt$5u_f=aldx0yceaed3#c1b^b'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -119,11 +119,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/staticfiles/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Bootstrap Crispy-Forms config
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # for uploading resume files
-MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'mediafiles')
+MEDIA_URL = '/mediafiles/'

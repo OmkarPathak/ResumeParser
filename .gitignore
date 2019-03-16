@@ -105,4 +105,6 @@ venv.bak/
 
 # media files
 media/
+mediafiles/
+staticfiles/
 resumes/

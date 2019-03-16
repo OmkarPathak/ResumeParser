@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  web:
+    build: ./resume_parser
+    command: gunicorn resume_parser.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./resume_parser/:/usr/src/app/
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/mediafiles
+    # ports:
+    #   - 8000:8000
+    expose:
+      - "8000"
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/mediafiles
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+
+volumes:
+  static_volume:
+  media_volume:
+
+    # https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
+    # https://docs.nginx.com/nginx/admin-guide/web-server/app-gateway-uwsgi-django/
