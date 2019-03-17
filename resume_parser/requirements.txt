@@ -6,10 +6,11 @@ cycler==0.10.0
 cymem==2.0.2
 cytoolz==0.9.0.1
 dill==0.2.8.2
-Django==2.1.6
+Django==2.1.5
 django-crispy-forms==1.7.2
 docx2txt==0.6
 EbookLib==0.15
+gunicorn==19.9.0
 idna==2.7
 kiwisolver==1.0.1
 lxml==4.2.5
@@ -26,7 +27,9 @@ plac==0.9.6
 preshed==2.0.1
 pycryptodome==3.7.0
 pyparsing==2.3.0
+PyMuPDF==1.14.10
 PyPDF2==1.26.0
+pyspellchecker==0.4.0
 python-dateutil==2.7.5
 python-pptx==0.6.5
 pytz==2018.7
@@ -47,4 +50,3 @@ urllib3==1.24.1
 wrapt==1.10.11
 xlrd==1.0.0
 XlsxWriter==1.1.2
-gunicorn

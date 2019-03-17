@@ -7,6 +7,7 @@ import nltk
 import spacy
 import pandas as pd
 import docx2txt
+import subprocess
 from . import constants as cs
 from spacy.matcher import Matcher
 from pdfminer.converter import TextConverter
@@ -15,7 +16,8 @@ from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import stopwords 
+from nltk.corpus import stopwords
+from spellchecker import SpellChecker
 
 def extract_text_from_pdf(pdf_path):
     '''
@@ -41,6 +43,18 @@ def extract_text_from_pdf(pdf_path):
             # close open handles
             converter.close()
             fake_file_handle.close()
+
+def get_number_of_pages(file_name):
+    if file_name.endswith('.pdf'):
+        count = 0
+        with open(file_name, 'rb') as fh:
+            for page in PDFPage.get_pages(fh, 
+                                        caching=True,
+                                        check_extractable=True):
+                count += 1
+        return count
+    else:
+        return None
 
 def extract_text_from_doc(doc_path):
     '''
@@ -68,9 +82,10 @@ def extract_text(file_path, extension):
         text = extract_text_from_doc(file_path)
     return text
 
-def extract_entity_sections(text):
+def extract_entity_sections_grad(text):
     '''
-    Helper function to extract all the raw text from sections of resume
+    Helper function to extract all the raw text from sections of resume specifically for 
+    graduates and undergraduates
 
     :param text: Raw text of resume
     :return: dictionary of entities
@@ -83,12 +98,12 @@ def extract_entity_sections(text):
         if len(phrase) == 1:
             p_key = phrase
         else:
-            p_key = set(phrase.lower().split()) & set(cs.RESUME_SECTIONS)
+            p_key = set(phrase.lower().split()) & set(cs.RESUME_SECTIONS_GRAD)
         try:
             p_key = list(p_key)[0]
         except IndexError:
             pass
-        if p_key in cs.RESUME_SECTIONS:
+        if p_key in cs.RESUME_SECTIONS_GRAD:
             entities[p_key] = []
             key = p_key
         elif key and phrase.strip():
@@ -111,6 +126,33 @@ def extract_entity_sections(text):
     # for entity in cs.RESUME_SECTIONS:
     #     if entity not in entities.keys():
     #         entities[entity] = None 
+    return entities
+
+def extract_entity_sections_professional(text):
+    '''
+    Helper function to extract all the raw text from sections of resume specifically for 
+    professionals
+
+    :param text: Raw text of resume
+    :return: dictionary of entities
+    '''
+    text_split = [i.strip() for i in text.split('\n')]
+    entities = {}
+    key = False
+    for phrase in text_split:
+        if len(phrase) == 1:
+            p_key = phrase
+        else:
+            p_key = set(phrase.lower().split()) & set(cs.RESUME_SECTIONS_PROFESSIONAL)
+        try:
+            p_key = list(p_key)[0]
+        except IndexError:
+            pass
+        if p_key in cs.RESUME_SECTIONS_PROFESSIONAL:
+            entities[p_key] = []
+            key = p_key
+        elif key and phrase.strip():
+            entities[key].append(phrase)
     return entities
 
 def extract_email(text):
@@ -293,3 +335,13 @@ def string_found(string1, string2):
     if re.search(r"\b" + re.escape(string1) + r"\b", string2):
         return True
     return False
+
+def spell_check(text):
+    text = re.sub('\W+',' ', text)
+    text_split = text.split()
+    spell = SpellChecker()
+
+    # find those words that may be misspelled
+    misspelled = spell.unknown(text_split)
+    for word in misspelled:
+        print(word + ': ' + spell.correction(word))

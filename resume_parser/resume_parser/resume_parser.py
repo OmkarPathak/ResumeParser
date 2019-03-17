@@ -19,7 +19,8 @@ class ResumeParser(object):
             'education'         : None,
             'experience'        : None,
             'competencies'      : None,
-            'measurable_results': None
+            'measurable_results': None,
+            'no_of_pages'       : None
         }
         self.__resume      = resume
         self.__text_raw    = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
@@ -38,7 +39,7 @@ class ResumeParser(object):
         skills     = utils.extract_skills(self.__nlp, self.__noun_chunks)
         edu        = utils.extract_education([sent.string.strip() for sent in self.__nlp.sents])
         experience = utils.extract_experience(self.__text)
-        entities   = utils.extract_entity_sections(self.__text_raw)
+        entities   = utils.extract_entity_sections_grad(self.__text_raw)
         self.__details['name'] = name
         self.__details['email'] = email
         self.__details['mobile_number'] = mobile
@@ -52,6 +53,7 @@ class ResumeParser(object):
         except KeyError:
             self.__details['competencies'] = []
             self.__details['measurable_results'] = []
+        self.__details['no_of_pages'] = utils.get_number_of_pages(self.__resume)
         return
 
 def resume_result_wrapper(resume):
