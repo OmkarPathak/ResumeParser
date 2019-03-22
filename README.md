@@ -42,7 +42,7 @@ python resume_parser/pre_requisites.py
 
 # Docker Installation
 
-- For running the whole app in docker just run the following command fromm the root of the project
+- For running the whole app in docker just run the following command from the root of the project
 
 ```bash
 docker-compose up -d build
@@ -98,40 +98,50 @@ python resume_parser/manage.py runserver
 The module would return a list of dictionary objects with result as follows:
 
 ```
-[
-    {
-        'education': [('BE', '2014')],
-        'email': 'omkarpathak27@gmail.com',
-        'mobile_number': '8087996634',
-        'name': 'Omkar Pathak',
-        'skills': [
-            'Flask',
-            'Django',
-            'Mysql',
-            'C',
-            'Css',
-            'Html',
-            'Js',
-            'Machine learning',
-            'C++',
-            'Algorithms',
-            'Github',
-            'Php',
-            'Python',
-            'Opencv'
-        ]
-    }
-]
+[ 'education': [('BE', '2014')],
+  'email': 'omkarpathak27@gmail.com',
+  'experience': [' Schlumberger DATA ENGINEER Pune'],
+  'mobile_number': '8087996634',
+  'name': 'Omkar Pathak',
+  'no_of_pages': 3,
+  'skills': ['Python',
+             'C',
+             'Technical',
+             'Linux',
+             'Machine learning',
+             'System',
+             'Html',
+             'C++',
+             'Security',
+             'Testing',
+             'Content',
+             'Apis',
+             'Engineering',
+             'Payments',
+             'Django',
+             'Excel',
+             'Admissions',
+             'Mysql',
+             'Windows',
+             'Automation',
+             'Opencv',
+             'Website',
+             'Css',
+             'Js',
+             'Algorithms',
+             'Flask',
+             'Programming',
+             'Writing',
+             'Training',
+             'Php',
+             'Reports',
+             'Photography',
+             'Open source',
+             'Github',
+             'Analytics',
+             'Api'],
+  'total_experience': 0.58}]
 ```
-
-# To DO
-
-- [x] Extracting Experience
-- [ ] Extracting Projects
-- [ ] Extracting hobbies
-- [ ] Extracting universities
-- [ ] Extracting month of passing
-- [ ] Extracting Awards/ Achievements/ Recognition
 
 # References that helped me get here
 
@@ -140,3 +150,13 @@ The module would return a list of dictionary objects with result as follows:
 - [https://www.analyticsvidhya.com/blog/2017/04/natural-language-processing-made-easy-using-spacy-%E2%80%8Bin-python/](https://www.analyticsvidhya.com/blog/2017/04/natural-language-processing-made-easy-using-spacy-%E2%80%8Bin-python/)
 
 - [https://medium.com/@divalicious.priya/information-extraction-from-cv-acec216c3f48](https://medium.com/@divalicious.priya/information-extraction-from-cv-acec216c3f48)
+
+### Built with ♥ and :coffee: by [`Omkar Pathak`](http://www.omkarpathak.in/)
+
+# Donation
+
+If you have found my softwares to be of any use to you, do consider helping me pay my internet bills. This would encourage me to create many such softwares :)
+
+| PayPal | <a href="https://paypal.me/omkarpathak27" target="_blank"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg" alt="Donate via PayPal!" title="Donate via PayPal!" /></a> |
+|:-------------------------------------------:|:-------------------------------------------------------------:|
+| ₹ (INR)  | <a href="https://www.instamojo.com/@omkarpathak/" target="_blank"><img src="https://www.soldermall.com/images/pic-online-payment.jpg" alt="Donate via Instamojo" title="Donate via instamojo" /></a> |
