@@ -19,7 +19,7 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-from spellchecker import SpellChecker
+# from spellchecker import SpellChecker
 
 def extract_text_from_pdf(pdf_path):
     '''
@@ -373,12 +373,12 @@ def string_found(string1, string2):
         return True
     return False
 
-def spell_check(text):
-    text = re.sub('\W+',' ', text)
-    text_split = text.split()
-    spell = SpellChecker()
+# def spell_check(text):
+#     text = re.sub('\W+',' ', text)
+#     text_split = text.split()
+#     spell = SpellChecker()
 
-    # find those words that may be misspelled
-    misspelled = spell.unknown(text_split)
-    for word in misspelled:
-        print(word + ': ' + spell.correction(word))
+#     # find those words that may be misspelled
+#     misspelled = spell.unknown(text_split)
+#     for word in misspelled:
+#         print(word + ': ' + spell.correction(word))
