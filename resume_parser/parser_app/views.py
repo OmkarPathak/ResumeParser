@@ -46,6 +46,8 @@ def homepage(request):
                     'resumes': resumes,
                     'competencies': competencies,
                     'measurable_results': measurable_results,
+                    'no_of_pages': data.get('no_of_pages'),
+                    'total_experience': data.get('total_experience'),
                     }
             else:
                 context = {

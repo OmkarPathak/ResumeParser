@@ -98,7 +98,7 @@ python resume_parser/manage.py runserver
 The module would return a list of dictionary objects with result as follows:
 
 ```
-[ 'education': [('BE', '2014')],
+[{'education': [('BE', '2014')],
   'email': 'omkarpathak27@gmail.com',
   'experience': [' Schlumberger DATA ENGINEER Pune'],
   'mobile_number': '8087996634',

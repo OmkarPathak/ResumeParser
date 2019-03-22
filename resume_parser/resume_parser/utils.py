@@ -139,7 +139,7 @@ def get_total_experience(experience_list):
     '''
     exp_ = []
     for line in experience_list:
-        experience = re.search('(?P<fmonth>\w+\s\d+)\s+\D+\s+(?P<smonth>\D+\s\d+)', line, re.I)
+        experience = re.search('(?P<fmonth>\w+.\d+)\s*[\D|to]\s*(?P<smonth>\w+.\d+)', line, re.I)
         if experience:
             exp_.append(experience.groups())
     total_experience_in_months = sum([get_number_of_months_from_dates(i[0], i[1]) for i in exp_])
