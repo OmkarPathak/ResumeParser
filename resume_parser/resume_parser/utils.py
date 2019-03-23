@@ -127,7 +127,7 @@ def extract_entity_sections_grad(text):
     # make entities that are not found None
     # for entity in cs.RESUME_SECTIONS:
     #     if entity not in entities.keys():
-    #         entities[entity] = None 
+    #         entities[entity] = None
     return entities
 
 def get_total_experience(experience_list):
@@ -153,16 +153,22 @@ def get_number_of_months_from_dates(date1, date2):
     :param date2: Ending date
     :return: months of experience from date1 to date2
     '''
-    if len(date1.split()[0]) > 3:
-        date1 = date1.split()
-        date1 = date1[0][:3] + ' ' + date1[1] 
-    if len(date2.split()[0]) > 3:
-        date2 = date2.split()
-        date2 = date2[0][:3] + ' ' + date2[1] 
-    date1 = datetime.strptime(str(date1), '%b %Y')
-    date2 = datetime.strptime(str(date2), '%b %Y')
-    months_of_experience = relativedelta.relativedelta(date2, date1)
-    months_of_experience = months_of_experience.years * 12 + months_of_experience.months
+    try:
+        if len(date1.split()[0]) > 3:
+            date1 = date1.split()
+            date1 = date1[0][:3] + ' ' + date1[1] 
+        if len(date2.split()[0]) > 3:
+            date2 = date2.split()
+            date2 = date2[0][:3] + ' ' + date2[1]
+    except IndexError:
+        return 0
+    try: 
+        date1 = datetime.strptime(str(date1), '%b %Y')
+        date2 = datetime.strptime(str(date2), '%b %Y')
+        months_of_experience = relativedelta.relativedelta(date2, date1)
+        months_of_experience = months_of_experience.years * 12 + months_of_experience.months
+    except ValueError:
+        return 0
     return months_of_experience
 
 def extract_entity_sections_professional(text):

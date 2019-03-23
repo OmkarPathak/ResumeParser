@@ -47,15 +47,18 @@ class ResumeParser(object):
         self.__details['skills'] = skills
         # self.__details['education'] = entities['education']
         self.__details['education'] = edu
-        self.__details['experience'] = experience
         try:
-            self.__details['competencies'] = utils.extract_competencies(self.__text_raw, entities['experience'])
-            self.__details['measurable_results'] = utils.extract_measurable_results(self.__text_raw, entities['experience'])
-            self.__details['total_experience'] = round(utils.get_total_experience(entities['experience']) / 12, 2)
+            self.__details['experience'] = entities['experience']
+            try:
+                self.__details['competencies'] = utils.extract_competencies(self.__text_raw, entities['experience'])
+                self.__details['measurable_results'] = utils.extract_measurable_results(self.__text_raw, entities['experience'])
+                self.__details['total_experience'] = round(utils.get_total_experience(entities['experience']) / 12, 2)
+            except KeyError:
+                self.__details['competencies'] = []
+                self.__details['measurable_results'] = []
+                self.__details['total_experience'] = 0
         except KeyError:
-            self.__details['competencies'] = []
-            self.__details['measurable_results'] = []
-            self.__details['total_experience'] = 0
+            pass
         self.__details['no_of_pages'] = utils.get_number_of_pages(self.__resume)
         return
 
