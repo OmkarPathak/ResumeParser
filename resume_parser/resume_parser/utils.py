@@ -139,10 +139,10 @@ def get_total_experience(experience_list):
     '''
     exp_ = []
     for line in experience_list:
-        experience = re.search('(?P<fmonth>\w+.\d+)\s*[\D|to]\s*(?P<smonth>\w+.\d+)', line, re.I)
+        experience = re.search('(?P<fmonth>\w+.\d+)\s*(\D|to)\s*(?P<smonth>\w+.\d+|present)', line, re.I)
         if experience:
             exp_.append(experience.groups())
-    total_experience_in_months = sum([get_number_of_months_from_dates(i[0], i[1]) for i in exp_])
+    total_experience_in_months = sum([get_number_of_months_from_dates(i[0], i[2]) for i in exp_])
     return total_experience_in_months
 
 def get_number_of_months_from_dates(date1, date2):
@@ -153,6 +153,8 @@ def get_number_of_months_from_dates(date1, date2):
     :param date2: Ending date
     :return: months of experience from date1 to date2
     '''
+    if date2.lower() == 'present':
+        date2 = datetime.now().strftime('%b %Y')
     try:
         if len(date1.split()[0]) > 3:
             date1 = date1.split()

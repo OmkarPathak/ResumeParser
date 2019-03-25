@@ -31,7 +31,8 @@ RESUME_SECTIONS_PROFESSIONAL = [
                     'certifications',
                     'objective',
                     'career objective',
-                    'summary'
+                    'summary',
+                    'leadership'
                 ]
 
 RESUME_SECTIONS_GRAD = [
@@ -46,7 +47,8 @@ RESUME_SECTIONS_GRAD = [
                     'certifications',
                     'objective',
                     'career objective',
-                    'summary'
+                    'summary',
+                    'leadership'
                 ]
 
 COMPETENCIES = {
