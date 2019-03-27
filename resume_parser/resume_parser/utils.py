@@ -227,7 +227,7 @@ def extract_name(nlp_text, matcher):
     
     matches = matcher(nlp_text)
     
-    for match_id, start, end in matches:
+    for _, start, end in matches:
         span = nlp_text[start:end]
         return span.text
 
@@ -352,6 +352,9 @@ def extract_competencies(text, experience_list):
                 else:
                     competency_dict[competency].append(item)
     
+    for key in competency_dict.keys():
+        for item in competency_dict[key]:
+            print(re.findall(r'([^.]*' + item + '[^.]*)', experience_text))
     return competency_dict
 
 def extract_measurable_results(text, experience_list):

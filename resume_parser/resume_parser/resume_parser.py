@@ -39,13 +39,11 @@ class ResumeParser(object):
         mobile     = utils.extract_mobile_number(self.__text)
         skills     = utils.extract_skills(self.__nlp, self.__noun_chunks)
         edu        = utils.extract_education([sent.string.strip() for sent in self.__nlp.sents])
-        experience = utils.extract_experience(self.__text)
         entities   = utils.extract_entity_sections_grad(self.__text_raw)
         self.__details['name'] = name
         self.__details['email'] = email
         self.__details['mobile_number'] = mobile
         self.__details['skills'] = skills
-        # self.__details['education'] = entities['education']
         self.__details['education'] = edu
         try:
             self.__details['experience'] = entities['experience']
