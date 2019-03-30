@@ -345,16 +345,25 @@ def extract_competencies(text, experience_list):
     competency_dict = {}
 
     for competency in cs.COMPETENCIES.keys():
+        matches = {}
         for item in cs.COMPETENCIES[competency]:
             if string_found(item, experience_text):
                 if competency not in competency_dict.keys():
-                    competency_dict[competency] = [item]
+                    match = re.search(r'([^.|,]*' + item + '[^.|,]*)', experience_text)
+                    if item not in matches.keys():
+                        matches[item] = [match.group(0)]
+                    else:
+                        for i in match.groups():
+                            matches[item].append(i)    
+                    competency_dict[competency] = matches
                 else:
-                    competency_dict[competency].append(item)
-    
-    for key in competency_dict.keys():
-        for item in competency_dict[key]:
-            print(re.findall(r'([^.]*' + item + '[^.]*)', experience_text))
+                    match = re.search(r'([^.|,]*' + item + '[^.|,]*)', experience_text)
+                    if item not in matches.keys():
+                        matches[item] = [match.group(0)]
+                    else:
+                        for i in match.groups():
+                            matches[item].append(i)
+                    competency_dict[competency] = matches
     return competency_dict
 
 def extract_measurable_results(text, experience_list):
@@ -368,15 +377,30 @@ def extract_measurable_results(text, experience_list):
     # we scan for measurable results only in first half of each sentence
     experience_text = ' '.join([text[:len(text) // 2 - 1] for text in experience_list])
     mr_dict = {}
+    experience_text_for_matching = ' '.join(experience_list)
 
     for mr in cs.MEASURABLE_RESULTS.keys():
+        matches = {}
         for item in cs.MEASURABLE_RESULTS[mr]:
             if string_found(item, experience_text):
                 if mr not in mr_dict.keys():
-                    mr_dict[mr] = [item]
+                    match = re.search(r'([^.|,]*' + item + '[^.|,]*)', experience_text_for_matching)
+                    if item not in matches.keys():
+                        matches[item] = [match.group(0)]
+                    else:
+                        for i in match.groups():
+                            if i not in matches[item]:
+                                matches[item].append(i) 
+                    mr_dict[mr] = matches
                 else:
-                    mr_dict[mr].append(item)
-    
+                    match = re.search(r'([^.|,]*' + item + '[^.|,]*)', experience_text_for_matching)
+                    if item not in matches.keys():
+                        matches[item] = [match.group(0)]
+                    else:
+                        for i in match.groups():
+                            if i not in matches[item]:
+                                matches[item].append(i) 
+                    mr_dict[mr] = matches
     return mr_dict
 
 def string_found(string1, string2):
