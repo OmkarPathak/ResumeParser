@@ -11,7 +11,7 @@ class UserDetails(models.Model):
     user            = models.ForeignKey(User, on_delete=models.CASCADE)
     mobile_number   = models.IntegerField('Mobile Number', null=True, blank=True)
     skills          = models.CharField('Skills', max_length=1000, null=True, blank=True)
-    years_of_exp    = models.IntegerField('Experience', null=True, blank=True)
+    years_of_exp    = models.FloatField('Experience', null=True, blank=True)
     
 class Competencies(models.Model):
     user            = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -29,7 +29,7 @@ class Resume(models.Model):
 
 class ResumeDetails(models.Model):
     resume      = models.ForeignKey(Resume, on_delete=models.CASCADE)
-    page_nos    = models.IntegerField('Experience', null=True, blank=True)
+    page_nos    = models.IntegerField('Number of Pages', null=True, blank=True)
     
 class UploadResumeModelForm(forms.ModelForm):
     class Meta:
