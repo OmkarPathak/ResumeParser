@@ -6,7 +6,7 @@ cycler==0.10.0
 cymem==2.0.2
 cytoolz==0.9.0.1
 dill==0.2.8.2
-Django==2.1.5
+Django==2.2
 django-crispy-forms==1.7.2
 docx2txt==0.6
 EbookLib==0.15
@@ -46,7 +46,7 @@ thinc==6.12.0
 toolz==0.9.0
 tqdm==4.28.1
 ujson==1.35
-urllib3==1.24.1
+urllib3==1.24.2
 wrapt==1.10.11
 xlrd==1.0.0
 XlsxWriter==1.1.2
