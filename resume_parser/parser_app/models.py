@@ -13,24 +13,38 @@ class UserDetails(models.Model):
     skills          = models.CharField('Skills', max_length=1000, null=True, blank=True)
     years_of_exp    = models.FloatField('Experience', null=True, blank=True)
     
+    def __str__(self):
+        return self.user.get_full_name()
+
 class Competencies(models.Model):
     user            = models.ForeignKey(User, on_delete=models.CASCADE)
     competency      = models.CharField('Competency', max_length=1000, null=True, blank=True)
     
+    def __str__(self):
+        return self.user.get_full_name()
+
 class MeasurableResults(models.Model):
     user              = models.ForeignKey(User, on_delete=models.CASCADE)
     measurable_result = models.CharField('Competency', max_length=1000, null=True, blank=True)
     
+    def __str__(self):
+        return self.user.get_full_name()
 
 class Resume(models.Model):
     user              = models.ForeignKey(User, on_delete=models.CASCADE)
     resume            = models.FileField('Upload Resumes', upload_to='resumes/')
     last_uploaded_on  = models.DateTimeField('Uploaded On', auto_now_add=True)
 
+    def __str__(self):
+        return self.user.get_full_name()
+
 class ResumeDetails(models.Model):
     resume      = models.ForeignKey(Resume, on_delete=models.CASCADE)
     page_nos    = models.IntegerField('Number of Pages', null=True, blank=True)
     
+    def __str__(self):
+        return self.resume.user.get_full_name()
+
 class UploadResumeModelForm(forms.ModelForm):
     class Meta:
         model = Resume
