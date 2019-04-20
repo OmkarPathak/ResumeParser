@@ -10,7 +10,12 @@ import os
 
 def homepage(request):
     if request.method == 'POST':
-        Resume.objects.all().delete()
+        user = User.objects.get(id=1)
+        UserDetails.objects.filter(user=user).delete()
+        Competencies.objects.filter(user=user).delete()
+        MeasurableResults.objects.filter(user=user).delete()
+        Resume.objects.filter(user=user).delete()
+        ResumeDetails.objects.filter(resume__user=user).delete()
         file_form = UploadResumeModelForm(request.POST, request.FILES)
         files = request.FILES.getlist('resume')
         if file_form.is_valid():
