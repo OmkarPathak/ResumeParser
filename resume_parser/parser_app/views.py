@@ -5,7 +5,10 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
 from django.db import IntegrityError
-from django.http import HttpResponse, FileResponse, Http404
+from django.http import HttpResponse, FileResponse, Http404, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
+from .serializers import UserDetailsSerializer, CompetenciesSerializer, MeasurableResultsSerializer, ResumeSerializer, ResumeDetailsSerializer
 import os
 
 def homepage(request):
@@ -103,3 +106,35 @@ def get_education(education):
     for edu in education:
         education_string += edu[0] + ' (' + str(edu[1]) + '), '
     return education_string.rstrip(', ')
+
+@csrf_exempt
+def user_detail(request, pk):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        user = User.objects.get(pk=pk)
+        user_details = UserDetails.objects.get(user=user)
+        comp = Competencies.objects.filter(user=user)
+        mr = MeasurableResults.objects.filter(user=user)
+        resume = Resume.objects.get(user=user)
+        resume_details = ResumeDetails.objects.filter(resume=resume)
+    except UserDetails.DoesNotExist:
+        return HttpResponse(status=404)
+    except Competencies.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        comp_serializer = CompetenciesSerializer(comp, many=True)
+        mr_serializer = MeasurableResultsSerializer(mr, many=True)
+        resume_serializer = ResumeSerializer(resume)
+        resume_details_serializer = ResumeDetailsSerializer(resume_details, many=True)
+        user_details_serializer = UserDetailsSerializer(user_details)
+
+        data = {}
+        data['competencies'] = comp_serializer.data
+        data['measurable_results'] = mr_serializer.data
+        data['resume'] = resume_serializer.data
+        data['resume_details'] = resume_details_serializer.data
+        data['user_details'] = user_details_serializer.data
+        return JsonResponse(data)
