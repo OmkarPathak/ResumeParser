@@ -17,6 +17,7 @@ from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfinterp import PDFResourceManager
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFSyntaxError
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 # from spellchecker import SpellChecker
@@ -30,32 +31,38 @@ def extract_text_from_pdf(pdf_path):
     '''
     # https://www.blog.pythonlibrary.org/2018/05/03/exporting-data-from-pdfs-with-python/
     with open(pdf_path, 'rb') as fh:
-        for page in PDFPage.get_pages(fh, 
-                                      caching=True,
-                                      check_extractable=True):
-            resource_manager = PDFResourceManager()
-            fake_file_handle = io.StringIO()
-            converter = TextConverter(resource_manager, fake_file_handle, codec='utf-8', laparams=LAParams())
-            page_interpreter = PDFPageInterpreter(resource_manager, converter)
-            page_interpreter.process_page(page)
- 
-            text = fake_file_handle.getvalue()
-            yield text
- 
-            # close open handles
-            converter.close()
-            fake_file_handle.close()
-
-def get_number_of_pages(file_name):
-    if file_name.endswith('.pdf'):
-        count = 0
-        with open(file_name, 'rb') as fh:
+        try:
             for page in PDFPage.get_pages(fh, 
                                         caching=True,
                                         check_extractable=True):
-                count += 1
-        return count
-    else:
+                resource_manager = PDFResourceManager()
+                fake_file_handle = io.StringIO()
+                converter = TextConverter(resource_manager, fake_file_handle, codec='utf-8', laparams=LAParams())
+                page_interpreter = PDFPageInterpreter(resource_manager, converter)
+                page_interpreter.process_page(page)
+    
+                text = fake_file_handle.getvalue()
+                yield text
+    
+                # close open handles
+                converter.close()
+                fake_file_handle.close()
+        except PDFSyntaxError:
+            return
+
+def get_number_of_pages(file_name):
+    try:
+        if file_name.endswith('.pdf'):
+            count = 0
+            with open(file_name, 'rb') as fh:
+                for page in PDFPage.get_pages(fh, 
+                                            caching=True,
+                                            check_extractable=True):
+                    count += 1
+            return count
+        else:
+            return None
+    except PDFSyntaxError:
         return None
 
 def extract_text_from_doc(doc_path):
@@ -286,11 +293,14 @@ def extract_education(nlp_text):
     '''
     edu = {}
     # Extract education degree
-    for index, text in enumerate(nlp_text):
-        for tex in text.split():
-            tex = re.sub(r'[?|$|.|!|,]', r'', tex)
-            if tex.upper() in cs.EDUCATION and tex not in cs.STOPWORDS:
-                edu[tex] = text + nlp_text[index + 1]
+    try:
+        for index, text in enumerate(nlp_text):
+            for tex in text.split():
+                tex = re.sub(r'[?|$|.|!|,]', r'', tex)
+                if tex.upper() in cs.EDUCATION and tex not in cs.STOPWORDS:
+                    edu[tex] = text + nlp_text[index + 1]
+    except IndexError:
+        pass
 
     # Extract year
     education = []
