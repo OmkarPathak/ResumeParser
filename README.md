@@ -38,7 +38,7 @@ python resume_parser/pre_requisites.py
 
 - Place all the resumes that you want to parse in `resume_parser/resumes/` directory
 
-- Run `resume_parser/resume_parser/resume_parser.py`
+- Run `python resume_parser/cli.py -f <resume_file_path>`
 
 # Docker Installation
 
@@ -84,6 +84,7 @@ python resume_parser/cli.py -d <resume_directory_path>
 ```bash
 python resume_parser/manage.py makemigrations
 python resume_parser/manage.py migrate
+python resume_parser/manage.py createsuperuser
 python resume_parser/manage.py runserver
 ```
 
