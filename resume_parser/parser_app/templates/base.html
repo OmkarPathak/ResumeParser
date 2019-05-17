@@ -86,41 +86,41 @@
                   <td>{{user_details.email}}</td>
                   <td>{{user_details.mobile_number}}</td>
                   <td>
-                    {% with t=competencies|index:forloop.counter0 %}
+                    {% with t=competencies %}
                     <b>Teamwork </b>({{t.teamwork|length}}): {{t.teamwork}}
                     {% endwith %}
                     <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
+                    {% with t=competencies %}
                     <b>Analytical </b>({{t.analytical|length}}): {{t.analytical}}
                     {% endwith %}
                     <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
+                    {% with t=competencies %}
                     <b>Result Driven </b>({{t.result_driven|length}}): {{t.result_driven}}
                     {% endwith %}
                     <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
+                    {% with t=competencies %}
                     <b>Leadership </b>({{t.leadership|length}}): {{t.leadership}}
                     {% endwith %}
                     <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
+                    {% with t=competencies %}
                     <b>Communication </b>({{t.communication|length}}): {{t.communication}}
                     {% endwith %}
                   </td>
 
                   <td>
-                    {% with t=measurable_results|index:forloop.counter0 %}
+                    {% with t=measurable_results %}
                     <b>Metrics </b>({{t.metrics|length}}): {{t.metrics}}
                     {% endwith %}
                     <br><br>
-                    {% with t=measurable_results|index:forloop.counter0 %}
+                    {% with t=measurable_results %}
                     <b>Action Words </b>({{t.action_words|length}}): {{t.action_words}}
                     {% endwith %}
                     <br><br>
-                    {% with t=measurable_results|index:forloop.counter0 %}
+                    {% with t=measurable_results %}
                     <b>Weak Words </b>({{t.weak_words|length}}): {{t.weak_words}}
                     {% endwith %}
                   </td>
-                  <td><b>No. of pages:</b> {{ no_of_pages }}, <b>Total Experience:</b> {{ total_experience }} years</td>
+                  <td><b>No. of pages:</b> {{ no_of_pages }}, <b>Total Experience:</b> {{ total_experience }} years, <b>Overall Score:</b> {{ overall_score }}</td>
                   <td>{{resume.education}}</td>
                   <td>{{user_details.skills}}</td>
                   <td>{{resume.experience}}</td>

@@ -76,11 +76,10 @@ def homepage(request):
             user_detail = UserDetails.objects.get(user=user)
             messages.success(request, 'Resumes uploaded!')
             
-            competencies = []
-            measurable_results = []
-            
-            competencies.append(data.get('competencies'))
-            measurable_results.append(data.get('measurable_results'))
+            competencies = data.get('competencies')
+            measurable_results = data.get('measurable_results')
+
+            overall_score = competencies.get('score') + measurable_results.get('score')
             
             if competencies:
                 context = {
@@ -89,14 +88,18 @@ def homepage(request):
                     'measurable_results': measurable_results,
                     'no_of_pages': data.get('no_of_pages'),
                     'total_experience': data.get('total_experience'),
-                    'user_details': user_detail
+                    'user_details': user_detail,
+                    'overall_score': overall_score
                     }
             else:
                 context = {
                     'resumes': resumes,
                     'competencies': [],
                     'measurable_results': [],
-                    'user_details': user_detail
+                    'no_of_pages': data.get('no_of_pages'),
+                    'total_experience': data.get('total_experience'),
+                    'user_details': user_detail,
+                    'overall_score': overall_score
                     }
             return render(request, 'base.html', context)
     else:

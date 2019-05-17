@@ -335,6 +335,17 @@ def extract_experience(resume_text):
     x = [x[x.lower().index('experience') + 10:] for i, x in enumerate(test) if x and 'experience' in x.lower()]
     return x
 
+def get_score(_dict):
+    _len = len(_dict)
+    if _len >= 5:
+        return 1
+    elif _len < 5 and _len > 2:
+        return 0.5
+    elif _len  == 1:
+        return 0.2
+    else:
+        return 0
+
 def extract_competencies(text, experience_list):
     '''
     Helper function to extract competencies from resume text
@@ -344,6 +355,9 @@ def extract_competencies(text, experience_list):
     '''
     experience_text = ' '.join(experience_list)
     competency_dict = {}
+    score = 0
+
+    percentage = (100 // len(cs.COMPETENCIES.keys()))
 
     for competency in cs.COMPETENCIES.keys():
         matches = {}
@@ -365,6 +379,9 @@ def extract_competencies(text, experience_list):
                         for i in match.groups():
                             matches[item].append(i)
                     competency_dict[competency] = matches
+                score += get_score(competency_dict[competency]) * percentage
+            
+    competency_dict['score'] = score
     return competency_dict
 
 def extract_measurable_results(text, experience_list):
@@ -379,6 +396,9 @@ def extract_measurable_results(text, experience_list):
     experience_text = ' '.join([text[:len(text) // 2 - 1] for text in experience_list])
     mr_dict = {}
     experience_text_for_matching = ' '.join(experience_list)
+    score = 0
+
+    percentage = (100 // len(cs.COMPETENCIES.keys()))
 
     for mr in cs.MEASURABLE_RESULTS.keys():
         matches = {}
@@ -402,6 +422,9 @@ def extract_measurable_results(text, experience_list):
                             if i not in matches[item]:
                                 matches[item].append(i) 
                     mr_dict[mr] = matches
+                score += get_score(mr_dict[mr]) * percentage
+    
+    mr_dict['score'] = score
     return mr_dict
 
 def string_found(string1, string2):
