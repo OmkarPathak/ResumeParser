@@ -229,7 +229,8 @@ def extract_name(nlp_text, matcher):
     
     for _, start, end in matches:
         span = nlp_text[start:end]
-        return span.text
+        if 'name' not in span.text.lower():
+            return span.text
 
 def extract_mobile_number(text):
     '''

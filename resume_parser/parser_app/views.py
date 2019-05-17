@@ -40,9 +40,11 @@ def homepage(request):
                     # resume.education     = get_education(data.get('education'))
                     user_details = UserDetails()
                     user_details.user           = user
-                    user_details.mobile_number = data.get('mobile_number')
-                    user_details.skills        = ', '.join(data.get('skills'))
-                    user_details.years_of_exp  = data.get('total_experience')
+                    user_details.name           = data.get('name')
+                    user_details.email          = data.get('email')
+                    user_details.mobile_number  = data.get('mobile_number')
+                    user_details.skills         = ', '.join(data.get('skills'))
+                    user_details.years_of_exp   = data.get('total_experience')
                     user_details.save()
 
                     for comp in data.get('competencies'):
@@ -71,6 +73,7 @@ def homepage(request):
                     return redirect('homepage')
 
             resumes = Resume.objects.filter(user=User.objects.get(id=1))
+            user_detail = UserDetails.objects.get(user=user)
             messages.success(request, 'Resumes uploaded!')
             
             competencies = []
@@ -86,12 +89,14 @@ def homepage(request):
                     'measurable_results': measurable_results,
                     'no_of_pages': data.get('no_of_pages'),
                     'total_experience': data.get('total_experience'),
+                    'user_details': user_detail
                     }
             else:
                 context = {
                     'resumes': resumes,
                     'competencies': [],
-                    'measurable_results': []
+                    'measurable_results': [],
+                    'user_details': user_detail
                     }
             return render(request, 'base.html', context)
     else:

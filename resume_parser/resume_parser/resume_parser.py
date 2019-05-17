@@ -56,7 +56,9 @@ class ResumeParser(object):
                 self.__details['measurable_results'] = []
                 self.__details['total_experience'] = 0
         except KeyError:
-            pass
+            self.__details['competencies'] = []
+            self.__details['measurable_results'] = []
+            self.__details['total_experience'] = 0
         self.__details['no_of_pages'] = utils.get_number_of_pages(self.__resume)
         return
 

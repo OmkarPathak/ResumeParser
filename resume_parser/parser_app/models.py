@@ -9,6 +9,8 @@ from django.contrib.auth.models import User
 
 class UserDetails(models.Model):
     user            = models.ForeignKey(User, on_delete=models.CASCADE)
+    name            = models.CharField('Name', max_length=255, null=True, blank=True)
+    email           = models.EmailField('Email', max_length=255, null=True, blank=True)
     mobile_number   = models.IntegerField('Mobile Number', null=True, blank=True)
     skills          = models.CharField('Skills', max_length=1000, null=True, blank=True)
     years_of_exp    = models.FloatField('Experience', null=True, blank=True)

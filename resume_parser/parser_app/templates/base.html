@@ -82,9 +82,9 @@
                 <tr>
                   <td>{{forloop.counter}}</td>
                   <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url|truncatechars:20}}</a></td>
-                  <td>{{resume.user.name}}</td>
-                  <td>{{resume.user.email}}</td>
-                  <td>{{resume.user.mobile_number}}</td>
+                  <td>{{user_details.name}}</td>
+                  <td>{{user_details.email}}</td>
+                  <td>{{user_details.mobile_number}}</td>
                   <td>
                     {% with t=competencies|index:forloop.counter0 %}
                     <b>Teamwork </b>({{t.teamwork|length}}): {{t.teamwork}}
@@ -122,7 +122,7 @@
                   </td>
                   <td><b>No. of pages:</b> {{ no_of_pages }}, <b>Total Experience:</b> {{ total_experience }} years</td>
                   <td>{{resume.education}}</td>
-                  <td>{{resume.skills}}</td>
+                  <td>{{user_details.skills}}</td>
                   <td>{{resume.experience}}</td>
                 </tr>
               {% endfor %}
