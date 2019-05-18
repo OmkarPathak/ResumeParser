@@ -38,14 +38,14 @@ class Resume(models.Model):
     last_uploaded_on  = models.DateTimeField('Uploaded On', auto_now_add=True)
 
     def __str__(self):
-        return self.user.get_full_name()
+        return self.user.email
 
 class ResumeDetails(models.Model):
     resume      = models.ForeignKey(Resume, on_delete=models.CASCADE)
     page_nos    = models.IntegerField('Number of Pages', null=True, blank=True)
     
     def __str__(self):
-        return self.resume.user.get_full_name()
+        return self.resume.user.email
 
 class UploadResumeModelForm(forms.ModelForm):
     class Meta:
