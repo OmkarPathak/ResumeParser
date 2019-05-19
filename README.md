@@ -58,9 +58,10 @@ For running the resume extractor you can also use the `cli` provided
 usage: cli.py [-h] [-f FILE] [-d DIRECTORY]
 
 optional arguments:
-  -h, --help                            show this help message and exit
-  -f FILE, --file FILE                  resume file to be extracted
-  -d DIRECTORY, --directory DIRECTORY   directory containing all the resumes to be extracted
+  -h, --help                              show this help message and exit
+  -f FILE, --file FILE                    resume file to be extracted
+  -d DIRECTORY, --directory DIRECTORY     directory containing all the resumes to be extracted
+  -r REMOTEFILE, --remotefile REMOTEFILE  remote path for resume file to be extracted
 ```
 
 For extracting data from a single resume file, use
@@ -73,6 +74,12 @@ For extracting data from several resumes, place them in a directory and then exe
 
 ```bash
 python resume_parser/cli.py -d <resume_directory_path>
+```
+
+For extracting data from remote resumes, execute
+
+```bash
+python resume_parser/cli.py -r <path_to_remote_resume_file>
 ```
 
 # GUI
