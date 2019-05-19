@@ -6,6 +6,7 @@ import spacy
 import pprint
 from spacy.matcher import Matcher
 import multiprocessing as mp
+import io
 
 class ResumeParser(object):
     def __init__(self, resume):
@@ -24,7 +25,11 @@ class ResumeParser(object):
             'total_experience'  : None,
         }
         self.__resume      = resume
-        self.__text_raw    = utils.extract_text(self.__resume, os.path.splitext(self.__resume)[1])
+        if not isinstance(self.__resume, io.BytesIO):
+            ext = os.path.splitext(self.__resume)[1]
+        else:
+            ext = self.__resume.name.split('.')[1]
+        self.__text_raw    = utils.extract_text(self.__resume, '.' + ext)
         self.__text        = ' '.join(self.__text_raw.split())
         self.__nlp         = nlp(self.__text)
         self.__noun_chunks = list(self.__nlp.noun_chunks)
