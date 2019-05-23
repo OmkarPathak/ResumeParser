@@ -26,7 +26,7 @@ class ResumeParser(object):
         }
         self.__resume      = resume
         if not isinstance(self.__resume, io.BytesIO):
-            ext = os.path.splitext(self.__resume)[1]
+            ext = os.path.splitext(self.__resume)[1].split('.')[1]
         else:
             ext = self.__resume.name.split('.')[1]
         self.__text_raw    = utils.extract_text(self.__resume, '.' + ext)

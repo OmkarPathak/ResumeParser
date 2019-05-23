@@ -75,11 +75,14 @@ def homepage(request):
             resumes = Resume.objects.filter(user=User.objects.get(id=1))
             user_detail = UserDetails.objects.get(user=user)
             messages.success(request, 'Resumes uploaded!')
-            
+
+            overall_score = 0
+
             competencies = data.get('competencies')
             measurable_results = data.get('measurable_results')
 
-            overall_score = competencies.get('score') + measurable_results.get('score')
+            if competencies and measurable_results:
+                overall_score = competencies.get('score') + measurable_results.get('score')
             
             if competencies:
                 context = {
