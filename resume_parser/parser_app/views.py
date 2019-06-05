@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from .serializers import UserDetailsSerializer, CompetenciesSerializer, MeasurableResultsSerializer, ResumeSerializer, ResumeDetailsSerializer
 import os
+import requests
 
 def homepage(request):
     if request.method == 'POST':
@@ -146,3 +147,11 @@ def user_detail(request, pk):
         data['resume_details'] = resume_details_serializer.data
         data['user_details'] = user_details_serializer.data
         return JsonResponse(data)
+
+@csrf_exempt
+def job_recommendation(request):
+    if request.method == 'POST':
+        job_title = request.POST.get('job_title')
+        job_location = request.POST.get('job_location')
+    data = requests.get('https://api.ziprecruiter.com/jobs/v1?search=Python&location=Santa%20Monica&api_key=mqpqz4ev44nfu3n9brazrrix27yzipzm').json()
+    return JsonResponse(data)
