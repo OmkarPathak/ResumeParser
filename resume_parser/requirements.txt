@@ -71,7 +71,7 @@ python-magic==0.4.15
 python-pptx==0.6.5
 pytz==2018.7
 PyWavelets==1.0.2
-PyYAML==3.13
+PyYAML==5.1
 regex==2018.1.10
 requests==2.20.1
 scikit-image==0.14.2
