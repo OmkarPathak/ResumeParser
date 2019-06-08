@@ -105,9 +105,12 @@ def extract_text_from_doc(doc_path):
     :param doc_path: path to .doc or .docx file to be extracted
     :return: string of extracted text
     '''
-    temp = docx2txt.process(doc_path)
-    text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
-    return ' '.join(text)
+    try:
+        temp = docx2txt.process(doc_path)
+        text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
+        return ' '.join(text)
+    except KeyError:
+        return ' '
 
 def extract_text(file_path, extension):
     '''

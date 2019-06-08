@@ -69,7 +69,7 @@ class ResumeParserCli(object):
 
 def resume_result_wrapper(resume):
     print_cyan('Extracting data from: {}'.format(resume))
-    parser = ResumeParser('https://www.omkarpathak.in/downloads/OmkarResume.pdf')
+    parser = ResumeParser(resume)
     return parser.get_extracted_data()
 
 if __name__ == '__main__':
