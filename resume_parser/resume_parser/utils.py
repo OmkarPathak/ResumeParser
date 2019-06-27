@@ -8,6 +8,7 @@ import spacy
 import pandas as pd
 import docx2txt
 import subprocess
+import textract
 from datetime import datetime
 from dateutil import relativedelta
 from . import constants as cs
@@ -98,15 +99,29 @@ def get_number_of_pages(file_name):
     except PDFSyntaxError:
         return None
 
-def extract_text_from_doc(doc_path):
+def extract_text_from_docx(doc_path):
     '''
-    Helper function to extract plain text from .doc or .docx files
+    Helper function to extract plain text from .docx files
 
-    :param doc_path: path to .doc or .docx file to be extracted
+    :param doc_path: path to .docx file to be extracted
     :return: string of extracted text
     '''
     try:
         temp = docx2txt.process(doc_path)
+        text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
+        return ' '.join(text)
+    except KeyError:
+        return ' '
+
+def extract_text_from_doc(doc_path):
+    '''
+    Helper function to extract plain text from .doc files
+
+    :param doc_path: path to .doc file to be extracted
+    :return: string of extracted text
+    '''
+    try:
+        temp = textract.process(doc_path).decode('utf-8')
         text = [line.replace('\t', ' ') for line in temp.split('\n') if line]
         return ' '.join(text)
     except KeyError:
@@ -123,7 +138,9 @@ def extract_text(file_path, extension):
     if extension == '.pdf':
         for page in extract_text_from_pdf(file_path):
             text += ' ' + page
-    elif extension == '.docx' or extension == '.doc':
+    elif extension == '.docx':
+        text = extract_text_from_docx(file_path)
+    elif extension == '.doc':
         text = extract_text_from_doc(file_path)
     return text
 

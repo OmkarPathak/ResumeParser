@@ -1,0 +1,9 @@
+# For ubuntu you need to execute:
+
+sudo apt-get install libpulse-dev
+
+# And then execute the following command:
+
+pip install -r requirements.txt
+
+# For other operating systems refer: https://textract.readthedocs.io/en/stable/installation.html

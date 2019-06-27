@@ -11,7 +11,7 @@ pip install pdfminer.six    # python 3
 pip install docx2txt
 ```
 
-- For NLP operations we use spacy and nltk. Install them using:
+- For NLP operations we use spacy and nltk. Install them using below commands or simply execute `python resume_parser/pre_requisites.py`:
 
 ```bash
 # spaCy
@@ -26,10 +26,11 @@ python -m nltk nltk.download('words')
 - For extracting other supporting dependencies, execute:
 
 ```bash
+# If you want to parse .docx and .pdf files (all OS supported)
 pip install -r resume_parser/requirements.txt
 
-# and then execute
-python resume_parser/pre_requisites.py
+# If you want to parse .docx, .doc and .pdf files (Ubuntu and OSX supported)
+pip install -r resume_parser/requirements_with_textract.txt
 ```
 
 - Modify `resume_parser/resume_parser/skills.csv` as per your requirements
@@ -96,6 +97,10 @@ python resume_parser/manage.py runserver
 ```
 
 - Visit `127.0.0.1` to view the GUI
+
+# Notes:
+
+- If you are running the app on windows, then you can only extract .docs and .pdf files
 
 # Working:
 
