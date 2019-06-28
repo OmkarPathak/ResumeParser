@@ -8,7 +8,6 @@ import spacy
 import pandas as pd
 import docx2txt
 import subprocess
-import textract
 from datetime import datetime
 from dateutil import relativedelta
 from . import constants as cs
@@ -21,7 +20,9 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFSyntaxError
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
-# from spellchecker import SpellChecker
+
+if os.name != 'nt':
+    import textract
 
 def extract_text_from_pdf(pdf_path):
     '''
@@ -141,6 +142,8 @@ def extract_text(file_path, extension):
     elif extension == '.docx':
         text = extract_text_from_docx(file_path)
     elif extension == '.doc':
+        if os.name == 'nt':
+            return ' '
         text = extract_text_from_doc(file_path)
     return text
 
