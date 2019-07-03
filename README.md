@@ -1,5 +1,5 @@
 # ResumeParser
-This is just a wrapper for pyresparser. I have release the resume parser as a [Python Package](https://github.com/OmkarPathak/pyresparser)
+This is just a wrapper for pyresparser. I have released the resume parser as a [Python Package](https://github.com/OmkarPathak/pyresparser)
 
 # Installation
 
