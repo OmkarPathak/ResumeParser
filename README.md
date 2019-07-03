@@ -1,45 +1,13 @@
 # ResumeParser
-A simple resume parser used for extracting information from resumes
+This is just a wrapper for pyresparser. I have release the resume parser as a [Python Package](https://github.com/OmkarPathak/pyresparser)
 
 # Installation
 
-- For extracting text from various documents we use [pdfminer](https://github.com/euske/pdfminer) and [docx2text](https://github.com/ankushshah89/python-docx2txt) modules. Install them using:
-
 ```bash
-pip install pdfminer        # python 2
-pip install pdfminer.six    # python 3
-pip install docx2txt
+pip install pyresparser
 ```
 
-- For NLP operations we use spacy and nltk. Install them using below commands or simply execute `python resume_parser/pre_requisites.py`:
-
-```bash
-# spaCy
-pip install spacy
-python -m spacy download en_core_web_sm
-
-# nltk
-pip install nltk
-python -m nltk nltk.download('words')
-```
-
-- For extracting other supporting dependencies, execute:
-
-```bash
-# If you want to parse .docx and .pdf files (all OS supported)
-pip install -r resume_parser/requirements.txt
-
-# If you want to parse .docx, .doc and .pdf files (Ubuntu and OSX supported)
-pip install -r resume_parser/requirements_with_textract.txt
-```
-
-- Modify `resume_parser/resume_parser/skills.csv` as per your requirements
-
-- Modify `Education Degrees` as per you requirements in [resume_parser/resume_parser/constants.py](https://github.com/OmkarPathak/ResumeParser/blob/master/constants.py)
-
-- Place all the resumes that you want to parse in `resume_parser/resumes/` directory
-
-- Run `python resume_parser/cli.py -f <resume_file_path>`
+- For supported formats and other installation instructions visit: [https://github.com/OmkarPathak/pyresparser](https://github.com/OmkarPathak/pyresparser)
 
 # Docker Installation
 
@@ -50,38 +18,6 @@ docker-compose up -d build
 ```
 
 - Once all the installations are done, visit `0.0.0.0` in your broswer to use the app
-
-# CLI
-
-For running the resume extractor you can also use the `cli` provided
-
-```bash
-usage: cli.py [-h] [-f FILE] [-d DIRECTORY]
-
-optional arguments:
-  -h, --help                              show this help message and exit
-  -f FILE, --file FILE                    resume file to be extracted
-  -d DIRECTORY, --directory DIRECTORY     directory containing all the resumes to be extracted
-  -r REMOTEFILE, --remotefile REMOTEFILE  remote path for resume file to be extracted
-```
-
-For extracting data from a single resume file, use
-
-```bash
-python resume_parser/cli.py -f <resume_file_path>
-```
-
-For extracting data from several resumes, place them in a directory and then execute
-
-```bash
-python resume_parser/cli.py -d <resume_directory_path>
-```
-
-For extracting data from remote resumes, execute
-
-```bash
-python resume_parser/cli.py -r <path_to_remote_resume_file>
-```
 
 # GUI
 
