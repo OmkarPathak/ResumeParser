@@ -40,6 +40,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'parser_app',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.socialaccount',
+    'allauth.account',
+    'rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +136,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # for uploading resume files
 MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'mediafiles')
 MEDIA_URL = '/mediafiles/'
+
+ACCOUNT_LOGOUT_ON_GET = True
+SITE_ID = 1
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'omkarpathak.comp@mmcoe.edu.in'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
