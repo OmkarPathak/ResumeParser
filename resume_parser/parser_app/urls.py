@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('user/details/<pk>/', views.user_detail),
     path('job_recommendation/', views.job_recommendation),
-    path('hello/', views.TestView.as_view(), name='hello'),
-    path('test/', views.my_view, name='test'),
+    # path('hello/', views.TestView.as_view(), name='hello'),
+    path('upload_resume/', views.upload_resume, name='upload_resume'),
     path('', views.homepage, name='homepage'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

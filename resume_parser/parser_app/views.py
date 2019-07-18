@@ -10,10 +10,13 @@ from django.db import IntegrityError
 from django.http import HttpResponse, FileResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes, authentication_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status, authentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser
+from rest_framework.authtoken.models import Token
 from .serializers import UserDetailsSerializer, CompetenciesSerializer, MeasurableResultsSerializer, ResumeSerializer, ResumeDetailsSerializer
 
 def homepage(request):
@@ -170,12 +173,40 @@ class TestView(APIView):
         content = {'message': 'Hello, World!'}
         return Response(content)
 
-@api_view(['POST','GET'])
-def my_view(request):
-    if request.user.is_authenticated:
-        content = {'message': 'Hello, World!'}
-        return Response(content) 
+@api_view(['POST'])
+# @authentication_classes([authentication.TokenAuthentication])
+@parser_classes([MultiPartParser])
+def upload_resume(request):
+    file_data               = request.data
+    print(file_data)
+    # location                = request.POST.get('location'),
+    # desired_job_position    = request.POST.get('desired_job_position'),
+    # designation             = request.POST.get('designation')
+    email                   = request.POST.get('email')
+    password                = request.POST.get('password')
 
-# get all tokens
-# from rest_framework.authtoken.models import Token
-# Token.objects.get(key=key).user or user_id
+    try:
+        data = {
+            'email': email,
+            'username': email,
+            'password1': password,
+            'password2': password,
+            }
+    except KeyError:
+        pass
+
+    response = requests.post("http://localhost:8000/rest-auth/registration/", data=data)
+    data = response.json()
+
+    if response.status_code != 400:
+        try:
+            user_id = Token.objects.get(key=data['key']).user_id
+            context = {
+                'user_id': user_id,
+                'token': data['key']
+            }
+        except:
+            context = data
+    else:
+        context = data
+    return Response(context)
