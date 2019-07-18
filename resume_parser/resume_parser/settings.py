@@ -146,3 +146,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'omkarpathak.comp@mmcoe.edu.in'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}

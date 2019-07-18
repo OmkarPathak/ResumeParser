@@ -1,3 +1,5 @@
+import os
+import requests
 from django.shortcuts import render, redirect
 from resume_parser import resume_parser
 from .models import UserDetails, Competencies, MeasurableResults, Resume, ResumeDetails, UploadResumeModelForm
@@ -8,9 +10,11 @@ from django.db import IntegrityError
 from django.http import HttpResponse, FileResponse, Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from .serializers import UserDetailsSerializer, CompetenciesSerializer, MeasurableResultsSerializer, ResumeSerializer, ResumeDetailsSerializer
-import os
-import requests
 
 def homepage(request):
     if request.method == 'POST':
@@ -158,3 +162,20 @@ def job_recommendation(request):
         job_location = request.POST.get('job_location')
     data = requests.get('https://api.ziprecruiter.com/jobs/v1?search=Python&location=Santa%20Monica&api_key=mqpqz4ev44nfu3n9brazrrix27yzipzm').json()
     return JsonResponse(data)
+
+class TestView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        content = {'message': 'Hello, World!'}
+        return Response(content)
+
+@api_view(['POST','GET'])
+def my_view(request):
+    if request.user.is_authenticated:
+        content = {'message': 'Hello, World!'}
+        return Response(content) 
+
+# get all tokens
+# from rest_framework.authtoken.models import Token
+# Token.objects.get(key=key).user or user_id
