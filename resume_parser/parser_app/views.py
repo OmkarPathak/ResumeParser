@@ -17,6 +17,8 @@ from rest_framework import status, authentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 from rest_framework.authtoken.models import Token
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from .serializers import UserDetailsSerializer, CompetenciesSerializer, MeasurableResultsSerializer, ResumeSerializer, ResumeDetailsSerializer
 
 def homepage(request):
@@ -177,14 +179,17 @@ class TestView(APIView):
 # @authentication_classes([authentication.TokenAuthentication])
 @parser_classes([MultiPartParser])
 def upload_resume(request):
-    file_data               = request.data
-    print(file_data)
-    # location                = request.POST.get('location'),
-    # desired_job_position    = request.POST.get('desired_job_position'),
-    # designation             = request.POST.get('designation')
+    file_data               = request.data.dict()
+    file_data               = file_data.get('file')
+    location                = request.POST.get('location'),
+    desired_job_position    = request.POST.get('desired_job_position'),
+    designation             = request.POST.get('designation')
     email                   = request.POST.get('email')
     password                = request.POST.get('password')
 
+    path = default_storage.save(os.path.join(settings.MEDIA_ROOT, file_data.name), ContentFile(file_data.read()))
+    parser = resume_parser.ResumeParser(path)
+    data = parser.get_extracted_data()
     try:
         data = {
             'email': email,
