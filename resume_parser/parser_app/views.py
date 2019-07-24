@@ -180,9 +180,12 @@ class TestView(APIView):
 @parser_classes([MultiPartParser])
 def upload_resume(request):
     file_data               = request.data.dict()
+    print('File Data:')
+    print(file_data)
+    print(type(file_data))
     file_data               = file_data.get('file')
-    location                = request.POST.get('location'),
-    desired_job_position    = request.POST.get('desired_job_position'),
+    location                = request.POST.get('signUpDetails')
+    desired_job_position    = request.POST.get('desired_job_position')
     designation             = request.POST.get('designation')
     email                   = request.POST.get('email')
     password                = request.POST.get('password')
