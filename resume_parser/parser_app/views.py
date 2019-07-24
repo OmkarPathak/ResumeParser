@@ -181,7 +181,7 @@ class TestView(APIView):
 def upload_resume(request):
     request_data            = request.data.dict()
     file_data               = request_data.get('file')
-    data                    = request_data.get('signUpDetails')
+    data                    = eval(request_data.get('signUpDetails'))
     location                = data.get('location')
     desired_job_position    = data.get('desired_job_position')
     designation             = data.get('designation')
