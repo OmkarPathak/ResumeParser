@@ -179,9 +179,9 @@ class TestView(APIView):
 # @authentication_classes([authentication.TokenAuthentication])
 @parser_classes([MultiPartParser])
 def upload_resume(request):
-    file_data               = request.data.dict()
-    file_data               = file_data.get('file')
-    data                    = file_data.get('signUpDetails')
+    request_data            = request.data.dict()
+    file_data               = request_data.get('file')
+    data                    = request_data.get('signUpDetails')
     location                = data.get('location')
     desired_job_position    = data.get('desired_job_position')
     designation             = data.get('designation')
