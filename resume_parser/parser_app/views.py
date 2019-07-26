@@ -190,7 +190,7 @@ def upload_resume(request):
 
     path = default_storage.save(os.path.join(settings.MEDIA_ROOT, file_data.name), ContentFile(file_data.read()))
     parser = resume_parser.ResumeParser(path)
-    data = parser.get_extracted_data()
+    parsed_data = parser.get_extracted_data()
     try:
         data = {
             'email': email,
@@ -209,8 +209,46 @@ def upload_resume(request):
             user_id = Token.objects.get(key=data['key']).user_id
             context = {
                 'user_id': user_id,
-                'token': data['key']
+                'token': data['key'],
+                'parsed_data': parsed_data
             }
+            user = User.objects.get(id=user_id)
+
+            # User Details
+            user_details      = UserDetails()
+            user_details.user = user
+            user_details.name = parsed_data.get('name')
+            user_details.email = parsed_data.get('email')
+            user_details.skills = parsed_data.get('skills')
+            user_details.mobile_number = parsed_data.get('mobile_number')
+            user_details.years_of_exp = parsed_data.get('years_of_exp')
+            user_details.save()
+
+            # Competencies
+            for comp in data.get('competencies'):
+                competencies = Competencies()
+                competencies.user       = user
+                competencies.competency = comp
+                competencies.save()
+
+            # Measurable Results
+            for mr in data.get('measurable_results'):
+                measurable_results                   = MeasurableResults()
+                measurable_results.user              = user
+                measurable_results.measurable_result = mr
+                measurable_results.save()
+
+            # Resume
+            resume                  = Resume()
+            resume.user             = user
+            resume.resume           = path
+            resume.save()
+
+            # Resume Details
+            resume_details          = ResumeDetails()
+            resume_details.resume   = resume
+            resume_details.page_nos = data.get('no_of_pages')
+            resume_details.save()
         except:
             context = data
     else:
