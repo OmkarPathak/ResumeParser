@@ -224,18 +224,20 @@ def upload_resume(request):
         user_details.save()
 
         # Competencies
-        for comp in data.get('competencies'):
-            competencies = Competencies()
-            competencies.user       = user
-            competencies.competency = comp
-            competencies.save()
+        if data.get('competencies'):
+            for comp in data.get('competencies'):
+                competencies = Competencies()
+                competencies.user       = user
+                competencies.competency = comp
+                competencies.save()
 
         # Measurable Results
-        for mr in data.get('measurable_results'):
-            measurable_results                   = MeasurableResults()
-            measurable_results.user              = user
-            measurable_results.measurable_result = mr
-            measurable_results.save()
+        if data.get('measurable_results'):
+            for mr in data.get('measurable_results'):
+                measurable_results                   = MeasurableResults()
+                measurable_results.user              = user
+                measurable_results.measurable_result = mr
+                measurable_results.save()
 
         # Resume
         resume                  = Resume()
