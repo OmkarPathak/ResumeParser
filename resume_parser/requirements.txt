@@ -4,6 +4,13 @@ certifi==2019.6.16
 chardet==3.0.4
 cymem==2.0.2
 docx2txt==0.7
+Django==2.0.8
+django-allauth==0.39.1
+django-crispy-forms==1.7.2
+django-easy-pdf==0.1.1
+django-rest-auth==0.9.5
+django-rest-framework==0.1.0
+gunicorn
 idna==2.8
 jsonschema==3.0.1
 murmurhash==1.0.2
@@ -22,6 +29,7 @@ six==1.12.0
 sortedcontainers==2.1.0
 spacy==2.1.4
 srsly==0.0.7
+textract==1.6.3
 thinc==7.0.4
 tqdm==4.32.2
 urllib3==1.25.3
