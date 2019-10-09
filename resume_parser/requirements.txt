@@ -4,7 +4,7 @@ certifi==2019.6.16
 chardet==3.0.4
 cymem==2.0.2
 docx2txt==0.7
-Django==2.0.8
+Django==2.0.12
 django-allauth==0.39.1
 django-crispy-forms==1.7.2
 django-easy-pdf==0.1.1
