@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from resume_parser import resume_parser
+from pyresparser import ResumeParser
 from .models import Resume, UploadResumeModelForm
 from django.contrib import messages
 from django.conf import settings
@@ -13,8 +13,6 @@ def homepage(request):
         file_form = UploadResumeModelForm(request.POST, request.FILES)
         files = request.FILES.getlist('resume')
         resumes_data = []
-        competencies = []
-        measurable_results = []
         if file_form.is_valid():
             for file in files:
                 try:
@@ -23,46 +21,38 @@ def homepage(request):
                     resume.save()
                     
                     # extracting resume entities
-                    parser = resume_parser.ResumeParser(os.path.join(settings.MEDIA_ROOT, resume.resume.name))
+                    parser = ResumeParser(os.path.join(settings.MEDIA_ROOT, resume.resume.name))
                     data = parser.get_extracted_data()
                     resumes_data.append(data)
-                    resume.name          = data.get('name')
-                    resume.email         = data.get('email')
-                    resume.mobile_number = data.get('mobile_number')
-                    # resume.education     = '\n'.join(data.get('education'))
-                    resume.education     = get_education(data.get('education'))
-                    resume.skills        = ', '.join(data.get('skills'))
-                    resume.experience    = ', '.join(data.get('experience'))
-                    competencies.append(data.get('competencies'))
-                    measurable_results.append(data.get('measurable_results'))
+                    resume.name               = data.get('name')
+                    resume.email              = data.get('email')
+                    resume.mobile_number      = data.get('mobile_number')
+                    if data.get('degree') is not None:
+                        resume.education      = ', '.join(data.get('degree'))
+                    else:
+                        resume.education      = None
+                    resume.company_names      = data.get('company_names')
+                    resume.college_name       = data.get('college_name')
+                    resume.designation        = data.get('designation')
+                    resume.total_experience   = data.get('total_experience')
+                    if data.get('skills') is not None:
+                        resume.skills         = ', '.join(data.get('skills'))
+                    else:
+                        resume.skills         = None
+                    if data.get('experience') is not None:
+                        resume.experience     = ', '.join(data.get('experience'))
+                    else:
+                        resume.experience     = None
                     resume.save()
                 except IntegrityError:
                     messages.warning(request, 'Duplicate resume found:', file.name)
                     return redirect('homepage')
             resumes = Resume.objects.all()
             messages.success(request, 'Resumes uploaded!')
-            if competencies:
-                context = {
-                    'resumes': resumes,
-                    'competencies': competencies,
-                    'measurable_results': measurable_results,
-                    }
-            else:
-                context = {
-                    'resumes': resumes,
-                    'competencies': [],
-                    'measurable_results': []
-                    }
+            context = {
+                'resumes': resumes,
+            }
             return render(request, 'base.html', context)
     else:
         form = UploadResumeModelForm()
     return render(request, 'base.html', {'form': form})
-
-def get_education(education):
-    '''
-    Helper function to display the education in human readable format
-    '''
-    education_string = ''
-    for edu in education:
-        education_string += edu[0] + ' (' + str(edu[1]) + '), '
-    return education_string.rstrip(', ')

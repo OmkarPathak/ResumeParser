@@ -69,9 +69,11 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Mobile Number</th>
-                <th>Competencies</th>
-                <th>Measurable Results</th>
                 <th>Education</th>
+                <th>Company Names</th>
+                <th>Designation</th>
+                <th>College Name</th>
+                <th>Total Experience in years</th>
                 <th>Skills</th>
                 <th>Experience</th>
               </tr>
@@ -84,42 +86,11 @@
                   <td>{{resume.name}}</td>
                   <td>{{resume.email}}</td>
                   <td>{{resume.mobile_number}}</td>
-                  <td>
-                    {% with t=competencies|index:forloop.counter0 %}
-                    <b>Teamwork </b>({{t.teamwork|length}}): {{t.teamwork}}
-                    {% endwith %}
-                    <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
-                    <b>Analytical </b>({{t.analytical|length}}): {{t.analytical}}
-                    {% endwith %}
-                    <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
-                    <b>Result Driven </b>({{t.result_driven|length}}): {{t.result_driven}}
-                    {% endwith %}
-                    <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
-                    <b>Leadership </b>({{t.leadership|length}}): {{t.leadership}}
-                    {% endwith %}
-                    <br><br>
-                    {% with t=competencies|index:forloop.counter0 %}
-                    <b>Communication </b>({{t.communication|length}}): {{t.communication}}
-                    {% endwith %}
-                  </td>
-
-                  <td>
-                    {% with t=measurable_results|index:forloop.counter0 %}
-                    <b>Metrics </b>({{t.metrics|length}}): {{t.metrics}}
-                    {% endwith %}
-                    <br><br>
-                    {% with t=measurable_results|index:forloop.counter0 %}
-                    <b>Action Words </b>({{t.action_words|length}}): {{t.action_words}}
-                    {% endwith %}
-                    <br><br>
-                    {% with t=measurable_results|index:forloop.counter0 %}
-                    <b>Weak Words </b>({{t.weak_words|length}}): {{t.weak_words}}
-                    {% endwith %}
-                  </td>
                   <td>{{resume.education}}</td>
+                  <td>{{resume.company_names}}</td>
+                  <td>{{resume.designation}}</td>
+                  <td>{{resume.college_name}}</td>
+                  <td>{{resume.total_experience}}</td>
                   <td>{{resume.skills}}</td>
                   <td>{{resume.experience}}</td>
                 </tr>
