@@ -21,7 +21,7 @@ nltk==3.4.5
 numpy==1.15.4
 pandas==0.23.4
 pdfminer.six==20181108
-Pillow==5.3.0
+Pillow==6.2.0
 plac==0.9.6
 preshed==2.0.1
 pycryptodome==3.7.0
