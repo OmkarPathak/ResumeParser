@@ -1,6 +1,8 @@
 # ResumeParser
 A simple resume parser used for extracting information from resumes
 
+Note: This is just a wrapper around the pyresparser. The actual source code for the parsing can be found here: [https://github.com/OmkarPathak/pyresparser](https://github.com/OmkarPathak/pyresparser)
+
 # Installation
 
 - For extracting text from various documents we use [pdfminer](https://github.com/euske/pdfminer) and [docx2text](https://github.com/ankushshah89/python-docx2txt) modules. Install them using:
