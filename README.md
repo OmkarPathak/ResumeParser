@@ -5,66 +5,8 @@ Note: This is just a wrapper around the pyresparser. The actual source code for 
 
 # Installation
 
-- For extracting text from various documents we use [pdfminer](https://github.com/euske/pdfminer) and [docx2text](https://github.com/ankushshah89/python-docx2txt) modules. Install them using:
-
 ```bash
-pip install pdfminer        # python 2
-pip install pdfminer.six    # python 3
-pip install docx2txt
-```
-
-- For NLP operations we use spacy and nltk. Install them using:
-
-```bash
-# spaCy
-pip install spacy
-python -m spacy download en_core_web_sm
-
-# nltk
-pip install nltk
-python -m nltk nltk.download('words')
-```
-
-- For extracting other supporting dependencies, execute:
-
-```bash
-pip install -r resume_parser/requirements.txt
-
-# and then execute
-python resume_parser/pre_requisites.py
-```
-
-- Modify `resume_parser/resume_parser/skills.csv` as per your requirements
-
-- Modify `Education Degrees` as per you requirements in [resume_parser/resume_parser/constants.py](https://github.com/OmkarPathak/ResumeParser/blob/master/constants.py)
-
-- Place all the resumes that you want to parse in `resume_parser/resumes/` directory
-
-- Run `resume_parser/resume_parser/resume_parser.py`
-
-# CLI
-
-For running the resume extractor you can also use the `cli` provided
-
-```bash
-usage: cli.py [-h] [-f FILE] [-d DIRECTORY]
-
-optional arguments:
-  -h, --help                            show this help message and exit
-  -f FILE, --file FILE                  resume file to be extracted
-  -d DIRECTORY, --directory DIRECTORY   directory containing all the resumes to be extracted
-```
-
-For extracting data from a single resume file, use
-
-```bash
-python resume_parser/cli.py -f <resume_file_path>
-```
-
-For extracting data from several resumes, place them in a directory and then execute
-
-```bash
-python resume_parser/cli.py -d <resume_directory_path>
+pip install pyresparser
 ```
 
 # GUI
