@@ -27,6 +27,20 @@ python resume_parser/manage.py runserver
 
 ![Working](results/resume_parser_result.png)
 
+# Running app in Docker
+
+- Install docker-compose
+- Execute the following commands from the root of the project
+    - Build our images
+
+        `docker-compose build`
+
+    - Starting our containers and services
+
+        `docker-compose up -d`
+
+- Visit `localhost:8080` in your browser to run the app
+
 # Result
 
 The module would return a list of dictionary objects with result as follows:

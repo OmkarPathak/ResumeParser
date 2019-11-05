@@ -3,13 +3,11 @@ version: '3'
 services:
   web:
     build: ./resume_parser
-    command: gunicorn resume_parser.wsgi:application --bind 0.0.0.0:8000
+    command: sh -c "python /usr/src/app/manage.py migrate && gunicorn resume_parser.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - ./resume_parser/:/usr/src/app/
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/mediafiles
-    # ports:
-    #   - 8000:8000
     expose:
       - "8000"
   nginx:
@@ -18,7 +16,7 @@ services:
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/mediafiles
     ports:
-      - "8080:8000"
+      - "8080:8000"   # guest:host
     depends_on:
       - web
 
