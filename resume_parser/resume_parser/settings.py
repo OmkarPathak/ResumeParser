@@ -128,3 +128,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # for uploading resume files
 MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'mediafiles')
 MEDIA_URL = '/mediafiles/'
+
+# User session expire on browser close
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+SESSION_COOKIE_AGE = 600  # set just 10 minutes
+
+SESSION_SAVE_EVERY_REQUEST = True
