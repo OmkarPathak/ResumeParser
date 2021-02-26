@@ -1,4 +1,4 @@
-Django==2.2.10
+Django==2.2.13
 django-crispy-forms==1.7.2
 pyresparser
 gunicorn
