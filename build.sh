@@ -4,6 +4,7 @@ set -o errexit
 
 # Install dependencies
 pip install -r resume_parser/requirements.txt
+pip install ./pyresparser
 
 # Collect static files
 python resume_parser/manage.py collectstatic --no-input
