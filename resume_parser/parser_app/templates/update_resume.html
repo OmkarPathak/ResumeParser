@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Resume{% endblock %}
+
+{% block content %}
+<div class="row" style="margin-top: 2%">
+    <div class="col-lg-6 offset-lg-3">
+        <h2>Update Resume Details</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" name="name" value="{{ resume.name|default_if_none:'' }}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="{{ resume.email|default_if_none:'' }}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="text" name="mobile_number" value="{{ resume.mobile_number|default_if_none:'' }}"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Tag</label>
+                <input type="text" name="tag" value="{{ resume.tag|default_if_none:'' }}" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Designation</label>
+                <input type="text" name="designation" value="{{ resume.designation|default_if_none:'' }}"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>College Name</label>
+                <input type="text" name="college_name" value="{{ resume.college_name|default_if_none:'' }}"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Education</label>
+                <textarea name="education" class="form-control"
+                    rows="3">{{ resume.education|default_if_none:'' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Skills</label>
+                <textarea name="skills" class="form-control" rows="3">{{ resume.skills|default_if_none:'' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Experience</label>
+                <textarea name="experience" class="form-control"
+                    rows="3">{{ resume.experience|default_if_none:'' }}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Remark</label>
+                <textarea name="remark" class="form-control" rows="3">{{ resume.remark|default_if_none:'' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success">Update</button>
+            <a href="{% url 'resumes_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

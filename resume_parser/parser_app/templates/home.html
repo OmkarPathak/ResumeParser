@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Resume Parser | Home{% endblock %}
+
+{% block content %}
+{% if form %}
+<div class="row">
+    <div class="col-lg-3 col-md-3"></div>
+    <div class="col-lg-6 col-md-6">
+        <form method="POST" id="upload-form" enctype="multipart/form-data" action="{% url 'homepage' %}"
+            style="margin-top: 2%; margin-bottom: 3%">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" id="import" name="import" class="btn btn-success"
+                style="margin-top: 2%; border-radius: 0">Upload</button>
+
+            <!-- Progress Container -->
+            <div id="progress-container" style="display: none; margin-top: 20px;">
+                <h5 style="margin-bottom: 15px;">Processing Queue</h5>
+                <ul id="file-list" class="list-group" style="margin-bottom: 20px;">
+                    <!-- List items will be injected here -->
+                </ul>
+                <div id="status-message" class="alert alert-info" style="display: none;">
+                    Processing files... Please do not close the window.
+                </div>
+                <a href="{% url 'resumes_list' %}" id="data-page-btn" class="btn btn-primary btn-block"
+                    style="display: none; border-radius: 0;">Go to Data Page</a>
+            </div>
+
+            <script>
+                document.getElementById('upload-form').addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    const fileInput = document.getElementById('id_resume');
+                    const files = fileInput.files;
+                    if (files.length === 0) return;
+
+                    const progressContainer = document.getElementById('progress-container');
+                    const fileList = document.getElementById('file-list');
+                    const statusMessage = document.getElementById('status-message');
+                    const submitBtn = document.getElementById('import');
+                    const dataPageBtn = document.getElementById('data-page-btn');
+                    const csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+
+                    // UI Reset
+                    progressContainer.style.display = 'block';
+                    fileList.innerHTML = '';
+                    statusMessage.style.display = 'block';
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = 'Processing...';
+
+                    // Generate File Queue UI
+                    Array.from(files).forEach((file, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        li.id = `file-${index}`;
+                        li.innerHTML = `
+                            ${file.name}
+                            <span class="badge badge-secondary badge-pill status-badge">Pending</span>
+                        `;
+                        fileList.appendChild(li);
+                    });
+
+                    // Sequential Upload
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const li = document.getElementById(`file-${i}`);
+                        const badge = li.querySelector('.status-badge');
+
+                        // Update to Processing
+                        badge.className = 'badge badge-warning badge-pill status-badge';
+                        badge.innerText = 'Processing...';
+
+                        const formData = new FormData();
+                        formData.append('resume', file);
+                        formData.append('csrfmiddlewaretoken', csrfToken);
+
+                        // Append other form data (like tags) if presents
+                        const tagInput = document.getElementById('id_tag'); // Assuming crispy forms renders id_tag
+                        if (tagInput) formData.append('tag', tagInput.value);
+
+                        try {
+                            const response = await fetch("{% url 'homepage' %}", {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            });
+
+                            if (response.ok) {
+                                badge.className = 'badge badge-success badge-pill status-badge';
+                                badge.innerText = 'Completed';
+                            } else {
+                                const data = await response.json();
+                                badge.className = 'badge badge-danger badge-pill status-badge';
+                                badge.innerText = 'Failed';
+                                li.innerHTML += `<br><small class="text-danger">${data.message || 'Error'}</small>`;
+                            }
+                        } catch (error) {
+                            badge.className = 'badge badge-danger badge-pill status-badge';
+                            badge.innerText = 'Error';
+                            console.error('Upload error:', error);
+                        }
+                    }
+
+                    // Final State
+                    statusMessage.style.display = 'none';
+                    submitBtn.innerHTML = 'All Done';
+                    dataPageBtn.style.display = 'block';
+                });
+            </script>
+        </form>
+    </div>
+    <div class="col-lg-3 col-md-3"></div>
+</div>
+{% elif resumes %}
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <a href="{% url 'homepage' %}">
+            <button class="btn btn-success" style="margin-bottom: 10px; border-radius: 0;">Upload More</button>
+        </a>
+        <a href="{% url 'resumes_list' %}" class="btn btn-primary" style="margin-bottom: 10px; border-radius: 0;">Go to
+            Data Page</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="alert alert-info">
+            Recently uploaded resumes are shown below. To view all complete history, visit the <a
+                href="{% url 'resumes_list' %}">Data Page</a>.
+        </div>
+        <table class="table table-bordered table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Resume File</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile Number</th>
+                    <th>Education</th>
+                    <th>Company Names</th>
+                    <th>Designation</th>
+                    <th>College Name</th>
+                    <th>Total Experience in years</th>
+                    <th>Skills</th>
+                    <th>Experience</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resume in resumes %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url|truncatechars:20}}</a></td>
+                    <td>{{resume.name}}</td>
+                    <td>{{resume.email}}</td>
+                    <td>{{resume.mobile_number}}</td>
+                    <td>{{resume.education}}</td>
+                    <td>{{resume.company_names}}</td>
+                    <td>{{resume.designation}}</td>
+                    <td>{{resume.college_name}}</td>
+                    <td>{{resume.total_experience}}</td>
+                    <td>{{resume.skills}}</td>
+                    <td>{{resume.experience}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

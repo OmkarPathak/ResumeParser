@@ -3,104 +3,52 @@
 {% load active %}
 {% load crispy_forms_tags %}
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Facebook Cards -->
-    <meta property="og:description" content="A fun project to store my learning from each book that I read"/>
-    <meta property="og:url" content=""/>
-    <meta property="og:image" content="{% static 'images/logomark.png' %}"/>
-    <meta property="og:type" content="website"/>
-    <meta property="og:site_name" content="Bookworm"/>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@omkarpathak27">
-    <meta name="twitter:creator" content="Omkar Pathak">
-    <meta name="twitter:title" content= "Bookworm">
-    <meta name="twitter:description" content="A fun project to store my learning from each book that I read">
-    <meta name="twitter:creator" content="Omkar Pathak">
-    <meta name="twitter:image:src" content="{% static 'images/logomark.png' %}">
-    <meta name="twitter:domain" content="https://www.omkarpathak.in">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-    <link rel="shortcut icon" href="{% static 'images/logomarkv2.ico' %}">
-    <title>{% block title %}{% endblock %}</title>
-  </head>
-  <body style="font-family: 'Poppins', sans-serif;">
-    {% include 'navbar.html' %}
+  <!-- Facebook Cards -->
+  <meta property="og:description" content="A fun project to store my learning from each book that I read" />
+  <meta property="og:url" content="" />
+  <meta property="og:image" content="{% static 'images/logomark.png' %}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bookworm" />
 
-    <div class="container-fluid">
-      {% include 'messages.html' %}
-    
-      {% if form %}
-      <div class="row">
-        <div class="col-lg-5 col-md-5"></div>
-        <div class="col-lg-6 col-md-6">
-          <form method="POST" enctype="multipart/form-data" action="{% url 'homepage' %}" style="margin-top: 2%; margin-bottom: 3%">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" id="import" name="import" class="btn btn-success" style="margin-top: 2%; border-radius: 0">Upload</button>
-          </form>
-        </div>
-      </div>
-      {% elif resumes %}
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <a href="{% url 'homepage' %}">
-              <button class="btn btn-success" style="margin-bottom: 10px; border-radius: 0;">Upload More</button>
-            </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-          <table class="table table-bordered table-striped table-responsive">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Resume File</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Mobile Number</th>
-                <th>Education</th>
-                <th>Company Names</th>
-                <th>Designation</th>
-                <th>College Name</th>
-                <th>Total Experience in years</th>
-                <th>Skills</th>
-                <th>Experience</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for resume in resumes %}
-                <tr>
-                  <td>{{forloop.counter}}</td>
-                  <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url|truncatechars:20}}</a></td>
-                  <td>{{resume.name}}</td>
-                  <td>{{resume.email}}</td>
-                  <td>{{resume.mobile_number}}</td>
-                  <td>{{resume.education}}</td>
-                  <td>{{resume.company_names}}</td>
-                  <td>{{resume.designation}}</td>
-                  <td>{{resume.college_name}}</td>
-                  <td>{{resume.total_experience}}</td>
-                  <td>{{resume.skills}}</td>
-                  <td>{{resume.experience}}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {% endif %}
-    </div>
-  
-  </body>
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@omkarpathak27">
+  <meta name="twitter:creator" content="Omkar Pathak">
+  <meta name="twitter:title" content="Bookworm">
+  <meta name="twitter:description" content="A fun project to store my learning from each book that I read">
+  <meta name="twitter:creator" content="Omkar Pathak">
+  <meta name="twitter:image:src" content="{% static 'images/logomark.png' %}">
+  <meta name="twitter:domain" content="https://www.omkarpathak.in">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" type="text/css"
+    media="all" />
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  <link rel="shortcut icon" href="{% static 'images/logomarkv2.ico' %}">
+  <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body style="font-family: 'Poppins', sans-serif;">
+  {% include 'navbar.html' %}
+
+  <div class="container-fluid">
+    {% include 'messages.html' %}
+
+    {% block content %}
+    {% endblock %}
+  </div>
+
+</body>
+
 </html>

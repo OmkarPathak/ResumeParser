@@ -9,8 +9,11 @@
     </button>
     <div class="navbar-collapse collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item {% if request.resolver_match.url_name == 'login' %} active {% endif %}">
+            <li class="nav-item {% if request.resolver_match.url_name == 'homepage' %} active {% endif %}">
                 <a class="nav-link" href="{% url 'homepage'%}">Homepage</a>
+            </li>
+            <li class="nav-item {% if request.resolver_match.url_name == 'resumes_list' %} active {% endif %}">
+                <a class="nav-link" href="{% url 'resumes_list'%}">Data</a>
             </li>
         </ul>
     </div>
