@@ -1,0 +1,18 @@
+databases:
+  - name: resumeparser_db
+    databaseName: resumeparser
+    user: resumeparser
+
+services:
+  - type: web
+    name: resume-parser
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "cd resume_parser && gunicorn resume_parser.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
