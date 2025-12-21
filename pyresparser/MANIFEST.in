@@ -1,0 +1,8 @@
+include README.md
+include bin/pyresparser.py
+
+recursive-include pyresparser *
+
+exclude pyresparser/traindata.json
+exclude pyresparser/custom_train.py
+exclude pyresparser/custom_test.py

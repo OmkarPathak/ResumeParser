@@ -1,0 +1,22 @@
+language: python
+cache: pip
+matrix:
+  include:
+    - python: 3.5
+    - python: 3.6
+    - python: 3.7
+install:
+  - pip install -r requirements.txt
+  - python -m spacy download en_core_web_sm
+  - python -m nltk.downloader words
+  - python -m nltk.downloader stopwords
+  - pip install pytest
+  - pip install coverage
+  - pip install codecov
+  - pip install flake8
+before_script:
+  - "flake8 pyresparser"
+script:
+  - "coverage run -m pytest"
+after_success:
+  - codecov
