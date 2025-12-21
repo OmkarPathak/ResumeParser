@@ -40,7 +40,7 @@ sortedcontainers==2.4.0
 spacy<3.8.0,>=3.7.0
 sqlparse==0.5.4
 srsly
-thinc
+thinc<8.3.0
 tqdm==4.67.1
 typing_extensions==4.15.0
 tzdata==2025.3
