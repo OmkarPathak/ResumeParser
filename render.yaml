@@ -2,10 +2,12 @@ databases:
   - name: resumeparser_db
     databaseName: resumeparser
     user: resumeparser
+    plan: free
 
 services:
   - type: web
     name: resume-parser
+    plan: free
     runtime: python
     buildCommand: "./build.sh"
     startCommand: "cd resume_parser && gunicorn resume_parser.wsgi:application"
