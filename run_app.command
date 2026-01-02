@@ -22,7 +22,7 @@ source env/bin/activate
 # Install dependencies
 if [ -f "requirements.txt" ]; then
     # Check if dependencies are already installed
-    if python3 -c "import pyresparser; import spacy" &> /dev/null; then
+    if python3 -c "import pyresparser; import spacy; import dj_database_url; import whitenoise" &> /dev/null; then
          echo "Dependencies already installed. Skipping installation."
     else
         echo "Installing dependencies..."
