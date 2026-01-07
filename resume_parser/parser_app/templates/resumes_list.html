@@ -4,140 +4,248 @@
 {% block title %}Resume List{% endblock %}
 
 {% block content %}
-<div class="row" style="margin-top: 2%">
+<div class="row justify-content-center" style="margin-top: 2rem;">
     <div class="col-lg-12">
-        <div class="col-lg-12">
-            <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 20px;">
-                <h2>Uploaded Resumes</h2>
-                <div>
-                    <a href="{% url 'homepage' %}" class="btn btn-primary">Upload More</a>
-                    <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-success">Export to
-                        Excel (CSV)</a>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <div class="d-flex justify-content-between align-items-center mb-0">
+                    <h3 class="mb-0 font-weight-bold" style="color: var(--text-main);">Resume Database</h3>
+                    <div>
+                        <a href="{% url 'homepage' %}" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus mr-2"></i> New Upload</a>
+                        <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-secondary shadow-sm ml-2"><i class="fas fa-file-export mr-2"></i> Export CSV</a>
+                    </div>
                 </div>
             </div>
 
-            <form method="GET" action="." style="margin-bottom: 20px;">
-                <div class="form-row align-items-center">
-                    <div class="col-md-4">
-                        <input type="text" name="q" class="form-control" placeholder="Search by Name, Email, Skills..."
-                            value="{{ search_query|default:'' }}">
+            <div class="card-body">
+                <form method="GET" action="." class="mb-4">
+                    <div class="form-row align-items-end">
+                        <div class="col-md-4">
+                            <label class="text-muted small font-weight-bold mb-1">Search</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-right-0"><i class="fas fa-search text-muted"></i></span>
+                                </div>
+                                <input type="text" name="q" class="form-control form-control-sm border-left-0 bg-light" placeholder="Name, Email, Skills..." value="{{ search_query|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="text-muted small font-weight-bold mb-1">Filter by Tag</label>
+                            <select name="tag" class="form-control form-control-sm bg-light">
+                                <option value="">All Tags</option>
+                                {% for tag in tags %}
+                                <option value="{{ tag }}" {% if selected_tag == tag %}selected{% endif %}>{{ tag }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                         <div class="col-md-2">
+                            <label class="text-muted small font-weight-bold mb-1">Rows</label>
+                            <select name="per_page" class="form-control form-control-sm bg-light" onchange="this.form.submit()">
+                                <option value="10" {% if request.GET.per_page == '10' %}selected{% endif %}>10</option>
+                                <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
+                                <option value="100" {% if request.GET.per_page == '100' %}selected{% endif %}>100</option>
+                                <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>All</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+                            <a href="{% url 'resumes_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+                            <button type="submit" class="btn btn-danger btn-sm ml-2" form="bulk-delete-form" onclick="return confirm('Are you sure you want to delete selected resumes?')" id="bulk-delete-btn" disabled>
+                                <i class="fas fa-trash"></i> Delete Selected
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <select name="tag" class="form-control">
-                            <option value="">-- Filter by Tag --</option>
-                            {% for tag in tags %}
-                            <option value="{{ tag }}" {% if selected_tag == tag %}selected{% endif %}>{{ tag }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                        <a href="{% url 'resumes_list' %}" class="btn btn-secondary">Reset</a>
-                    </div>
-                </div>
-            </form>
+                </form>
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Tag</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Mobile Number</th>
-                            <th>AI Summary</th>
-                            <th>Remarks</th>
-                            <th>Uploaded On</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for resume in resumes %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ resume.tag|default_if_none:'' }}</td>
-                            <td>{{ resume.name }}</td>
-                            <td>{{ resume.email }}</td>
-                            <td>{{ resume.mobile_number }}</td>
-                            <td>
-                                {% if resume.ai_summary %}
-                                    <span title="{{ resume.ai_summary }}">{{ resume.ai_summary|truncatechars:50 }}</span>
-                                    {% if resume.ai_strengths %}
-                                    <br><small class="text-success"><b>Strengths:</b> {{ resume.ai_strengths|truncatechars:50 }}</small>
-                                    {% endif %}
-                                {% else %}
-                                    <span class="text-muted">Not analyzed</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ resume.remark }}</td>
-                            <td>{{ resume.uploaded_on }}</td>
-                            <td>
-                                <a href="{{ resume.resume.url }}" target="_blank" class="text-dark" title="View File" style="margin-right: 10px;">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{% url 'update_resume' resume.id %}" class="text-info" title="Edit" style="margin-right: 10px;">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="{% url 'delete_resume' resume.id %}" class="text-danger"
-                                    onclick="return confirm('Are you sure?')" title="Delete">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </td>
-                        </tr>
+                <form method="POST" action="{% url 'delete_bulk_resumes' %}" id="bulk-delete-form">
+                    {% csrf_token %}
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="border-top-0">
+                                        <input type="checkbox" id="select-all">
+                                    </th>
+                                    <th class="border-top-0">#</th>
+                                    <th class="border-top-0">Tag</th>
+                                    <th class="border-top-0">Name</th>
+                                    <th class="border-top-0">Email</th>
+                                    <th class="border-top-0">Mobile</th>
+                                    <th class="border-top-0">AI Summary</th>
+                                    <th class="border-top-0">Time</th>
+                                    <th class="border-top-0">Remarks</th>
+                                    <th class="border-top-0">Date</th>
+                                    <th class="border-top-0 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resume in resumes %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="bulk_delete" value="{{ resume.id }}" class="resume-checkbox">
+                                    </td>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        {% if resume.tag %}
+                                        <span class="badge badge-light border">{{ resume.tag }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="font-weight-bold">{{ resume.name }}</td>
+                                    <td>{{ resume.email }}</td>
+                                    <td>{{ resume.mobile_number }}</td>
+                                    <td>
+                                        {% if resume.ai_summary %}
+                                            <a href="javascript:void(0);" 
+                                               onclick="openSummaryModal('{{ resume.id }}', '{{ resume.name|escapejs }}')"
+                                               class="text-decoration-none view-summary-btn">
+                                                <i class="fas fa-eye text-primary"></i> 
+                                                <small class="text-primary font-weight-bold ml-1">View</small>
+                                            </a>
+                                            <!-- Hidden Content for Modal -->
+                                            <div id="summary-content-{{ resume.id }}" class="d-none">{{ resume.ai_summary }}</div>
+                                            <div id="strengths-content-{{ resume.id }}" class="d-none">{{ resume.ai_strengths|default:'' }}</div>
+                                        {% else %}
+                                            <span class="text-muted small">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if resume.processing_time %}
+                                            <span class="badge bg-soft-success border-0">{{ resume.processing_time }}s</span>
+                                        {% else %}
+                                            <span class="text-muted small">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ resume.remark }}</td>
+                                    <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
+                                    <td class="text-right">
+                                        <a href="{{ resume.resume.url }}" target="_blank" class="btn btn-sm btn-light text-dark" title="View File">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm btn-light text-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm btn-light text-danger"
+                                            onclick="return confirm('Are you sure?')" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                
+                <!-- Summary Modal -->
+                <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content shadow-lg border-0">
+                      <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title" id="summaryModalLabel">AI Analysis</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body pb-0">
+                        <h6 class="font-weight-bold text-primary mb-2">Professional Summary</h6>
+                        <p id="modal-summary-text" class="text-muted" style="white-space: pre-wrap;"></p>
+                        
+                        <div id="modal-strengths-section" style="display: none;">
+                            <hr>
+                            <h6 class="font-weight-bold text-success mb-2">Key Strengths</h6>
+                            <p id="modal-strengths-text" class="text-muted" style="white-space: pre-wrap;"></p>
+                        </div>
+                      </div>
+                      <div class="modal-footer border-top-0">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <script>
+                    function openSummaryModal(id, name) {
+                        // Get Content by ID
+                        var summaryText = document.getElementById('summary-content-' + id).innerText;
+                        var strengthsText = document.getElementById('strengths-content-' + id).innerText;
+                        
+                        // Populate Modal
+                        $('#summaryModalLabel').text('AI Analysis: ' + name);
+                        $('#modal-summary-text').text(summaryText);
+                        
+                        if (strengthsText && strengthsText.trim() !== '') {
+                            $('#modal-strengths-section').show();
+                            $('#modal-strengths-text').text(strengthsText);
+                        } else {
+                            $('#modal-strengths-section').hide();
+                        }
+                        
+                        // Open Modal
+                        $('#summaryModal').modal('show');
+                    }
+
+                    document.getElementById('select-all').addEventListener('change', function() {
+                        const checkboxes = document.querySelectorAll('.resume-checkbox');
+                        checkboxes.forEach(cb => cb.checked = this.checked);
+                        toggleDeleteBtn();
+                    });
+
+                    document.querySelectorAll('.resume-checkbox').forEach(cb => {
+                        cb.addEventListener('change', toggleDeleteBtn);
+                    });
+
+                    function toggleDeleteBtn() {
+                        const selected = document.querySelectorAll('.resume-checkbox:checked').length;
+                        document.getElementById('bulk-delete-btn').disabled = selected === 0;
+                    }
+                    
+                    // Activate Bootstrap tooltips
+                    $(function () {
+                      $('[data-toggle="tooltip"]').tooltip()
+                    })
+                </script>
+
+                {% if resumes.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if resumes.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle m-1" style="width: 40px; height: 40px; text-align: center; line-height: 25px;"
+                                href="?page={{ resumes.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
+                                aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for i in resumes.paginator.page_range %}
+                        {% if resumes.number == i %}
+                        <li class="page-item active"><span class="page-link border-0 shadow-sm rounded-circle m-1 bg-primary" style="width: 40px; height: 40px; text-align: center; line-height: 25px;">{{ i }}</span></li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle m-1" style="width: 40px; height: 40px; text-align: center; line-height: 25px;"
+                                href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}">
+                                {{ i }}
+                            </a>
+                        </li>
+                        {% endif %}
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
 
-            {% if resumes.has_other_pages %}
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    {% if resumes.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link"
-                            href="?page={{ resumes.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
-                            aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link" aria-hidden="true">&laquo;</span>
-                    </li>
-                    {% endif %}
-
-                    {% for i in resumes.paginator.page_range %}
-                    {% if resumes.number == i %}
-                    <li class="page-item active"><span class="page-link">{{ i }}</span></li>
-                    {% else %}
-                    <li class="page-item">
-                        <a class="page-link"
-                            href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}">
-                            {{ i }}
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if resumes.has_next %}
-                    <li class="page-item">
-                        <a class="page-link"
-                            href="?page={{ resumes.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
-                            aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link" aria-hidden="true">&raquo;</span>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        </div>
+                        {% if resumes.has_next %}
+                        <li class="page-item">
+                            <a class="page-link border-0 shadow-sm rounded-circle m-1" style="width: 40px; height: 40px; text-align: center; line-height: 25px;"
+                                href="?page={{ resumes.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
+                                aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div> <!-- End Card Body -->
+        </div> <!-- End Card -->
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

@@ -10,70 +10,105 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
 from .utils import extract_text
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from django.db import connection
+from django.db.models import Avg
+import time
+
+def process_single_resume(file, tag):
+    """
+    Worker function to process a single resume in a separate thread.
+    """
+    start_time = time.time()
+    try:
+        # Re-fetch resume to ensure freshness
+        resume = Resume.objects.get(id=file) # 'file' argument here being the ID
+        
+        file_path = os.path.join(settings.MEDIA_ROOT, resume.resume.name)
+        ext = os.path.splitext(file_path)[1]
+        
+        # 1. Text Extraction (I/O Bound)
+        resume_text = extract_text(file_path, ext)
+        
+        # 2. AI Analysis (Compute/Network Bound)
+        data = get_resume_insights(resume_text)
+        
+        if data:
+            resume.name           = data.get('name')
+            resume.email          = data.get('email')
+            resume.mobile_number  = data.get('mobile_number')
+            resume.education      = ', '.join(data.get('education')) if isinstance(data.get('education'), list) else data.get('education')
+            resume.skills         = ', '.join(data.get('skills')) if isinstance(data.get('skills'), list) else data.get('skills')
+            resume.company_names  = ', '.join(data.get('company_names')) if isinstance(data.get('company_names'), list) else data.get('company_names')
+            resume.college_name   = data.get('college_name')
+            resume.designation    = data.get('designation')
+            resume.total_experience = data.get('total_experience')
+            resume.experience     = ', '.join(data.get('experience')) if isinstance(data.get('experience'), list) else data.get('experience')
+            resume.ai_summary     = data.get('ai_summary')
+            resume.ai_strengths   = data.get('ai_strengths')
+            
+            # Calculate processing time
+            end_time = time.time()
+            resume.processing_time = round(end_time - start_time, 2)
+            
+            resume.save()
+            return f"Success: {resume.resume.name}"
+            
+    except Exception as e:
+        print(f"Worker Error for {file}: {e}")
+        return f"Error: {e}"
+    finally:
+        # Close connection to prevent leaks in threads
+        connection.close()
+
 def homepage(request):
     if request.method == 'POST':
         # Removed Resume.objects.all().delete() to maintain history
         file_form = UploadResumeModelForm(request.POST, request.FILES)
         files = request.FILES.getlist('resume')
-        resumes_data = []
         
         # Check if it's an AJAX request
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.is_ajax()
 
         if file_form.is_valid():
+            resume_ids = []
+            
+            # Step 1: Fast Serial Save (Disk I/O)
             for file in files:
                 try:
-                    # saving the file
                     resume = Resume(resume=file)
-                    resume.tag = request.POST.get('tag') # Save the tag
+                    resume.tag = request.POST.get('tag')
                     resume.save()
-                    
-                    # New Logic: Extract Text -> AI Analysis
-                    file_path = os.path.join(settings.MEDIA_ROOT, resume.resume.name)
-                    ext = os.path.splitext(file_path)[1]
-                    
-                    resume_text = extract_text(file_path, ext)
-                    data = get_resume_insights(resume_text)
-                    
-                    if data:
-                        resume.name           = data.get('name')
-                        resume.email          = data.get('email')
-                        resume.mobile_number  = data.get('mobile_number')
-                        # Ensure education and skills are stored as strings if they come as lists
-                        resume.education      = ', '.join(data.get('education')) if isinstance(data.get('education'), list) else data.get('education')
-                        resume.skills         = ', '.join(data.get('skills')) if isinstance(data.get('skills'), list) else data.get('skills')
-                        resume.company_names  = ', '.join(data.get('company_names')) if isinstance(data.get('company_names'), list) else data.get('company_names')
-                        resume.college_name   = data.get('college_name')
-                        resume.designation    = data.get('designation')
-                        resume.total_experience = data.get('total_experience')
-                        resume.experience     = ', '.join(data.get('experience')) if isinstance(data.get('experience'), list) else data.get('experience')
-                        resume.ai_summary     = data.get('ai_summary')
-                        resume.ai_strengths   = data.get('ai_strengths')
-
-                    resume.save() # Save again after populating extracted data
+                    resume_ids.append(resume.id)
                 except IntegrityError:
                     if is_ajax:
                         return JsonResponse({'status': 'error', 'message': f'Duplicate resume found: {file.name}'}, status=400)
                     messages.warning(request, f'Duplicate resume found: {file.name}')
-                    return redirect('homepage')
-                except Exception as e:
-                    print(f"Error during resume parsing for {file.name}: {e}")
-                    if is_ajax:
-                        return JsonResponse({'status': 'error', 'message': f'Error processing {file.name}: {e}'}, status=500)
-                    messages.error(request, f'Error processing {file.name}: {e}')
-                    # Optionally, you might want to delete the partially saved resume here
-                    # resume.delete()
-                    return redirect('homepage')
+            
+            # Step 2: Parallel Processing (Text Extraction + AI)
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                futures = {executor.submit(process_single_resume, r_id, request.POST.get('tag')): r_id for r_id in resume_ids}
+                # Wait for completion implemented implicitly by view return? No, we should wait if we want to show updated list.
+                # But for UX, we might want to return immediately or wait. 
+                # Given user asked for parallel, they usually expect faster turnaround.
+                # Let's wait for results to ensure list is updated.
+                for future in as_completed(futures):
+                    pass
             
             if is_ajax:
-                return JsonResponse({'status': 'success', 'message': 'File uploaded successfully'})
+                return JsonResponse({'status': 'success', 'message': 'Files processed successfully'})
 
-            messages.success(request, 'Resumes uploaded!')
+            messages.success(request, 'Resumes processed in background!')
 
             return redirect('resumes_list')
     else:
-        form = UploadResumeModelForm()
-    return render(request, 'home.html', {'form': form})
+        file_form = UploadResumeModelForm()
+        
+    # Calculate Average Processing Time
+    avg_time = Resume.objects.aggregate(Avg('processing_time'))['processing_time__avg']
+    avg_time = round(avg_time, 2) if avg_time else 0
+    
+    return render(request, 'home.html', {'form': file_form, 'avg_processing_time': avg_time})
 
 def resumes_list(request):
     resumes = Resume.objects.all().order_by('-uploaded_on')
@@ -98,7 +133,15 @@ def resumes_list(request):
         )
 
     # Pagination
-    paginator = Paginator(resumes, 10) # Show 10 resumes per page
+    per_page = request.GET.get('per_page', '10')
+    if per_page == 'all':
+        paginator = Paginator(resumes, resumes.count())
+    else:
+        try:
+            paginator = Paginator(resumes, int(per_page))
+        except ValueError:
+            paginator = Paginator(resumes, 10)
+            
     page_number = request.GET.get('page')
     try:
         resumes = paginator.page(page_number)
@@ -119,6 +162,16 @@ def delete_resume(request, pk):
     resume = Resume.objects.get(pk=pk)
     resume.delete()
     messages.success(request, 'Resume deleted successfully!')
+    return redirect('resumes_list')
+
+def delete_bulk_resumes(request):
+    if request.method == 'POST':
+        resume_ids = request.POST.getlist('bulk_delete')
+        if resume_ids:
+            Resume.objects.filter(id__in=resume_ids).delete()
+            messages.success(request, f'{len(resume_ids)} resumes deleted successfully!')
+        else:
+            messages.warning(request, 'No resumes selected for deletion.')
     return redirect('resumes_list')
 
 def update_resume(request, pk):

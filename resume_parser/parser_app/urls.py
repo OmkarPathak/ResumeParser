@@ -24,4 +24,5 @@ urlpatterns = [
     path('resume/delete/<int:pk>/', views.delete_resume, name='delete_resume'),
     path('resume/update/<int:pk>/', views.update_resume, name='update_resume'),
     path('resumes/export/', views.export_resumes, name='export_resumes'),
+    path('resumes/delete/bulk/', views.delete_bulk_resumes, name='delete_bulk_resumes'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

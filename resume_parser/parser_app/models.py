@@ -22,6 +22,7 @@ class Resume(models.Model):
     total_experience  = models.CharField('Total Experience (in Years)', max_length=1000, null=True, blank=True)
     ai_summary        = models.TextField('AI Summary', null=True, blank=True)
     ai_strengths      = models.TextField('AI Strengths', null=True, blank=True)
+    processing_time   = models.FloatField('Processing Time (seconds)', null=True, blank=True)
     remark            = models.CharField('Remark', max_length=1000, null=True, blank=True)
 
 class UploadResumeModelForm(forms.ModelForm):

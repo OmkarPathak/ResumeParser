@@ -4,16 +4,45 @@
 {% block title %}Resume Parser | Home{% endblock %}
 
 {% block content %}
-{% if form %}
-<div class="row">
-    <div class="col-lg-3 col-md-3"></div>
-    <div class="col-lg-6 col-md-6">
-        <form method="POST" id="upload-form" enctype="multipart/form-data" action="{% url 'homepage' %}"
-            style="margin-top: 2%; margin-bottom: 3%">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" id="import" name="import" class="btn btn-success"
-                style="margin-top: 2%; border-radius: 0">Upload</button>
+<div class="row justify-content-center" style="margin-top: 1rem;">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-md">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4" style="color: var(--primary);">Upload Resume</h2>
+                <p class="text-muted text-center mb-4">Upload CVs to extract entities and generate summaries instantly.</p>
+
+                {% if avg_processing_time > 0 %}
+                <div class="alert alert-secondary text-center mb-4 border-0" role="alert" style="background-color: #EEF2FF; color: var(--primary);">
+                    <i class="fas fa-bolt mr-2"></i> Average Processing Time: <strong>{{ avg_processing_time }}s</strong>
+                </div>
+                {% endif %}
+
+                <form method="POST" id="upload-form" enctype="multipart/form-data" action="{% url 'homepage' %}">
+                    {% csrf_token %}
+                    <div class="form-group mb-4">
+                        <label for="id_tag" class="font-weight-bold ml-1 text-muted">Tag (Optional)</label>
+                        <input type="text" name="tag" id="id_tag" class="form-control" placeholder="e.g. Java Developers, Q1 Hiring">
+                    </div>
+
+                    <div class="upload-area p-5 text-center mb-4" id="drop-zone" style="border: 2px dashed #E0E7FF; border-radius: 12px; background-color: #F8FAFC; cursor: pointer; transition: all 0.3s;">
+                        <input type="file" name="resume" id="id_resume" multiple class="d-none" accept=".pdf,.docx,.doc,.txt">
+                        <div id="drop-zone-content">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: #4F46E5;"></i>
+                            <h5 class="font-weight-bold" style="color: #475569;">Drag & Drop files here</h5>
+                            <p class="text-muted small mb-0">or click to browse from your computer</p>
+                            <p class="text-muted small mt-2">Supports PDF, DOCX, TXT</p>
+                        </div>
+                        <div id="file-preview" style="display: none;">
+                            <i class="fas fa-file-alt fa-2x mb-2" style="color: #4F46E5;"></i>
+                            <h6 class="font-weight-bold text-primary" id="file-count">0 files selected</h6>
+                            <p class="text-muted small" id="file-names"></p>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="clear-files">Remove All</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="import" name="import" class="btn btn-primary btn-block btn-lg shadow-sm" style="opacity: 0.6; pointer-events: none;">
+                        <i class="fas fa-magic mr-2"></i> Parse Resumes
+                    </button>
 
             <!-- Progress Container -->
             <div id="progress-container" style="display: none; margin-top: 20px;">
@@ -29,6 +58,82 @@
             </div>
 
             <script>
+                // --- Drag & Drop Logic ---
+                const dropZone = document.getElementById('drop-zone');
+                const fileInput = document.getElementById('id_resume');
+                const importBtn = document.getElementById('import');
+                const dropContent = document.getElementById('drop-zone-content');
+                const filePreview = document.getElementById('file-preview');
+                const fileCount = document.getElementById('file-count');
+                const fileNames = document.getElementById('file-names');
+                const clearBtn = document.getElementById('clear-files');
+
+                // Trigger file input on click
+                dropZone.addEventListener('click', () => fileInput.click());
+
+                // Prevent bubbling on clear button
+                clearBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fileInput.value = '';
+                    handleFiles([]);
+                });
+
+                // Drag Events
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, () => dropZone.style.backgroundColor = '#EEF2FF', false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, () => dropZone.style.backgroundColor = '#F8FAFC', false);
+                });
+
+                // Handle Drop
+                dropZone.addEventListener('drop', handleDrop, false);
+
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    fileInput.files = files; // Assign dropped files to input
+                    handleFiles(files);
+                }
+
+                // Handle Input Change
+                fileInput.addEventListener('change', function() {
+                    handleFiles(this.files);
+                });
+
+                function handleFiles(files) {
+                    if (files.length > 0) {
+                        dropContent.style.display = 'none';
+                        filePreview.style.display = 'block';
+                        fileCount.innerText = `${files.length} file(s) selected`;
+                        
+                        // Show first 3 names
+                        const names = Array.from(files).map(f => f.name).slice(0, 3);
+                        if (files.length > 3) names.push(`+ ${files.length - 3} more`);
+                        fileNames.innerText = names.join(', ');
+
+                        // Enable Submit
+                        importBtn.style.opacity = '1';
+                        importBtn.style.pointerEvents = 'auto';
+                    } else {
+                        dropContent.style.display = 'block';
+                        filePreview.style.display = 'none';
+                        importBtn.style.opacity = '0.6';
+                        importBtn.style.pointerEvents = 'none';
+                    }
+                }
+
+                // --- Existing Submission Logic ---
                 document.getElementById('upload-form').addEventListener('submit', async function (e) {
                     e.preventDefault();
 
@@ -112,62 +217,13 @@
                 });
             </script>
         </form>
-    </div>
-    <div class="col-lg-3 col-md-3"></div>
-</div>
-{% elif resumes %}
-<div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <a href="{% url 'homepage' %}">
-            <button class="btn btn-success" style="margin-bottom: 10px; border-radius: 0;">Upload More</button>
-        </a>
-        <a href="{% url 'resumes_list' %}" class="btn btn-primary" style="margin-bottom: 10px; border-radius: 0;">Go to
-            Data Page</a>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="alert alert-info">
-            Recently uploaded resumes are shown below. To view all complete history, visit the <a
-                href="{% url 'resumes_list' %}">Data Page</a>.
-        </div>
-        <table class="table table-bordered table-striped table-responsive">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Resume File</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Mobile Number</th>
-                    <th>Education</th>
-                    <th>Company Names</th>
-                    <th>Designation</th>
-                    <th>College Name</th>
-                    <th>Total Experience in years</th>
-                    <th>Skills</th>
-                    <th>Experience</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for resume in resumes %}
-                <tr>
-                    <td>{{forloop.counter}}</td>
-                    <td><a href="{{resume.resume.url}}" target="_blank">{{resume.resume.url|truncatechars:20}}</a></td>
-                    <td>{{resume.name}}</td>
-                    <td>{{resume.email}}</td>
-                    <td>{{resume.mobile_number}}</td>
-                    <td>{{resume.education}}</td>
-                    <td>{{resume.company_names}}</td>
-                    <td>{{resume.designation}}</td>
-                    <td>{{resume.college_name}}</td>
-                    <td>{{resume.total_experience}}</td>
-                    <td>{{resume.skills}}</td>
-                    <td>{{resume.experience}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-{% endif %}
+            </div> <!-- Close card-body -->
+        </div> <!-- Close card -->
+    </div> <!-- Close col -->
+</div> <!-- Close row -->
+
+{% comment %} 
+Legary resume list code removed. 
+Use resumes_list.html for viewing data. 
+{% endcomment %}
 {% endblock %}
