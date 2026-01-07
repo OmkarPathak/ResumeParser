@@ -19,37 +19,34 @@ def get_package_path(package_name):
 datas = [
     ('parser_app/templates', 'parser_app/templates'),
     ('parser_app/static', 'parser_app/static'),
-    # Include NLTK data - expecting it to be in resume_parser/nltk_data after build script runs
-    ('nltk_data', 'nltk_data'), 
+    ('models', 'models'), # Include AI models at root (matched with settings.BASE_DIR)
+    ('db.sqlite3', '.'),
 ]
 
 binaries = []
-hiddenimports = [
+hiddenimports=[
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'parser_app',
-    'parser_app.templatetags',
     'crispy_forms',
+    'parser_app',
+    'whitenoise.middleware',
+    'whitenoise',
+    # AI Dependencies
+    'llama_cpp', 
+    'huggingface_hub',
     'crispy_forms.templatetags.crispy_forms_tags', 
-    'en_core_web_sm',
 ]
 
 # Packages to specifically handle
 packages_to_collect = [
-    'spacy', 
-    'pyresparser', 
-    'thinc', 
-    'srsly', 
-    'cymem', 
-    'preshed', 
-    'blis', 
     'crispy_forms',
     'docx2txt',
     'pdfminer',
+    'llama_cpp', # Explicitly collect to get libllama.dylib
 ]
 
 # Dynamic collection
@@ -61,11 +58,6 @@ for pkg in packages_to_collect:
         hiddenimports += tmp_ret[2]
     except Exception as e:
         print(f"Warning: Could not collect {pkg}: {e}")
-
-# Explicitly add en_core_web_sm if not collected (it's often missed if installed as link)
-en_core_path = get_package_path('en_core_web_sm')
-if en_core_path:
-    datas.append((en_core_path, 'en_core_web_sm'))
 
 a = Analysis(
     ['manage.py'],

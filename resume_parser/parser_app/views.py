@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from pyresparser import ResumeParser
+from .ai_service import get_resume_insights
 from .models import Resume, UploadResumeModelForm
 from django.contrib import messages
 from django.conf import settings
@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http import HttpResponse, FileResponse, Http404, JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import os
+from .utils import extract_text
 
 def homepage(request):
     if request.method == 'POST':
@@ -27,34 +28,41 @@ def homepage(request):
                     resume.tag = request.POST.get('tag') # Save the tag
                     resume.save()
                     
-                    # extracting resume entities
-                    parser = ResumeParser(os.path.join(settings.MEDIA_ROOT, resume.resume.name))
-                    data = parser.get_extracted_data()
-                    resumes_data.append(data)
-                    resume.name               = data.get('name')
-                    resume.email              = data.get('email')
-                    resume.mobile_number      = data.get('mobile_number')
-                    if data.get('degree') is not None:
-                        resume.education      = ', '.join(data.get('degree'))
-                    else:
-                        resume.education      = None
-                    resume.company_names      = data.get('company_names')
-                    resume.college_name       = data.get('college_name')
-                    resume.designation        = data.get('designation')
-                    resume.total_experience   = data.get('total_experience')
-                    if data.get('skills') is not None:
-                        resume.skills         = ', '.join(data.get('skills'))
-                    else:
-                        resume.skills         = None
-                    if data.get('experience') is not None:
-                        resume.experience     = ', '.join(data.get('experience'))
-                    else:
-                        resume.experience     = None
-                    resume.save()
+                    # New Logic: Extract Text -> AI Analysis
+                    file_path = os.path.join(settings.MEDIA_ROOT, resume.resume.name)
+                    ext = os.path.splitext(file_path)[1]
+                    
+                    resume_text = extract_text(file_path, ext)
+                    data = get_resume_insights(resume_text)
+                    
+                    if data:
+                        resume.name           = data.get('name')
+                        resume.email          = data.get('email')
+                        resume.mobile_number  = data.get('mobile_number')
+                        # Ensure education and skills are stored as strings if they come as lists
+                        resume.education      = ', '.join(data.get('education')) if isinstance(data.get('education'), list) else data.get('education')
+                        resume.skills         = ', '.join(data.get('skills')) if isinstance(data.get('skills'), list) else data.get('skills')
+                        resume.company_names  = ', '.join(data.get('company_names')) if isinstance(data.get('company_names'), list) else data.get('company_names')
+                        resume.college_name   = data.get('college_name')
+                        resume.designation    = data.get('designation')
+                        resume.total_experience = data.get('total_experience')
+                        resume.experience     = ', '.join(data.get('experience')) if isinstance(data.get('experience'), list) else data.get('experience')
+                        resume.ai_summary     = data.get('ai_summary')
+                        resume.ai_strengths   = data.get('ai_strengths')
+
+                    resume.save() # Save again after populating extracted data
                 except IntegrityError:
                     if is_ajax:
                         return JsonResponse({'status': 'error', 'message': f'Duplicate resume found: {file.name}'}, status=400)
-                    messages.warning(request, 'Duplicate resume found:', file.name)
+                    messages.warning(request, f'Duplicate resume found: {file.name}')
+                    return redirect('homepage')
+                except Exception as e:
+                    print(f"Error during resume parsing for {file.name}: {e}")
+                    if is_ajax:
+                        return JsonResponse({'status': 'error', 'message': f'Error processing {file.name}: {e}'}, status=500)
+                    messages.error(request, f'Error processing {file.name}: {e}')
+                    # Optionally, you might want to delete the partially saved resume here
+                    # resume.delete()
                     return redirect('homepage')
             
             if is_ajax:
@@ -125,6 +133,8 @@ def update_resume(request, pk):
         resume.education = request.POST.get('education')
         resume.skills = request.POST.get('skills')
         resume.experience = request.POST.get('experience')
+        resume.ai_summary = request.POST.get('ai_summary')
+        resume.ai_strengths = request.POST.get('ai_strengths')
         resume.remark = request.POST.get('remark')
         resume.save()
         messages.success(request, 'Resume details updated successfully!')

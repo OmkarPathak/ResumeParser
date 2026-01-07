@@ -17,17 +17,12 @@ fi
 
 source env/bin/activate
 
-# 2. Install Dependencies
-echo "Installing dependencies..."
-pip install --upgrade pip setuptools wheel
+# 2. Install Project Dependencies
+echo "Installing Project Dependencies..."
 pip install -r requirements.txt
-pip install -e ../pyresparser
-pip install pyinstaller
 
-# 3. Download NLTK Data locally
-echo "Downloading NLTK data..."
-mkdir -p nltk_data
-python -m nltk.downloader -d nltk_data stopwords punkt punkt_tab wordnet maxent_ne_chunker words averaged_perceptron_tagger averaged_perceptron_tagger_eng
+# 3. Create necessary directories
+mkdir -p models
 
 # 4. Cleanup previous builds
 rm -rf build dist

@@ -23,16 +23,16 @@ RUN pip install --upgrade pip && \
     pip install -r /app/requirements.txt
 
 # Copy the entire project directories
-COPY pyresparser /app/pyresparser
-COPY resume_parser /app/resume_parser
+COPY . /app
 
-# Install the custom local package 'pyresparser'
-RUN pip install -e /app/pyresparser
+# Create directory for AI model
+RUN mkdir -p /app/resume_parser/models
 
-# Download NLTK data and Spacy models
-# We switch to resume_parser directory where pre_requisites.py is located
-WORKDIR /app/resume_parser
-RUN python pre_requisites.py
+# Collect static files
+RUN python resume_parser/manage.py collectstatic --noinput
+
+# Run migrations
+RUN python resume_parser/manage.py migrate
 
 # Expose the application port
 EXPOSE 8000

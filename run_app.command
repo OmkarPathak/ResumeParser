@@ -21,17 +21,19 @@ source env/bin/activate
 
 # Install dependencies
 if [ -f "requirements.txt" ]; then
-    # Check if dependencies are already installed
-    if python3 -c "import pyresparser; import spacy; import dj_database_url; import whitenoise" &> /dev/null; then
-         echo "Dependencies already installed. Skipping installation."
+    echo "Checking dependencies..."
+    if python3 -c "import dj_database_url; import whitenoise" &> /dev/null; then
+        echo "Dependencies found."
     else
-        echo "Installing dependencies..."
-        pip install -r requirements.txt
-        
-        # Install pyresparser from local source
-        echo "Installing local pyresparser..."
-        pip install -e ../pyresparser
+        echo "Dependencies missing. Treating as first run..."
+        FIRST_RUN=1
     fi
+    echo "Installing dependencies..."
+    pip install -r requirements.txt
+    
+    # Install pyresparser from local source
+    echo "Installing local pyresparser..."
+    pip install -e ../pyresparser
 fi
 
 # Apply migrations

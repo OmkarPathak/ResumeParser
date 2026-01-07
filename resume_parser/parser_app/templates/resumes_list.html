@@ -43,10 +43,10 @@
                         <tr>
                             <th>#</th>
                             <th>Tag</th>
-                            <th>Resume File</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Mobile Number</th>
+                            <th>AI Summary</th>
                             <th>Remarks</th>
                             <th>Uploaded On</th>
                             <th>Actions</th>
@@ -57,16 +57,32 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td>{{ resume.tag|default_if_none:'' }}</td>
-                            <td><a href="{{ resume.resume.url }}" target="_blank">View File</a></td>
                             <td>{{ resume.name }}</td>
                             <td>{{ resume.email }}</td>
                             <td>{{ resume.mobile_number }}</td>
+                            <td>
+                                {% if resume.ai_summary %}
+                                    <span title="{{ resume.ai_summary }}">{{ resume.ai_summary|truncatechars:50 }}</span>
+                                    {% if resume.ai_strengths %}
+                                    <br><small class="text-success"><b>Strengths:</b> {{ resume.ai_strengths|truncatechars:50 }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Not analyzed</span>
+                                {% endif %}
+                            </td>
                             <td>{{ resume.remark }}</td>
                             <td>{{ resume.uploaded_on }}</td>
                             <td>
-                                <a href="{% url 'update_resume' resume.id %}" class="btn btn-primary btn-sm">Edit</a>
-                                <a href="{% url 'delete_resume' resume.id %}" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Are you sure?')">Delete</a>
+                                <a href="{{ resume.resume.url }}" target="_blank" class="text-dark" title="View File" style="margin-right: 10px;">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'update_resume' resume.id %}" class="text-info" title="Edit" style="margin-right: 10px;">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'delete_resume' resume.id %}" class="text-danger"
+                                    onclick="return confirm('Are you sure?')" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}

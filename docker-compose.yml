@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   web:
     build: 
@@ -7,8 +5,8 @@ services:
       dockerfile: Dockerfile
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./resume_parser:/app/resume_parser
-      - ./pyresparser:/app/pyresparser
+      - .:/app
+      - ./resume_parser/db.sqlite3:/app/db.sqlite3sparser
     ports:
       - "8000:8000"
     environment:
