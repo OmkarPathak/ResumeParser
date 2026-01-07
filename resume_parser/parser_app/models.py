@@ -30,7 +30,7 @@ class UploadResumeModelForm(forms.ModelForm):
         model = Resume
         fields = ['resume', 'tag']
         widgets = {
-            'resume': ClearableFileInput(attrs={'multiple': True}),
+            'resume': ClearableFileInput(),
         }
 
 # delete the resume files associated with each object or record

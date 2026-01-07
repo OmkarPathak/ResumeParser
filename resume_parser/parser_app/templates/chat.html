@@ -8,7 +8,7 @@
     <div class="col-lg-8">
         <div class="card shadow-lg" style="height: 80vh; display: flex; flex-direction: column;">
             <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                <h4 class="font-weight-bold" style="color: var(--primary);">
+                <h4 class="font-weight-bold text-purple">
                     <i class="fas fa-robot mr-2"></i>Chat with Database
                 </h4>
                 <p class="text-muted small">Ask questions like "Who knows Python?" or "Find 5 years experience"</p>
@@ -18,7 +18,7 @@
                 <!-- Welcome Message -->
                 <div class="chat-message bot-message mb-3">
                     <div class="p-3 rounded-lg bg-white shadow-sm" style="max-width: 80%; border-top-left-radius: 0;">
-                        <span class="font-weight-bold text-primary mb-1 d-block">AI Assistant</span>
+                        <span class="font-weight-bold text-purple mb-1 d-block">AI Assistant</span>
                         Hello! I've analyzed all the resumes in your database. How can I help you find the perfect candidate today?
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                 <form id="chat-form" class="d-flex">
                     <input type="text" id="user-input" class="form-control form-control-lg mr-2" 
                            placeholder="Type your question..." autocomplete="off">
-                    <button type="submit" class="btn btn-primary btn-lg shadow-sm" id="send-btn">
+                    <button type="submit" class="btn btn-purple btn-lg shadow-sm" id="send-btn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </form>
@@ -38,9 +38,18 @@
 </div>
 
 <style>
+    :root {
+        --purple: #6f42c1;
+        --purple-light: #e0dafd;
+    }
+    .text-purple { color: var(--purple) !important; }
+    .bg-purple { background-color: var(--purple) !important; color: white; }
+    .btn-purple { background-color: var(--purple); color: white; border: none; }
+    .btn-purple:hover { background-color: #5a32a3; color: white; }
+    
     .rounded-lg { border-radius: 0.75rem; }
     .bot-message .p-3 { margin-right: auto; }
-    .user-message .p-3 { margin-left: auto; background-color: var(--primary); color: white; border-top-right-radius: 0; }
+    .user-message .p-3 { margin-left: auto; background-color: var(--purple); color: white; border-top-right-radius: 0; }
     
     /* Markdown Styling in Chat */
     .chat-content ul { padding-left: 20px; }
@@ -62,12 +71,14 @@
         // Simple Markdown bold replacement
         contentHtml = contentHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         // Replaces [Link Text](URL) with Anchor tags
-        contentHtml = contentHtml.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="font-weight-bold" style="text-decoration: underline;">$1 <i class="fas fa-external-link-alt small ml-1"></i></a>');
+        // Changed anchor color to be white-ish for user, purple for bot
+        const linkColor = role === 'user' ? 'text-white' : 'text-purple';
+        contentHtml = contentHtml.replace(/\[(.*?)\]\((.*?)\)/g, `<a href="$2" target="_blank" class="font-weight-bold ${linkColor}" style="text-decoration: underline;">$1 <i class="fas fa-external-link-alt small ml-1"></i></a>`);
         contentHtml = contentHtml.replace(/\n/g, '<br>');
 
-        const bgClass = role === 'user' ? 'bg-primary text-white' : 'bg-white text-dark shadow-sm';
+        const bgClass = role === 'user' ? 'bg-purple' : 'bg-white text-dark shadow-sm';
         const alignStyle = role === 'user' ? 'margin-left: auto; border-top-right-radius: 0;' : 'margin-right: auto; border-top-left-radius: 0;';
-        const nameColor = role === 'user' ? 'text-white-50' : 'text-primary';
+        const nameColor = role === 'user' ? 'text-white-50' : 'text-purple';
         const name = role === 'user' ? 'You' : 'AI Assistant';
 
         div.innerHTML = `

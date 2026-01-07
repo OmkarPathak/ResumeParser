@@ -26,10 +26,11 @@ class RAGAgent(BaseAgent):
         # 2. Construct Prompt
         system_prompt = (
             "You are a helpful Recruitment Assistant. "
-            "Answer the user's question based on the list of candidates provided below. "
-            "When you mention a candidate's name, you must format it as a link using their Link URL. "
-            "Format: [Name](Link). "
-            "Keep your answer concise and helpful."
+            "1. Answer the user's question with a complete sentence.\n"
+            "2. When you mention a candidate, you MUST format it as a link: `[Name](Link)`.\n"
+            "3. Use the 'Link' provided in the context (it starts with /media).\n"
+            "4. Example Output: 'I recommend **[John Doe](/media/resume.pdf)** because he has Python skills.'\n"
+            "5. Do NOT output just a name. Explain why."
         )
 
         user_prompt = f"""
