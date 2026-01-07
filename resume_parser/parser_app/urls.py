@@ -25,4 +25,5 @@ urlpatterns = [
     path('resume/update/<int:pk>/', views.update_resume, name='update_resume'),
     path('resumes/export/', views.export_resumes, name='export_resumes'),
     path('resumes/delete/bulk/', views.delete_bulk_resumes, name='delete_bulk_resumes'),
+    path('chat/', views.chat_view, name='chat_view'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

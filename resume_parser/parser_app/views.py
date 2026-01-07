@@ -226,3 +226,22 @@ def export_resumes(request):
         writer.writerow(resume)
 
     return response
+
+# --- RAG Chat View ---
+from .agents.rag_agent import RAGAgent
+
+def chat_view(request):
+    if request.method == 'POST':
+        query = request.POST.get('query')
+        if not query:
+            return JsonResponse({'error': 'No query provided'}, status=400)
+        
+        try:
+            agent = RAGAgent()
+            answer = agent.chat(query)
+            return JsonResponse({'answer': answer})
+        except Exception as e:
+            print(f"Chat Error: {e}")
+            return JsonResponse({'error': str(e)}, status=500)
+            
+    return render(request, 'chat.html')

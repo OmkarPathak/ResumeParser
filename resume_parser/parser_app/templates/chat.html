@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resume Parser | AI Chat{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" style="margin-top: 2rem;">
+    <div class="col-lg-8">
+        <div class="card shadow-lg" style="height: 80vh; display: flex; flex-direction: column;">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h4 class="font-weight-bold" style="color: var(--primary);">
+                    <i class="fas fa-robot mr-2"></i>Chat with Database
+                </h4>
+                <p class="text-muted small">Ask questions like "Who knows Python?" or "Find 5 years experience"</p>
+            </div>
+            
+            <div class="card-body p-4" id="chat-history" style="flex: 1; overflow-y: auto; background-color: #F8FAFC;">
+                <!-- Welcome Message -->
+                <div class="chat-message bot-message mb-3">
+                    <div class="p-3 rounded-lg bg-white shadow-sm" style="max-width: 80%; border-top-left-radius: 0;">
+                        <span class="font-weight-bold text-primary mb-1 d-block">AI Assistant</span>
+                        Hello! I've analyzed all the resumes in your database. How can I help you find the perfect candidate today?
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white border-top p-3">
+                <form id="chat-form" class="d-flex">
+                    <input type="text" id="user-input" class="form-control form-control-lg mr-2" 
+                           placeholder="Type your question..." autocomplete="off">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .rounded-lg { border-radius: 0.75rem; }
+    .bot-message .p-3 { margin-right: auto; }
+    .user-message .p-3 { margin-left: auto; background-color: var(--primary); color: white; border-top-right-radius: 0; }
+    
+    /* Markdown Styling in Chat */
+    .chat-content ul { padding-left: 20px; }
+    .chat-content p { margin-bottom: 0.5rem; }
+</style>
+
+{% block javascript %}
+<script>
+    const chatHistory = document.getElementById('chat-history');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    function appendMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `chat-message ${role}-message mb-3`;
+        
+        let contentHtml = text;
+        // Simple Markdown bold replacement
+        contentHtml = contentHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Replaces [Link Text](URL) with Anchor tags
+        contentHtml = contentHtml.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="font-weight-bold" style="text-decoration: underline;">$1 <i class="fas fa-external-link-alt small ml-1"></i></a>');
+        contentHtml = contentHtml.replace(/\n/g, '<br>');
+
+        const bgClass = role === 'user' ? 'bg-primary text-white' : 'bg-white text-dark shadow-sm';
+        const alignStyle = role === 'user' ? 'margin-left: auto; border-top-right-radius: 0;' : 'margin-right: auto; border-top-left-radius: 0;';
+        const nameColor = role === 'user' ? 'text-white-50' : 'text-primary';
+        const name = role === 'user' ? 'You' : 'AI Assistant';
+
+        div.innerHTML = `
+            <div class="p-3 rounded-lg ${bgClass} chat-content" style="max-width: 80%; ${alignStyle}">
+                <span class="font-weight-bold ${nameColor} mb-1 d-block small">${name}</span>
+                ${contentHtml}
+            </div>
+        `;
+        chatHistory.appendChild(div);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = userInput.value.trim();
+        if (!query) return;
+
+        // UI Updates
+        appendMessage('user', query);
+        userInput.value = '';
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+
+        // Loading Indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading';
+        loadingDiv.className = 'chat-message bot-message mb-3';
+        loadingDiv.innerHTML = `
+            <div class="p-3 rounded-lg bg-white shadow-sm" style="max-width: 80%; border-top-left-radius: 0;">
+                <span class="text-muted"><i class="fas fa-spinner fa-spin mr-2"></i>Thinking...</span>
+            </div>`;
+        chatHistory.appendChild(loadingDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        try {
+            const response = await fetch("{% url 'chat_view' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `query=${encodeURIComponent(query)}`
+            });
+
+            const data = await response.json();
+            document.getElementById('loading').remove();
+            
+            if (data.answer) {
+                appendMessage('bot', data.answer);
+            } else {
+                appendMessage('bot', "Sorry, I encountered an error.");
+            }
+
+        } catch (error) {
+            document.getElementById('loading').remove();
+            appendMessage('bot', "Error connecting to the server.");
+            console.error(error);
+        } finally {
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

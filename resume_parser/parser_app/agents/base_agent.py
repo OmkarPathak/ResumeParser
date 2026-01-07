@@ -50,7 +50,7 @@ class BaseAgent:
                 return None
         return LLM_MODEL
 
-    def inference(self, system_prompt, user_prompt, max_tokens=1000):
+    def inference(self, system_prompt, user_prompt, max_tokens=1000, response_format=None):
         """
         Common method to generate a response from the LLM.
         """
@@ -58,15 +58,19 @@ class BaseAgent:
             return None
 
         try:
-            response = self.model.create_chat_completion(
-                messages=[
+            kwargs = {
+                "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                response_format={"type": "json_object"},
-                temperature=0.7,
-                max_tokens=max_tokens
-            )
+                "temperature": 0.7,
+                "max_tokens": max_tokens
+            }
+            
+            if response_format:
+                kwargs["response_format"] = response_format
+
+            response = self.model.create_chat_completion(**kwargs)
             return response['choices'][0]['message']['content']
         except Exception as e:
             print(f"Agent Inference Error: {e}")

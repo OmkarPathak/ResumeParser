@@ -15,6 +15,9 @@
             <li class="nav-item {% if request.resolver_match.url_name == 'resumes_list' %} active {% endif %}">
                 <a class="nav-link" href="{% url 'resumes_list'%}">Data</a>
             </li>
+            <li class="nav-item {% if request.resolver_match.url_name == 'chat_view' %} active {% endif %}">
+                <a class="nav-link" href="{% url 'chat_view'%}">Chat</a>
+            </li>
         </ul>
     </div>
 </nav>

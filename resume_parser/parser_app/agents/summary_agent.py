@@ -26,7 +26,7 @@ class SummaryAgent(BaseAgent):
         {truncated_text}
         """
         
-        response_content = self.inference(system_prompt, user_prompt, max_tokens=800)
+        response_content = self.inference(system_prompt, user_prompt, max_tokens=800, response_format={"type": "json_object"})
         
         if response_content:
             try:
