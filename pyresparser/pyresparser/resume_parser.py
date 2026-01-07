@@ -18,8 +18,16 @@ class ResumeParser(object):
         custom_regex=None,
         use_gliner_extraction=False
     ):
-        nlp = spacy.load('en_core_web_sm')
-        custom_nlp = spacy.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), "model"))
+        try:
+            import en_core_web_sm
+            nlp = en_core_web_sm.load()
+        except ImportError:
+            nlp = spacy.load('en_core_web_sm')
+        
+        # Build path to custom model relative to this file
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        custom_model_path = os.path.join(base_path, "model")
+        custom_nlp = spacy.load(custom_model_path)
         self.__skills_file = skills_file
         self.__custom_regex = custom_regex
         self.__use_gliner_extraction = use_gliner_extraction

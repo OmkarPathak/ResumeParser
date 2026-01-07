@@ -1,0 +1,38 @@
+# Git and Docker
+.git
+.gitignore
+.dockerignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+env/
+venv/
+**/env/
+**/venv/
+.env
+
+# Build Artifacts
+**/dist/
+**/build/
+
+
+# Database
+*.sqlite3
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# Static/Media (optional, usually we want to keep them if they are part of source, but skip if they are large artifacts)
+# Keeping them for now in case they have checked-in assets, but usually we ignore detailed media
+resume_parser/media/
+resume_parser/static/

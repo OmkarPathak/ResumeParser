@@ -8,7 +8,10 @@ def get_package_path(package_name):
     import importlib
     try:
         module = importlib.import_module(package_name)
-        return os.path.dirname(module.__file__)
+        # Handle cases where module is a namespace package or has no __file__
+        if hasattr(module, '__file__'):
+             return os.path.dirname(module.__file__)
+        return os.path.dirname(module.__path__[0])
     except ImportError:
         return None
 
@@ -16,8 +19,8 @@ def get_package_path(package_name):
 datas = [
     ('parser_app/templates', 'parser_app/templates'),
     ('parser_app/static', 'parser_app/static'),
-    ('env/lib/python3.9/site-packages/en_core_web_sm', 'en_core_web_sm'),
-    ('env/lib/python3.9/site-packages/spacy', 'spacy'),
+    # Include NLTK data - expecting it to be in resume_parser/nltk_data after build script runs
+    ('nltk_data', 'nltk_data'), 
 ]
 
 binaries = []
@@ -35,7 +38,7 @@ hiddenimports = [
     'en_core_web_sm',
 ]
 
-# Collect important packages
+# Packages to specifically handle
 packages_to_collect = [
     'spacy', 
     'pyresparser', 
@@ -44,9 +47,12 @@ packages_to_collect = [
     'cymem', 
     'preshed', 
     'blis', 
-    'crispy_forms'
+    'crispy_forms',
+    'docx2txt',
+    'pdfminer',
 ]
 
+# Dynamic collection
 for pkg in packages_to_collect:
     try:
         tmp_ret = collect_all(pkg)
@@ -56,10 +62,10 @@ for pkg in packages_to_collect:
     except Exception as e:
         print(f"Warning: Could not collect {pkg}: {e}")
 
-# Explicitly add crispy_forms templates if not found by collect_all
-crispy_path = get_package_path('crispy_forms')
-if crispy_path:
-    datas.append((os.path.join(crispy_path, 'templates'), 'crispy_forms/templates'))
+# Explicitly add en_core_web_sm if not collected (it's often missed if installed as link)
+en_core_path = get_package_path('en_core_web_sm')
+if en_core_path:
+    datas.append((en_core_path, 'en_core_web_sm'))
 
 a = Analysis(
     ['manage.py'],
