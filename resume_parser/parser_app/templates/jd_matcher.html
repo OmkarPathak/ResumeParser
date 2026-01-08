@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center" style="margin-top: 2rem;">
+    <!-- JD Input Section -->
+    <div class="col-lg-12">
+        <div class="card shadow-sm border-0">
+             <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h3 class="mb-0 font-weight-bold" style="color: var(--text-main);">
+                    <i class="fas fa-briefcase text-primary mr-2"></i>Job Description Matcher
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="job_description" class="text-muted font-weight-bold">Paste Job Description Here:</label>
+                        <textarea class="form-control bg-light" id="job_description" name="job_description" rows="8" 
+                            style="border: 1px solid #dee2e6;"
+                            placeholder="e.g. We are looking for a Senior Python Developer with experience in Django, AWS, and Machine Learning..." required>{{ job_description }}</textarea>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-search mr-2"></i>Find Candidates
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if results %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                 <h4 class="mb-0 font-weight-bold" style="color: var(--text-main);">
+                    <i class="fas fa-trophy text-warning mr-2"></i>Top Candidates
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th scope="col" class="border-top-0">Rank</th>
+                        <th scope="col" class="border-top-0">Candidate Name</th>
+                        <th scope="col" class="border-top-0">Match Score</th>
+                        <th scope="col" class="border-top-0">Key Skills</th>
+                        <th scope="col" class="border-top-0">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>
+                            {% if forloop.counter == 1 %}
+                                <span class="badge badge-warning p-2">🥇 1st</span>
+                            {% elif forloop.counter == 2 %}
+                                <span class="badge badge-secondary p-2">🥈 2nd</span>
+                            {% elif forloop.counter == 3 %}
+                                <span class="badge badge-danger p-2">🥉 3rd</span>
+                            {% else %}
+                                <span class="font-weight-bold text-muted ml-2">{{ forloop.counter }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="font-weight-bold">
+                            <a href="{{ result.file_url }}" target="_blank" class="text-dark">
+                                {{ result.name }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                    style="width: {% widthratio result.score 1 100 %}%;" 
+                                    aria-valuenow="{% widthratio result.score 1 100 %}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small class="text-muted font-weight-bold">{% widthratio result.score 1 100 %}% Match</small>
+                        </td>
+                        <td style="max-width: 300px;">
+                            <div class="text-truncate" title="{{ result.skills }}">
+                                {{ result.skills }}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ result.file_url }}" target="_blank" class="btn btn-sm btn-outline-primary shadow-sm">
+                                View Resume
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endif %}
+{% endblock %}

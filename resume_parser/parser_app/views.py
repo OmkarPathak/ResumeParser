@@ -52,6 +52,25 @@ def process_single_resume(file, tag):
             resume.processing_time = round(end_time - start_time, 2)
             
             resume.save()
+
+            # 3. Auto-Index into Vector Store (New)
+            try:
+                from .agents.vector_store import VectorStore
+                vector_store = VectorStore()
+                text = f"{resume.skills or ''} {resume.experience or ''} {resume.ai_summary or ''}"
+                metadata = {
+                    'id': resume.id,
+                    'name': resume.name,
+                    'email': resume.email,
+                    'skills': resume.skills,
+                    'ai_summary': resume.ai_summary,
+                    'file_url': resume.resume.url if resume.resume else ''
+                }
+                vector_store.add_document(text, metadata)
+                print(f"Auto-Indexed: {resume.name}")
+            except Exception as vs_e:
+                print(f"Vector Store Error: {vs_e}")
+
             return f"Success: {resume.resume.name}"
             
     except Exception as e:
@@ -60,6 +79,23 @@ def process_single_resume(file, tag):
     finally:
         # Close connection to prevent leaks in threads
         connection.close()
+
+def jd_matcher(request):
+    """
+    View to match Job Description against indexed resumes.
+    """
+    if request.method == 'POST':
+        job_description = request.POST.get('job_description')
+        if job_description:
+            try:
+                from .agents.vector_store import VectorStore
+                vector_store = VectorStore()
+                results = vector_store.search(job_description, top_k=50) # Get top 50 matches
+                return render(request, 'jd_matcher.html', {'results': results, 'job_description': job_description})
+            except Exception as e:
+                messages.error(request, f"Error during matching: {e}")
+                
+    return render(request, 'jd_matcher.html')
 
 def homepage(request):
     if request.method == 'POST':
@@ -86,7 +122,7 @@ def homepage(request):
                     messages.warning(request, f'Duplicate resume found: {file.name}')
             
             # Step 2: Parallel Processing (Text Extraction + AI)
-            with ThreadPoolExecutor(max_workers=4) as executor:
+            with ThreadPoolExecutor(max_workers=2) as executor:
                 futures = {executor.submit(process_single_resume, r_id, request.POST.get('tag')): r_id for r_id in resume_ids}
                 # Wait for completion implemented implicitly by view return? No, we should wait if we want to show updated list.
                 # But for UX, we might want to return immediately or wait. 
@@ -96,7 +132,7 @@ def homepage(request):
                     pass
             
             if is_ajax:
-                return JsonResponse({'status': 'success', 'message': 'Files processed successfully'})
+                return JsonResponse({'status': 'success', 'message': 'Resumes processed successfully'})
 
             messages.success(request, 'Resumes processed in background!')
 

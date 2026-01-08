@@ -26,4 +26,5 @@ urlpatterns = [
     path('resumes/export/', views.export_resumes, name='export_resumes'),
     path('resumes/delete/bulk/', views.delete_bulk_resumes, name='delete_bulk_resumes'),
     path('chat/', views.chat_view, name='chat_view'),
+    path('jd-matcher/', views.jd_matcher, name='jd_matcher'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

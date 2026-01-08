@@ -1,0 +1,37 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Build distributions
+build/
+dist/
+*.spec
+
+# Database
+db.sqlite3
+
+# Models
+models/
+
+# Media/Static
+media/
+mediafiles/
+static/
+
+# IDE settings
+.vscode/
+.idea/
+.DS_Store
+
+# Local configs
+.env
