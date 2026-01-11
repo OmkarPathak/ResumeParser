@@ -138,3 +138,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Set to None for no limit, or increase the integer
 DATA_UPLOAD_MAX_NUMBER_FILES = 500
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'homepage'
+LOGOUT_REDIRECT_URL = 'login'

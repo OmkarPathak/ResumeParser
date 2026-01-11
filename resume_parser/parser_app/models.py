@@ -5,8 +5,10 @@ from django.forms import ClearableFileInput
 # for deleting media files after record is deleted
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 class Resume(models.Model):
+    user          = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     resume        = models.FileField('Upload Resumes', upload_to='resumes/')
     name          = models.CharField('Name', max_length=255, null=True, blank=True)
     tag           = models.CharField('Tag', max_length=255, null=True, blank=True)

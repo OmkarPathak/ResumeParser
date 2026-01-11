@@ -15,6 +15,22 @@ from django.db import connection
 from django.db.models import Avg
 import time
 
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Registration successful. Welcome!')
+            return redirect('homepage')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
 def process_single_resume(file, tag):
     """
     Worker function to process a single resume in a separate thread.
@@ -64,7 +80,8 @@ def process_single_resume(file, tag):
                     'email': resume.email,
                     'skills': resume.skills,
                     'ai_summary': resume.ai_summary,
-                    'file_url': resume.resume.url if resume.resume else ''
+                    'file_url': resume.resume.url if resume.resume else '',
+                    'user_id': resume.user.id if resume.user else None
                 }
                 vector_store.add_document(text, metadata)
                 print(f"Auto-Indexed: {resume.name}")
@@ -80,6 +97,7 @@ def process_single_resume(file, tag):
         # Close connection to prevent leaks in threads
         connection.close()
 
+@login_required
 def jd_matcher(request):
     """
     View to match Job Description against indexed resumes.
@@ -90,13 +108,16 @@ def jd_matcher(request):
             try:
                 from .agents.vector_store import VectorStore
                 vector_store = VectorStore()
-                results = vector_store.search(job_description, top_k=50) # Get top 50 matches
+                results = vector_store.search(job_description, top_k=50, user_id=request.user.id) # Get top 50 matches
                 return render(request, 'jd_matcher.html', {'results': results, 'job_description': job_description})
             except Exception as e:
                 messages.error(request, f"Error during matching: {e}")
                 
     return render(request, 'jd_matcher.html')
 
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def homepage(request):
     if request.method == 'POST':
         # Removed Resume.objects.all().delete() to maintain history
@@ -114,6 +135,7 @@ def homepage(request):
                 try:
                     resume = Resume(resume=file)
                     resume.tag = request.POST.get('tag')
+                    resume.user = request.user
                     resume.save()
                     resume_ids.append(resume.id)
                 except IntegrityError:
@@ -140,17 +162,23 @@ def homepage(request):
     else:
         file_form = UploadResumeModelForm()
         
-    # Calculate Average Processing Time
-    avg_time = Resume.objects.aggregate(Avg('processing_time'))['processing_time__avg']
+    # Calculate Average Processing Time (Global or User specific? Let's make it global for now or user specific if preferred)
+    # Let's filter by user if logged in
+    if request.user.is_authenticated:
+        avg_time = Resume.objects.filter(user=request.user).aggregate(Avg('processing_time'))['processing_time__avg']
+    else:
+        avg_time = 0 # Or global average
+        
     avg_time = round(avg_time, 2) if avg_time else 0
     
     return render(request, 'home.html', {'form': file_form, 'avg_processing_time': avg_time})
 
+@login_required
 def resumes_list(request):
-    resumes = Resume.objects.all().order_by('-uploaded_on')
+    resumes = Resume.objects.filter(user=request.user).order_by('-uploaded_on')
     
     # Get distinct tags for filter dropdown
-    tags = Resume.objects.exclude(tag__isnull=True).exclude(tag__exact='').values_list('tag', flat=True).distinct()
+    tags = Resume.objects.filter(user=request.user).exclude(tag__isnull=True).exclude(tag__exact='').values_list('tag', flat=True).distinct()
     
     # Filter by tag
     selected_tag = request.GET.get('tag')
@@ -194,24 +222,35 @@ def resumes_list(request):
     }
     return render(request, 'resumes_list.html', context)
 
+@login_required
 def delete_resume(request, pk):
-    resume = Resume.objects.get(pk=pk)
-    resume.delete()
-    messages.success(request, 'Resume deleted successfully!')
+    try:
+        resume = Resume.objects.get(pk=pk, user=request.user)
+        resume.delete()
+        messages.success(request, 'Resume deleted successfully!')
+    except Resume.DoesNotExist:
+        messages.warning(request, 'Resume not found or access denied.')
     return redirect('resumes_list')
 
+@login_required
 def delete_bulk_resumes(request):
     if request.method == 'POST':
         resume_ids = request.POST.getlist('bulk_delete')
         if resume_ids:
-            Resume.objects.filter(id__in=resume_ids).delete()
+            Resume.objects.filter(id__in=resume_ids, user=request.user).delete()
             messages.success(request, f'{len(resume_ids)} resumes deleted successfully!')
         else:
             messages.warning(request, 'No resumes selected for deletion.')
     return redirect('resumes_list')
 
+@login_required
 def update_resume(request, pk):
-    resume = Resume.objects.get(pk=pk)
+    try:
+        resume = Resume.objects.get(pk=pk, user=request.user)
+    except Resume.DoesNotExist:
+        messages.warning(request, 'Resume not found or access denied.')
+        return redirect('resumes_list')
+        
     if request.method == 'POST':
         resume.name = request.POST.get('name')
         resume.email = request.POST.get('email')
@@ -231,6 +270,7 @@ def update_resume(request, pk):
     return render(request, 'update_resume.html', {'resume': resume})
 
 import csv
+@login_required
 def export_resumes(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="resumes.csv"'
@@ -238,7 +278,7 @@ def export_resumes(request):
     writer = csv.writer(response)
     writer.writerow(['Name', 'Email', 'Mobile Number', 'Tag', 'Education', 'Skills', 'Company Names', 'Designation', 'Experience', 'Uploaded On'])
 
-    resumes = Resume.objects.all().order_by('-uploaded_on')
+    resumes = Resume.objects.filter(user=request.user).order_by('-uploaded_on')
 
     # Filter by tag
     selected_tag = request.GET.get('tag')
@@ -266,15 +306,34 @@ def export_resumes(request):
 # --- RAG Chat View ---
 from .agents.rag_agent import RAGAgent
 
+@login_required
 def chat_view(request):
     if request.method == 'POST':
+        # Check if it's a reset request
+        if request.POST.get('reset') == 'true':
+            request.session['chat_history'] = []
+            return JsonResponse({'status': 'success', 'message': 'Chat history cleared'})
+
         query = request.POST.get('query')
         if not query:
             return JsonResponse({'error': 'No query provided'}, status=400)
         
         try:
+            # 1. Get History from Session
+            history = request.session.get('chat_history', [])
+            
             agent = RAGAgent()
-            answer = agent.chat(query)
+            
+            # 2. Pass History to Agent & User ID
+            answer = agent.chat(query, history=history, user_id=request.user.id)
+            
+            # 3. Update History
+            history.append({'role': 'User', 'content': query})
+            history.append({'role': 'AI', 'content': answer})
+            
+            # 4. Save back to Session
+            request.session['chat_history'] = history
+            
             return JsonResponse({'answer': answer})
         except Exception as e:
             print(f"Chat Error: {e}")
