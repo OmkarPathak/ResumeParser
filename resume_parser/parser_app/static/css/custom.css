@@ -151,30 +151,58 @@ h1, h2, h3, h4, h5, h6 {
 
 /* --- Navbar --- */
 .navbar {
-    background-color: var(--bg-card) !important;
-    box-shadow: var(--shadow-sm);
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02); /* Very subtle shadow */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 
 .navbar-brand {
     font-weight: 800;
     color: var(--primary) !important;
-    font-size: 1.25rem;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    padding-left: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-item {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
 }
 
 .nav-link {
     font-weight: 500;
     color: var(--text-muted) !important;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem !important;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
 }
 
 .nav-link:hover {
     color: var(--primary) !important;
+    background-color: rgba(79, 70, 229, 0.08); /* Soft Indigo Tint */
 }
 
 .nav-item.active .nav-link {
     color: var(--primary) !important;
-    font-weight: 700;
+    font-weight: 600;
+    background-color: rgba(79, 70, 229, 0.12); /* Slightly stronger tint */
+}
+
+/* Fix for the non-clickable 'Hi, User' text to look distinct */
+.nav-item span.nav-link {
+    font-weight: 600;
+    color: var(--text-main) !important;
+    background-color: transparent !important;
+    margin-right: 1rem;
 }
 
 /* --- Utilities --- */

@@ -7,7 +7,7 @@ class RAGAgent(BaseAgent):
         super().__init__()
         self.vector_store = VectorStore()
 
-    def chat(self, user_query, history=None, user_id=None):
+    def chat(self, user_query, history=None, user_id=None, return_context=False):
         if history is None:
             history = []
 
@@ -15,14 +15,19 @@ class RAGAgent(BaseAgent):
         results = self.vector_store.search(user_query, top_k=3, user_id=user_id)
         
         context_str = ""
+        context_list = [] # For evaluation
         if results:
             context_str += "Here are the most relevant candidates from the database:\n\n"
             for i, res in enumerate(results, 1):
-                context_str += f"Name: {res.get('name', 'Unknown')}\n"
-                context_str += f"Link: {res.get('file_url', '#')}\n"
-                context_str += f"Skills: {res.get('skills', 'N/A')}\n"
-                context_str += f"Summary: {res.get('ai_summary', 'N/A')}\n"
-                context_str += "---\n"
+                # Construct clean context string for LLM
+                c_text = f"Name: {res.get('name', 'Unknown')}\n"
+                c_text += f"Link: {res.get('file_url', '#')}\n"
+                c_text += f"Skills: {res.get('skills', 'N/A')}\n"
+                c_text += f"Summary: {res.get('ai_summary', 'N/A')}\n"
+                context_str += c_text + "---\n"
+                
+                # Keep raw context for eval
+                context_list.append(c_text)
         else:
             context_str = "No relevant resumes found."
 
@@ -60,4 +65,9 @@ class RAGAgent(BaseAgent):
 
         # 3. Generate Answer
         print("RAGAgent: Generating response...")
-        return self.inference(system_prompt, user_prompt, max_tokens=600)
+        answer = self.inference(system_prompt, user_prompt, max_tokens=600)
+        
+        if return_context:
+            return answer, context_list
+            
+        return answer

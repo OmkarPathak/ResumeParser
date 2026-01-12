@@ -11,7 +11,7 @@
         <ul class="navbar-nav ml-auto">
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <span class="nav-link text-dark font-weight-bold">Hi, {{ user.username }}</span>
+                    <span class="nav-link">Hi, {{ user.username }}</span>
                 </li>
                 <li class="nav-item {% if request.resolver_match.url_name == 'homepage' %} active {% endif %}">
                     <a class="nav-link" href="{% url 'homepage'%}">Homepage</a>
@@ -28,14 +28,14 @@
             {% endif %}
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link text-primary" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="{% url 'register' %}">Register</a>
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
                 </li>
             {% endif %}
         </ul>
