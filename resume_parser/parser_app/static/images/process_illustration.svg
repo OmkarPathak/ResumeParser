@@ -1,0 +1,68 @@
+<svg width="800" height="500" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background / Glass Effect -->
+    <rect width="800" height="500" fill="#F8FAFC"/>
+    
+    <!-- Abstract Background Shapes -->
+    <circle cx="10%" cy="10%" r="200" fill="#EEF2FF" fill-opacity="0.5"/>
+    <circle cx="90%" cy="90%" r="150" fill="#F0FDFA" fill-opacity="0.5"/>
+    
+    <!-- Main Window / Dashboard Frame -->
+    <rect x="100" y="80" width="600" height="380" rx="12" fill="white" stroke="#E2E8F0" stroke-width="1" filter="url(#shadow-lg)"/>
+    
+    <!-- Header Bar -->
+    <path d="M100 92C100 85.3726 105.373 80 112 80H688C694.627 80 700 85.3726 700 92V120H100V92Z" fill="#F8FAFC" stroke-bottom="#E2E8F0"/>
+    <line x1="100" y1="120" x2="700" y2="120" stroke="#E2E8F0"/>
+    
+    <!-- Window Controls -->
+    <circle cx="125" cy="100" r="4" fill="#EF4444"/>
+    <circle cx="140" cy="100" r="4" fill="#FBBF24"/>
+    <circle cx="155" cy="100" r="4" fill="#10B981"/>
+    
+    <!-- Dashboard Content Layout -->
+    
+    <!-- Sidebar -->
+    <rect x="100" y="120" width="120" height="340" fill="#F8FAFC" fill-opacity="0.5"/>
+    <rect x="115" y="140" width="80" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="115" y="160" width="60" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="115" y="180" width="70" height="8" rx="4" fill="#E2E8F0"/>
+    
+    <!-- Candidate List Card 1 -->
+    <rect x="240" y="150" width="440" height="70" rx="8" fill="white" stroke="#E2E8F0"/>
+    <circle cx="270" cy="185" r="15" fill="#EEF2FF"/>
+    <rect x="300" y="170" width="120" height="10" rx="4" fill="#1E293B"/>
+    <rect x="300" y="190" width="80" height="8" rx="4" fill="#94A3B8"/>
+    <!-- Score Badge -->
+    <rect x="620" y="173" width="40" height="24" rx="12" fill="#ECFDF5"/>
+    <text x="640" y="189" font-family="sans-serif" font-size="10" fill="#059669" text-anchor="middle" font-weight="bold">92%</text>
+
+    <!-- Candidate List Card 2 -->
+    <rect x="240" y="240" width="440" height="70" rx="8" fill="white" stroke="#E2E8F0"/>
+    <circle cx="270" cy="275" r="15" fill="#F0F9FF"/>
+    <rect x="300" y="260" width="100" height="10" rx="4" fill="#334155"/>
+    <rect x="300" y="280" width="90" height="8" rx="4" fill="#94A3B8"/>
+    <!-- Score Badge -->
+    <rect x="620" y="263" width="40" height="24" rx="12" fill="#FEF3C7"/>
+    <text x="640" y="279" font-family="sans-serif" font-size="10" fill="#D97706" text-anchor="middle" font-weight="bold">78%</text>
+    
+    <!-- Candidate List Card 3 (Opacity fade) -->
+    <rect x="240" y="330" width="440" height="70" rx="8" fill="white" stroke="#E2E8F0" opacity="0.6"/>
+    <circle cx="270" cy="365" r="15" fill="#F1F5F9"/>
+    <rect x="300" y="350" width="110" height="10" rx="4" fill="#64748B"/>
+    <rect x="300" y="370" width="70" height="8" rx="4" fill="#CBD5E1"/>
+    
+    <!-- Floating 'Analysis Complete' Toast Notification -->
+    <g filter="url(#shadow-lg)">
+        <rect x="480" y="380" width="220" height="60" rx="8" fill="#1E293B"/>
+        <circle cx="510" cy="410" r="12" fill="#10B981"/>
+        <path d="M506 410L509 413L514 407" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="535" y="405" font-family="sans-serif" font-size="12" fill="white" font-weight="bold">Parsing Complete</text>
+        <text x="535" y="420" font-family="sans-serif" font-size="10" fill="#94A3B8">3 files processed successfully</text>
+    </g>
+
+    <!-- Definitions -->
+    <defs>
+        <filter id="shadow-lg" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#000000" flood-opacity="0.1"/>
+        </filter>
+    </defs>
+</svg>

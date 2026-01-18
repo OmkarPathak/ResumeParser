@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resume Parser | Turn Chaos into Clarity{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero-section d-flex align-items-center text-center py-5" style="min-height: 80vh; background: radial-gradient(circle at top center, #EEF2FF 0%, #ffffff 70%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 fade-in-up">
+                <span class="badge badge-soft-primary px-3 py-2 rounded-pill mb-4 font-weight-bold" style="letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.75rem;">
+                    🚀 The Ultimate Resume Intelligence Tool
+                </span>
+                <h1 class="display-3 font-weight-bold mb-4" style="line-height: 1.2;">
+                    Know Exactly Who Your <br>
+                    <span class="text-gradient">Next Hire Should Be.</span>
+                </h1>
+                <p class="lead text-muted mb-5 mx-auto" style="max-width: 700px; font-size: 1.25rem;">
+                    Turn recruiting chaos into clarity. Automatically extract skills, experience, and candidate details in seconds with our privacy-focused AI parser.
+                </p>
+                <div class="d-flex justify-content-center mb-5">
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5 py-3 mr-3 shadow-lg rounded-pill font-weight-bold" style="font-size: 1.1rem; transition: transform 0.2s;">
+                        Start Your Journey — It's Free <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-pill border-0 bg-white shadow-sm text-dark font-weight-bold" style="font-size: 1.1rem;">
+                        Live Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hero Image / Dashboard Preview -->
+        <div class="row justify-content-center fade-in-up delay-200">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                    <!-- Placeholder for App Dashboard Screenshot -->
+                    <div style="background: #F8FAFC; height: 400px; display: flex; align-items: center; justify-content: center; border-bottom: 4px solid #4F46E5;">
+                         <img src="{% static 'images/process_illustration.svg' %}" alt="Dashboard Preview" class="img-fluid" style="opacity: 1; max-height: 480px;">
+                    </div>
+                </div>
+                <p class="text-muted small mt-4">
+                    Trusted by 500+ Hiring Teams <span class="mx-2">•</span> <i class="fas fa-lock text-success mr-1"></i> Privacy Focused <span class="mx-2">•</span> <i class="fas fa-bolt text-warning mr-1"></i> Instant Results
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section id="features" class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5 fade-in-up delay-300">
+            <h2 class="font-weight-bold mb-3">Simple. Powerful. Fast.</h2>
+            <p class="text-muted text-center mx-auto" style="max-width: 600px;">
+                Stop guessing. Start hiring. Our tools give you the precision you need.
+            </p>
+        </div>
+
+        <div class="row">
+            <!-- Feature 1 -->
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100 text-center">
+                    <div class="feature-icon-circle mb-4" style="background: #ebf4ff; color: #3b82f6;"> <!-- Blue-50 to Blue-500 -->
+                        <i class="fas fa-search-dollar"></i>
+                    </div>
+                    <h5 class="font-weight-bold mb-3 text-dark">Precision Extraction</h5>
+                    <p class="text-muted small">
+                        Don't just parse text. Understand it. We identify skills, certifications, and experience gaps instantly.
+                    </p>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100 text-center">
+                    <div class="feature-icon-circle mb-4" style="background: #f0fdf4; color: #22c55e;"> <!-- Green-50 to Green-500 -->
+                         <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5 class="font-weight-bold mb-3 text-dark">Smart Analytics</h5>
+                    <p class="text-muted small">
+                        Visualize candidate data. Spot trends in specialized skills and hiring pools.
+                    </p>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-4 mb-4">
+                <div class="feature-card h-100 text-center">
+                    <div class="feature-icon-circle mb-4" style="background: #fef2f2; color: #ef4444;"> <!-- Red-50 to Red-500 -->
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5 class="font-weight-bold mb-3 text-dark">Total Privacy</h5>
+                    <p class="text-muted small">
+                        Your data is yours. We process resumes securely without harvesting your candidate pool.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS / STEPS -->
+<section class="py-5 mb-5" style="background-color: #F8FAFC;">
+    <div class="container">
+        <div class="row align-items-center">
+             <div class="col-lg-6 mb-5 mb-lg-0">
+                 <h2 class="font-weight-bold mb-4">Master Your Hiring Pipeline</h2>
+                 <p class="text-muted mb-5">From upload to offer letter, we streamline the messy parts of recruitment.</p>
+                 
+                 <div class="d-flex mb-4">
+                     <div class="mr-4">
+                         <div class="step-number shadow-sm">1</div>
+                     </div>
+                     <div>
+                         <h5 class="font-weight-bold">Upload & Forget</h5>
+                         <p class="text-muted small">Bulk upload thousands of resumes. We handle the heavy lifting in the background.</p>
+                     </div>
+                 </div>
+                 <div class="d-flex mb-4">
+                     <div class="mr-4">
+                         <div class="step-number shadow-sm">2</div>
+                     </div>
+                     <div>
+                         <h5 class="font-weight-bold">Deep Analysis</h5>
+                         <p class="text-muted small">Our AI standardizes formats, extracting the "Hidden Truth" behind the CV.</p>
+                     </div>
+                 </div>
+                 <div class="d-flex">
+                     <div class="mr-4">
+                         <div class="step-number shadow-sm">3</div>
+                     </div>
+                     <div>
+                         <h5 class="font-weight-bold">Shortlist Winners</h5>
+                         <p class="text-muted small">Export structured data to Excel or your ATS and make data-driven decisions.</p>
+                     </div>
+                 </div>
+             </div>
+             <div class="col-lg-6">
+                 <!-- Just a visual placeholder for the process -->
+                 <div class="bg-white p-4 rounded shadow-lg">
+                      <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+                          <span class="font-weight-bold text-primary">Candidate Score</span>
+                          <span class="badge badge-success">High Match</span>
+                      </div>
+                      <div class="progress mb-3" style="height: 10px;">
+                          <div class="progress-bar bg-primary" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                      <div class="text-muted small">
+                          Matched: Python, Django, Docker, AWS
+                      </div>
+                 </div>
+             </div>
+        </div>
+    </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section class="py-5 mb-5">
+    <div class="container">
+        <div class="cta-card text-center py-5 px-4 position-relative mb-4">
+            <!-- Decorative Blobs -->
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            
+            <div class="position-relative" style="z-index: 2;">
+                <h2 class="font-weight-bold mb-4 display-4 text-dark">Ready to upgrade your workflow?</h2>
+                <p class="lead mb-5 opacity-90 mx-auto text-muted" style="max-width: 600px;">
+                    Join over 1,000,000+ recruiters who are saving hours every week. No credit card required.
+                </p>
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg shadow-lg px-5 py-3 rounded-pill font-weight-bold" style="min-width: 200px;">
+                    Get Started Free
+                </a>
+                <p class="small mt-4 text-muted mb-0">
+                    <i class="fas fa-check-circle mr-1 text-success"></i> Free 14-day trial 
+                    <span class="mx-2">•</span> 
+                    <i class="fas fa-check-circle mr-1 text-success"></i> Cancel anytime
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

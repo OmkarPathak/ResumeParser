@@ -20,7 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', views.homepage, name='homepage'),
+    path('', views.index, name='index'),
+    path('home/', views.homepage, name='homepage'),
     path('resumes/', views.resumes_list, name='resumes_list'),
     path('resume/delete/<int:pk>/', views.delete_resume, name='delete_resume'),
     path('resume/update/<int:pk>/', views.update_resume, name='update_resume'),

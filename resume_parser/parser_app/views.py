@@ -117,7 +117,7 @@ def jd_matcher(request):
 
 from django.contrib.auth.decorators import login_required
 
-@login_required
+@login_required(login_url='login')
 def homepage(request):
     if request.method == 'POST':
         # Removed Resume.objects.all().delete() to maintain history
@@ -172,6 +172,25 @@ def homepage(request):
     avg_time = round(avg_time, 2) if avg_time else 0
     
     return render(request, 'home.html', {'form': file_form, 'avg_processing_time': avg_time})
+
+def landing_page(request):
+    if request.user.is_authenticated:
+        return redirect('homepage')
+    
+    # Calculate global average processing time for social proof
+    avg_time = Resume.objects.all().aggregate(Avg('processing_time'))['processing_time__avg']
+    avg_time = round(avg_time, 2) if avg_time else 0
+    
+    return render(request, 'landing.html', {'avg_processing_time': avg_time})
+
+def index(request):
+    """
+    Root view that dispatches to landing page or homepage based on auth.
+    """
+    if request.user.is_authenticated:
+        return redirect('homepage')
+    else:
+        return landing_page(request)
 
 @login_required
 def resumes_list(request):
