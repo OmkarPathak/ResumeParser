@@ -4,248 +4,630 @@
 {% block title %}Resume List{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center" style="margin-top: 2rem;">
-    <div class="col-lg-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                <div class="d-flex justify-content-between align-items-center mb-0">
-                    <h3 class="mb-0 font-weight-bold" style="color: var(--text-main);">Resume Database</h3>
-                    <div>
-                        <a href="{% url 'homepage' %}" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus mr-2"></i> New Upload</a>
-                        <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-secondary shadow-sm ml-2"><i class="fas fa-file-export mr-2"></i> Export CSV</a>
-                    </div>
-                </div>
-            </div>
+<style>
+    .card-modern {
+        border: none;
+        border-radius: 16px;
+        background: #fff;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-modern:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+    }
 
-            <div class="card-body">
-                <form method="GET" action="." class="mb-4">
-                    <div class="form-row align-items-end">
-                        <div class="col-md-4">
-                            <label class="text-muted small font-weight-bold mb-1">Search</label>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light border-right-0"><i class="fas fa-search text-muted"></i></span>
-                                </div>
-                                <input type="text" name="q" class="form-control form-control-sm border-left-0 bg-light" placeholder="Name, Email, Skills..." value="{{ search_query|default:'' }}">
+    .card-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #4e73df, #224abe);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .card-modern:hover::before {
+        opacity: 1;
+    }
+
+    .icon-box {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(78, 115, 223, 0.1);
+        color: #4e73df;
+        font-size: 1.1rem;
+        margin-right: 1rem;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .info-row i {
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        color: #b7b9cc;
+    }
+
+    .badge-modern {
+        padding: 0.35em 0.8em;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .avatar-placeholder {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .action-btn-group .btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        margin-left: 6px;
+        transition: all 0.2s;
+    }
+
+    .action-btn-group .btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .custom-control-label::before {
+        border-radius: 4px;
+        border: 2px solid #d1d3e2;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: #4e73df;
+        border-color: #4e73df;
+    }
+
+    .metric-badge {
+        background: #f8f9fc;
+        padding: 4px 10px;
+        border-radius: 20px;
+        color: #858796;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .summary-preview {
+        background: #f8f9fc;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: #5a5c69;
+        border: 1px solid #eaecf4;
+    }
+</style>
+
+<div class="container-fluid" style="margin-top: 1.5rem;">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="font-weight-bold text-gray-800 mb-1">Resume Database</h3>
+            <p className="text-muted small mb-0">Manage and analyze uploaded resumes</p>
+        </div>
+        <div>
+            <a href="{% url 'homepage' %}" class="btn btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50 mr-2"></i> New Upload</a>
+            <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-light text-secondary border shadow-sm ml-2"><i class="fas fa-file-export fa-sm mr-2"></i> Export CSV</a>
+        </div>
+    </div>
+
+    <style>
+        .filter-control {
+            height: 38px;
+            box-shadow: none !important;
+            border: 1px solid #e3e6f0;
+            background-color: #fff;
+            font-size: 0.85rem;
+            color: #6e707e;
+            border-radius: 0.35rem;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-control:focus {
+            border-color: #4e73df;
+            background-color: #fff;
+        }
+    
+        .filter-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e707e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1em;
+            padding-right: 2rem !important;
+        }
+        
+        .input-group-text-custom {
+            background-color: #fff;
+            border: 1px solid #e3e6f0;
+            border-right: none;
+        }
+        
+        /* Ensure input within group matches */
+        .input-group > .filter-control {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+
+    <!-- Filters Section -->
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+        <div class="card-body py-3">
+            <form method="GET" action="." class="mb-0">
+                <div class="row align-items-end">
+                    <div class="col-md-3 mb-2 mb-md-0">
+                        <label class="text-uppercase text-secondary font-weight-bold small mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Search</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text input-group-text-custom text-muted"><i class="fas fa-search"></i></span>
                             </div>
+                            <input type="text" name="q" class="form-control filter-control" placeholder="Name, Email, Skills..." value="{{ search_query|default:'' }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="text-muted small font-weight-bold mb-1">Filter by Tag</label>
-                            <select name="tag" class="form-control form-control-sm bg-light">
-                                <option value="">All Tags</option>
-                                {% for tag in tags %}
-                                <option value="{{ tag }}" {% if selected_tag == tag %}selected{% endif %}>{{ tag }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                         <div class="col-md-2">
-                            <label class="text-muted small font-weight-bold mb-1">Rows</label>
-                            <select name="per_page" class="form-control form-control-sm bg-light" onchange="this.form.submit()">
-                                <option value="10" {% if request.GET.per_page == '10' %}selected{% endif %}>10</option>
-                                <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
-                                <option value="100" {% if request.GET.per_page == '100' %}selected{% endif %}>100</option>
-                                <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>All</option>
-                            </select>
-                        </div>
-                        <div class="col-auto">
-                            <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-                            <a href="{% url 'resumes_list' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
-                            <button type="submit" class="btn btn-danger btn-sm ml-2" form="bulk-delete-form" onclick="return confirm('Are you sure you want to delete selected resumes?')" id="bulk-delete-btn" disabled>
-                                <i class="fas fa-trash"></i> Delete Selected
+                    </div>
+                    <div class="col-md-3 mb-2 mb-md-0">
+                        <label class="text-uppercase text-secondary font-weight-bold small mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Filter by Tag</label>
+                        <select name="tag" class="form-control filter-control filter-select">
+                            <option value="">All Tags</option>
+                            {% for tag in tags %}
+                            <option value="{{ tag }}" {% if selected_tag == tag %}selected{% endif %}>{{ tag }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-2 mb-md-0">
+                        <label class="text-uppercase text-secondary font-weight-bold small mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Rows</label>
+                        <select name="per_page" class="form-control filter-control filter-select" onchange="this.form.submit()">
+                            <option value="10" {% if request.GET.per_page == '10' %}selected{% endif %}>10</option>
+                            <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
+                            <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>All</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 text-md-right d-flex align-items-end justify-content-end">
+                        <div class="btn-group mr-2" role="group" aria-label="View Mode">
+                            <button type="button" class="btn btn-sm btn-outline-primary active" id="btn-view-card" onclick="switchView('card')" title="Card View" style="height: 38px;">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-view-table" onclick="switchView('table')" title="Table View" style="height: 38px;">
+                                <i class="fas fa-list"></i>
                             </button>
                         </div>
-                    </div>
-                </form>
-
-                <form method="POST" action="{% url 'delete_bulk_resumes' %}" id="bulk-delete-form">
-                    {% csrf_token %}
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="border-top-0">
-                                        <input type="checkbox" id="select-all">
-                                    </th>
-                                    <th class="border-top-0">#</th>
-                                    <th class="border-top-0">Tag</th>
-                                    <th class="border-top-0">Name</th>
-                                    <th class="border-top-0">Email</th>
-                                    <th class="border-top-0">Mobile</th>
-                                    <th class="border-top-0">AI Summary</th>
-                                    <th class="border-top-0">Time</th>
-                                    <th class="border-top-0">Remarks</th>
-                                    <th class="border-top-0">Date</th>
-                                    <th class="border-top-0 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for resume in resumes %}
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="bulk_delete" value="{{ resume.id }}" class="resume-checkbox">
-                                    </td>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>
-                                        {% if resume.tag %}
-                                        <span class="badge badge-light border">{{ resume.tag }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="font-weight-bold">{{ resume.name }}</td>
-                                    <td>{{ resume.email }}</td>
-                                    <td>{{ resume.mobile_number }}</td>
-                                    <td>
-                                        {% if resume.ai_summary %}
-                                            <a href="javascript:void(0);" 
-                                               onclick="openSummaryModal('{{ resume.id }}', '{{ resume.name|escapejs }}')"
-                                               class="text-decoration-none view-summary-btn">
-                                                <i class="fas fa-eye text-primary"></i> 
-                                                <small class="text-primary font-weight-bold ml-1">View</small>
-                                            </a>
-                                            <!-- Hidden Content for Modal -->
-                                            <div id="summary-content-{{ resume.id }}" class="d-none">{{ resume.ai_summary }}</div>
-                                            <div id="strengths-content-{{ resume.id }}" class="d-none">{{ resume.ai_strengths|default:'' }}</div>
-                                        {% else %}
-                                            <span class="text-muted small">N/A</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if resume.processing_time %}
-                                            <span class="badge bg-soft-success border-0">{{ resume.processing_time }}s</span>
-                                        {% else %}
-                                            <span class="text-muted small">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ resume.remark }}</td>
-                                    <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
-                                    <td class="text-right">
-                                        <a href="{{ resume.resume.url }}" target="_blank" class="btn btn-sm btn-light text-dark" title="View File">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm btn-light text-primary" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm btn-light text-danger"
-                                            onclick="return confirm('Are you sure?')" title="Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-                
-                <!-- Summary Modal -->
-                <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModalLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content shadow-lg border-0">
-                      <div class="modal-header border-bottom-0">
-                        <h5 class="modal-title" id="summaryModalLabel">AI Analysis</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
+                        <button type="submit" class="btn btn-primary btn-sm px-3 shadow-sm d-flex align-items-center" style="height: 38px;">
+                            <i class="fas fa-check mr-2"></i> Apply
                         </button>
-                      </div>
-                      <div class="modal-body pb-0">
-                        <h6 class="font-weight-bold text-primary mb-2">Professional Summary</h6>
-                        <p id="modal-summary-text" class="text-muted" style="white-space: pre-wrap;"></p>
-                        
-                        <div id="modal-strengths-section" style="display: none;">
-                            <hr>
-                            <h6 class="font-weight-bold text-success mb-2">Key Strengths</h6>
-                            <p id="modal-strengths-text" class="text-muted" style="white-space: pre-wrap;"></p>
-                        </div>
-                      </div>
-                      <div class="modal-footer border-top-0">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      </div>
+                        <a href="{% url 'resumes_list' %}" class="btn btn-light btn-sm px-3 ml-2 border shadow-sm d-flex align-items-center" style="height: 38px;">
+                            <i class="fas fa-undo mr-2"></i> Clear
+                        </a>
+                        <button type="submit" class="btn btn-danger btn-sm ml-2 px-3 shadow-sm d-flex align-items-center justify-content-center" form="bulk-delete-form" onclick="return confirm('Delete selected?')" id="bulk-delete-btn" disabled style="height: 38px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                  </div>
                 </div>
-
-                <script>
-                    function openSummaryModal(id, name) {
-                        // Get Content by ID
-                        var summaryText = document.getElementById('summary-content-' + id).innerText;
-                        var strengthsText = document.getElementById('strengths-content-' + id).innerText;
-                        
-                        // Populate Modal
-                        $('#summaryModalLabel').text('AI Analysis: ' + name);
-                        $('#modal-summary-text').text(summaryText);
-                        
-                        if (strengthsText && strengthsText.trim() !== '') {
-                            $('#modal-strengths-section').show();
-                            $('#modal-strengths-text').text(strengthsText);
-                        } else {
-                            $('#modal-strengths-section').hide();
-                        }
-                        
-                        // Open Modal
-                        $('#summaryModal').modal('show');
-                    }
-
-                    document.getElementById('select-all').addEventListener('change', function() {
-                        const checkboxes = document.querySelectorAll('.resume-checkbox');
-                        checkboxes.forEach(cb => cb.checked = this.checked);
-                        toggleDeleteBtn();
-                    });
-
-                    document.querySelectorAll('.resume-checkbox').forEach(cb => {
-                        cb.addEventListener('change', toggleDeleteBtn);
-                    });
-
-                    function toggleDeleteBtn() {
-                        const selected = document.querySelectorAll('.resume-checkbox:checked').length;
-                        document.getElementById('bulk-delete-btn').disabled = selected === 0;
-                    }
-                    
-                    // Activate Bootstrap tooltips
-                    $(function () {
-                      $('[data-toggle="tooltip"]').tooltip()
-                    })
-                </script>
-
-                {% if resumes.has_other_pages %}
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        {% if resumes.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link border-0 shadow-sm rounded-circle m-1" style="width: 40px; height: 40px; text-align: center; line-height: 25px;"
-                                href="?page={{ resumes.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
-                                aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        {% endif %}
-
-                        {% for i in resumes.paginator.page_range %}
-                        {% if resumes.number == i %}
-                        <li class="page-item active"><span class="page-link border-0 shadow-sm rounded-circle m-1 bg-primary" style="width: 40px; height: 40px; text-align: center; line-height: 25px;">{{ i }}</span></li>
-                        {% else %}
-                        <li class="page-item">
-                            <a class="page-link border-0 shadow-sm rounded-circle m-1" style="width: 40px; height: 40px; text-align: center; line-height: 25px;"
-                                href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}">
-                                {{ i }}
-                            </a>
-                        </li>
-                        {% endif %}
-                        {% endfor %}
-
-                        {% if resumes.has_next %}
-                        <li class="page-item">
-                            <a class="page-link border-0 shadow-sm rounded-circle m-1" style="width: 40px; height: 40px; text-align: center; line-height: 25px;"
-                                href="?page={{ resumes.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}"
-                                aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
-            </div> <!-- End Card Body -->
-        </div> <!-- End Card -->
+            </form>
+        </div>
     </div>
+
+    <!-- Cards Grid & Table View -->
+    <form method="POST" action="{% url 'delete_bulk_resumes' %}" id="bulk-delete-form">
+        {% csrf_token %}
+        
+        <!-- Card View Container -->
+        <div id="view-card">
+            <div class="d-flex align-items-center mb-3 ml-1">
+                <div class="custom-control custom-checkbox pl-0">
+                    <input type="checkbox" class="custom-control-input" id="select-all-cards">
+                    <label class="custom-control-label font-weight-bold text-secondary user-select-none pl-4" for="select-all-cards" style="padding-top: 2px;">Select All</label>
+                </div>
+                <span class="ml-3 text-muted small selection-count"></span>
+            </div>
+
+            <div class="row">
+                {% for resume in resumes %}
+                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="card-modern h-100 p-3 d-flex flex-column">
+                        <!-- Card Top: Checkbox & Actions -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="bulk_delete" value="{{ resume.id }}" class="custom-control-input resume-checkbox card-checkbox" id="resume_card_{{ resume.id }}">
+                                <label class="custom-control-label" for="resume_card_{{ resume.id }}"></label>
+                            </div>
+                            <div class="action-btn-group">
+                                <a href="{{ resume.resume.url }}" target="_blank" class="btn btn-sm text-info bg-light" title="View PDF">
+                                    <i class="fas fa-eye fa-sm"></i>
+                                </a>
+                                <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary bg-light" title="Edit">
+                                    <i class="fas fa-pen fa-sm"></i>
+                                </a>
+                                <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm text-danger bg-light" 
+                                   onclick="return confirm('Delete this resume?')" title="Delete">
+                                    <i class="fas fa-trash fa-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="avatar-placeholder mr-3 flex-shrink-0">
+                                {{ resume.name|slice:":1"|upper }}
+                            </div>
+                            <div style="min-width: 0;">
+                                <div class="d-flex align-items-center mb-1">
+                                    <h5 class="font-weight-bold text-dark mb-0 text-truncate" title="{{ resume.name }}">{{ resume.name }}</h5>
+                                    {% if resume.tag %}
+                                    <span class="badge badge-modern badge-light text-primary border border-light ml-2">{{ resume.tag }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <small class="text-muted text-truncate">{{ resume.uploaded_on|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Body: Details -->
+                        <div class="mb-3">
+                            <div class="info-row" title="{{ resume.email }}">
+                                <i class="fas fa-envelope"></i>
+                                <span class="text-truncate">{{ resume.email }}</span>
+                            </div>
+                            <div class="info-row" title="{{ resume.mobile_number }}">
+                                <i class="fas fa-phone"></i>
+                                <span class="text-truncate">{{ resume.mobile_number }}</span>
+                            </div>
+                        </div>
+
+                        <!-- AI Preview Section -->
+                        <div class="mt-auto">
+                            {% if resume.ai_summary %}
+                            <div class="summary-preview mb-3">
+                                {{ resume.ai_summary|truncatewords:8 }}
+                                <a href="javascript:void(0);" 
+                                   onclick="openSummaryModal('{{ resume.id }}', '{{ resume.name|escapejs }}')"
+                                   class="text-primary font-weight-bold ml-1" style="font-size: 0.85rem; text-decoration: none;">
+                                   Read more
+                                </a>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="metric-badge">
+                                    <i class="fas fa-clock mr-1" style="color: #4e73df;"></i>
+                                    {% if resume.processing_time %}{{ resume.processing_time }}s{% else %}N/A{% endif %}
+                                </div>
+                                {% if resume.remark and resume.remark != 'None' %}
+                                <div class="metric-badge" title="{{ resume.remark }}" style="max-width: 140px;">
+                                    <span class="text-truncate">{{ resume.remark }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Table View Container -->
+        <div id="view-table" style="display: none;">
+            <div class="card shadow-sm border-0" style="border-radius: 16px; overflow: hidden;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-secondary">
+                            <tr>
+                                <th class="border-top-0 border-bottom-0" style="width: 40px;">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="select-all-table">
+                                        <label class="custom-control-label" for="select-all-table"></label>
+                                    </div>
+                                </th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Name</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Tag</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Contact</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">AI Summary</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Metrics</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Date</th>
+                                <th class="border-top-0 border-bottom-0 text-right font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resume in resumes %}
+                            <tr>
+                                <td>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" name="bulk_delete" value="{{ resume.id }}" class="custom-control-input resume-checkbox table-checkbox" id="resume_table_{{ resume.id }}">
+                                        <label class="custom-control-label" for="resume_table_{{ resume.id }}"></label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-placeholder mr-3" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                            {{ resume.name|slice:":1"|upper }}
+                                        </div>
+                                        <span class="font-weight-bold text-dark">{{ resume.name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if resume.tag %}
+                                    <span class="badge badge-modern badge-light text-primary border border-light">{{ resume.tag }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column small">
+                                        <span class="text-muted mb-1"><i class="fas fa-envelope mr-2" style="width: 16px;"></i>{{ resume.email }}</span>
+                                        <span class="text-muted"><i class="fas fa-phone mr-2" style="width: 16px;"></i>{{ resume.mobile_number }}</span>
+                                    </div>
+                                </td>
+                                <td style="max-width: 300px;">
+                                    {% if resume.ai_summary %}
+                                    <div class="small">
+                                        <span class="text-muted">{{ resume.ai_summary|truncatewords:8 }}</span>
+                                        <a href="javascript:void(0);" 
+                                           onclick="openSummaryModal('{{ resume.id }}', '{{ resume.name|escapejs }}')"
+                                           class="text-primary font-weight-bold ml-1 text-decoration-none">View</a>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted small">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        {% if resume.processing_time %}
+                                        <span class="badge badge-light border mb-1" style="width: fit-content;">{{ resume.processing_time }}s</span>
+                                        {% endif %}
+                                        {% if resume.remark and resume.remark != 'None' %}
+                                        <small class="text-muted text-truncate" style="max-width: 100px;" title="{{ resume.remark }}">{{ resume.remark }}</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
+                                <td class="text-right">
+                                    <div class="btn-group">
+                                        <a href="{{ resume.resume.url }}" target="_blank" class="btn btn-sm text-info" title="View PDF"><i class="fas fa-eye"></i></a>
+                                        <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary" title="Edit"><i class="fas fa-pen"></i></a>
+                                        <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm text-danger" onclick="return confirm('Delete?')" title="Delete"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-2">
+                <span class="text-muted small selection-count"></span>
+            </div>
+        </div>
+
+    </form>
+    
+    <!-- Shared Hidden Content for Modals -->
+    {% for resume in resumes %}
+        {% if resume.ai_summary %}
+        <div id="summary-content-{{ resume.id }}" class="d-none">{{ resume.ai_summary }}</div>
+        <div id="strengths-content-{{ resume.id }}" class="d-none">{{ resume.ai_strengths|default:'' }}</div>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Summary Modal -->
+    <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header border-bottom-0 bg-light" style="border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title font-weight-bold text-dark" id="summaryModalLabel">AI Analysis</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <h6 class="text-uppercase text-primary font-weight-bold small mb-3" style="letter-spacing: 1px;">Professional Summary</h6>
+                    <div class="bg-light p-4 rounded-lg mb-4">
+                        <p id="modal-summary-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
+                    </div>
+                    
+                    <div id="modal-strengths-section" style="display: none;">
+                        <h6 class="text-uppercase text-success font-weight-bold small mb-3" style="letter-spacing: 1px;">Key Strengths</h6>
+                        <div class="bg-soft-success p-4 rounded-lg">
+                            <p id="modal-strengths-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 bg-light" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Pagination -->
+    {% if resumes.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-5 mb-5">
+        <ul class="pagination justify-content-center">
+            {% if resumes.has_previous %}
+            <li class="page-item">
+                <a class="page-link border-0 shadow-sm rounded-circle m-1 bg-white text-primary" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
+                    href="?page={{ resumes.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}"
+                    aria-label="Previous">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for i in resumes.paginator.page_range %}
+            {% if resumes.number == i %}
+            <li class="page-item active"><span class="page-link border-0 shadow-lg rounded-circle m-1 bg-primary text-white font-weight-bold" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">{{ i }}</span></li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link border-0 shadow-sm rounded-circle m-1 bg-white text-secondary" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
+                    href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}">
+                    {{ i }}
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if resumes.has_next %}
+            <li class="page-item">
+                <a class="page-link border-0 shadow-sm rounded-circle m-1 bg-white text-primary" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"
+                    href="?page={{ resumes.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.tag %}&tag={{ request.GET.tag }}{% endif %}{% if request.GET.per_page %}&per_page={{ request.GET.per_page }}{% endif %}"
+                    aria-label="Next">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    // View Switching Logic
+    function switchView(view) {
+        if (view === 'table') {
+            $('#view-card').hide();
+            $('#view-table').fadeIn(200);
+            $('#btn-view-card').removeClass('active');
+            $('#btn-view-table').addClass('active');
+            localStorage.setItem('resume_list_view', 'table');
+        } else {
+            $('#view-table').hide();
+            $('#view-card').fadeIn(200);
+            $('#btn-view-table').removeClass('active');
+            $('#btn-view-card').addClass('active');
+            localStorage.setItem('resume_list_view', 'card');
+        }
+    }
+
+    // Initialize
+    $(document).ready(function() {
+        // Restore saved view
+        const savedView = localStorage.getItem('resume_list_view');
+        if (savedView === 'table') {
+            switchView('table');
+        } else {
+            // Default to card view
+            switchView('card');
+        }
+
+        // Activate Tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    // Summary Modal Logic
+    function openSummaryModal(id, name) {
+        var summaryText = document.getElementById('summary-content-' + id).innerText;
+        var strengthsText = document.getElementById('strengths-content-' + id).innerText;
+        
+        $('#summaryModalLabel').text('AI Analysis: ' + name);
+        $('#modal-summary-text').text(summaryText);
+        
+        if (strengthsText && strengthsText.trim() !== '') {
+            $('#modal-strengths-section').show();
+            $('#modal-strengths-text').text(strengthsText);
+        } else {
+            $('#modal-strengths-section').hide();
+        }
+        
+        $('#summaryModal').modal('show');
+    }
+
+    // Checkbox Synchronization Logic
+    
+    // Sync "Select All" checkboxes
+    $('#select-all-cards').change(function() {
+        const checked = $(this).is(':checked');
+        $('#select-all-table').prop('checked', checked);
+        $('.resume-checkbox').prop('checked', checked);
+        toggleDeleteBtn();
+        updateSelectionCount();
+    });
+
+    $('#select-all-table').change(function() {
+        const checked = $(this).is(':checked');
+        $('#select-all-cards').prop('checked', checked);
+        $('.resume-checkbox').prop('checked', checked);
+        toggleDeleteBtn();
+        updateSelectionCount();
+    });
+
+    // Sync Individual Checkboxes
+    $(document).on('change', '.resume-checkbox', function() {
+        const id = $(this).val();
+        const checked = $(this).is(':checked');
+        
+        // Update the counterpart checkbox (e.g. if card clicked, update table)
+        // identifying by value since they share the resume.id
+        $(`.resume-checkbox[value="${id}"]`).prop('checked', checked);
+        
+        // Update Select All state if not all are checked
+        if (!checked) {
+            $('#select-all-cards, #select-all-table').prop('checked', false);
+        }
+        
+        toggleDeleteBtn();
+        updateSelectionCount();
+    });
+
+    function toggleDeleteBtn() {
+        // Count unique selected IDs (since we have duplicates in DOM)
+        const selectedIds = new Set();
+        $('.resume-checkbox:checked').each(function() {
+            selectedIds.add($(this).val());
+        });
+        
+        const count = selectedIds.size;
+        document.getElementById('bulk-delete-btn').disabled = count === 0;
+    }
+
+    function updateSelectionCount() {
+        const selectedIds = new Set();
+        $('.resume-checkbox:checked').each(function() {
+            selectedIds.add($(this).val());
+        });
+        
+        const count = selectedIds.size;
+        const text = count > 0 ? count + ' selected' : '';
+        
+        $('.selection-count').text(text);
+    }
+</script>
 {% endblock %}
