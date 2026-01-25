@@ -50,7 +50,7 @@ class BaseAgent:
                 return None
         return LLM_MODEL
 
-    def inference(self, system_prompt, user_prompt, max_tokens=1000, response_format=None):
+    def inference(self, system_prompt, user_prompt, max_tokens=1000, response_format=None, temperature=0.7):
         """
         Common method to generate a response from the LLM.
         """
@@ -63,7 +63,7 @@ class BaseAgent:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                "temperature": 0.7,
+                "temperature": temperature,
                 "max_tokens": max_tokens
             }
             

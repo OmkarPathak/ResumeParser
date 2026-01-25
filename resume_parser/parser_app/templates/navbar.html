@@ -1,5 +1,5 @@
 {% load static %}
-<nav class="navbar navbar-expand-md navbar-light bg-white sidebarNavigation" data-sidebarClass="navbar-light bg-white">
+<nav class="navbar navbar-expand-md navbar-light bg-white sticky-top shadow-sm" style="border-bottom: 1px solid #f1f5f9;">
     {% if user.is_authenticated %}
     <a class="navbar-brand" href="{% url 'homepage' %}">
         Resume Parser
@@ -30,6 +30,9 @@
                 </li>
                 <li class="nav-item {% if request.resolver_match.url_name == 'jd_matcher' %} active {% endif %}">
                     <a class="nav-link" href="{% url 'jd_matcher'%}">JD Matcher</a>
+                </li>
+                <li class="nav-item {% if request.resolver_match.url_name == 'resume_optimizer' %} active {% endif %}">
+                    <a class="nav-link" href="{% url 'resume_optimizer'%}">Optimizer</a>
                 </li>
             {% endif %}
             {% if user.is_authenticated %}

@@ -35,7 +35,7 @@ class ExtractionAgent(BaseAgent):
         {truncated_text}
         """
         
-        response_content = self.inference(system_prompt, user_prompt, max_tokens=1000, response_format={"type": "json_object"})
+        response_content = self.inference(system_prompt, user_prompt, max_tokens=1000, response_format={"type": "json_object"}, temperature=0.0)
         
         if response_content:
             try:

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .ai_service import get_resume_insights
+from .agents.optimization_agent import OptimizationAgent
 from .models import Resume, UploadResumeModelForm
 from django.contrib import messages
 from django.conf import settings
@@ -18,6 +19,7 @@ import time
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from .agents.optimization_agent import OptimizationAgent
 
 def register_view(request):
     if request.method == 'POST':
@@ -359,3 +361,45 @@ def chat_view(request):
             return JsonResponse({'error': str(e)}, status=500)
             
     return render(request, 'chat.html')
+
+@login_required
+def resume_optimizer(request):
+    """
+    View to optimize a selected resume against a Job Description.
+    """
+    resumes = Resume.objects.filter(user=request.user).order_by('-uploaded_on')
+    results = None
+    selected_resume_id = None
+    job_description = ""
+
+    if request.method == 'POST':
+        resume_id = request.POST.get('resume_id')
+        job_description = request.POST.get('job_description')
+        selected_resume_id = int(resume_id) if resume_id else None
+
+        if resume_id and job_description:
+            try:
+                resume = Resume.objects.get(id=resume_id, user=request.user)
+                file_path = os.path.join(settings.MEDIA_ROOT, resume.resume.name)
+                ext = os.path.splitext(file_path)[1]
+                
+                # Extract text from the resume file
+                resume_text = extract_text(file_path, ext)
+                
+                # Use OptimizationAgent to get suggestions
+                agent = OptimizationAgent()
+                results = agent.optimize_resume(resume_text, job_description)
+                
+            except Resume.DoesNotExist:
+                messages.error(request, "Selected resume not found.")
+            except Exception as e:
+                messages.error(request, f"Error during optimization: {e}")
+        else:
+            messages.warning(request, "Please select a resume and provide a job description.")
+
+    return render(request, 'optimizer.html', {
+        'resumes': resumes,
+        'results': results,
+        'selected_resume_id': selected_resume_id,
+        'job_description': job_description
+    })
