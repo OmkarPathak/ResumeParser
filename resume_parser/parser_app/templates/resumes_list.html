@@ -476,6 +476,9 @@
                         <!-- AI Preview Section -->
                         <div class="mt-auto">
                             {% if resume.ai_summary %}
+                            <div class="small font-weight-bold text-primary mb-1">
+                                <i class="fas fa-magic mr-1"></i> AI Summary
+                            </div>
                             <div class="summary-preview mb-3">
                                 {{ resume.ai_summary|truncatewords:8 }}
                                 <a href="javascript:void(0);" 
@@ -521,7 +524,7 @@
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Name</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Tag</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Contact</th>
-                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">AI Summary</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;"><i class="fas fa-magic mr-1"></i> AI Summary</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Metrics</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Date</th>
                                 <th class="border-top-0 border-bottom-0 text-right font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Actions</th>
@@ -612,19 +615,19 @@
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header border-bottom-0 bg-light" style="border-radius: 20px 20px 0 0;">
-                    <h5 class="modal-title font-weight-bold text-dark" id="summaryModalLabel">AI Analysis</h5>
+                    <h5 class="modal-title font-weight-bold text-dark" id="summaryModalLabel"><i class="fas fa-robot mr-2"></i> AI Analysis</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body p-4">
-                    <h6 class="text-uppercase text-primary font-weight-bold small mb-3" style="letter-spacing: 1px;">Professional Summary</h6>
+                    <h6 class="text-uppercase text-primary font-weight-bold small mb-3" style="letter-spacing: 1px;"><i class="fas fa-magic mr-1"></i> AI Professional Summary</h6>
                     <div class="bg-light p-4 rounded-lg mb-4">
                         <p id="modal-summary-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
                     </div>
                     
                     <div id="modal-strengths-section" style="display: none;">
-                        <h6 class="text-uppercase text-success font-weight-bold small mb-3" style="letter-spacing: 1px;">Key Strengths</h6>
+                        <h6 class="text-uppercase text-success font-weight-bold small mb-3" style="letter-spacing: 1px;"><i class="fas fa-star-of-life mr-1"></i> AI Key Strengths</h6>
                         <div class="bg-soft-success p-4 rounded-lg">
                             <p id="modal-strengths-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
                         </div>

@@ -23,7 +23,7 @@
                 <!-- Welcome Message -->
                 <div class="chat-message bot-message mb-3">
                     <div class="p-3 rounded-lg bg-white shadow-sm" style="max-width: 80%; border-top-left-radius: 0;">
-                        <span class="font-weight-bold text-purple mb-1 d-block">AI Assistant</span>
+                        <span class="font-weight-bold text-purple mb-1 d-block"><i class="fas fa-robot mr-1"></i> AI Assistant</span>
                         Hello! I've analyzed all the resumes in your database. How can I help you find the perfect candidate today?
                     </div>
                 </div>
@@ -89,7 +89,7 @@
 
         div.innerHTML = `
             <div class="p-3 rounded-lg ${bgClass} chat-content" style="max-width: 80%; ${alignStyle}">
-                <span class="font-weight-bold ${nameColor} mb-1 d-block small">${name}</span>
+                <span class="font-weight-bold ${nameColor} mb-1 d-block small">${name === 'AI Assistant' ? '<i class="fas fa-robot mr-1"></i> ' + name : name}</span>
                 ${contentHtml}
             </div>
         `;
