@@ -1,158 +1,67 @@
 {% load static %}
-<style>
-    .navbar-premium {
-        background: #ffffff !important;
-        padding: 0.75rem 2rem;
-        transition: all 0.3s ease;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .navbar-brand-modern {
-        font-weight: 800;
-        font-size: 1.25rem;
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        transition: transform 0.2s ease;
-    }
-
-    .navbar-brand-modern:hover {
-        transform: scale(1.05);
-    }
-
-    .nav-link-pill {
-        padding: 0.6rem 1.2rem !important;
-        margin: 0 0.25rem;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #64748b !important;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-    }
-
-    .nav-link-pill:hover {
-        background: #f1f5f9;
-        color: #1e293b !important;
-    }
-
-    .nav-link-pill.active {
-        background: #eef2ff;
-        color: #4f46e5 !important;
-    }
-
-    .nav-link-pill i {
-        margin-right: 8px;
-        font-size: 1rem;
-        opacity: 0.8;
-    }
-
-    /* Specialized AI Style for Optimizer/Chat/Matcher */
-    .nav-link-ai {
-        position: relative;
-    }
-
-    .nav-link-ai.active::after {
-        content: '';
-        position: absolute;
-        bottom: 5px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 4px;
-        height: 4px;
-        background: #4f46e5;
-        border-radius: 50%;
-    }
-
-    .user-pill {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        padding: 0.4rem 1rem;
-        border-radius: 50px;
-        font-weight: 700;
-        color: #475569;
-        font-size: 0.85rem;
-        margin-right: 1.5rem;
-    }
-
-    .btn-logout {
-        color: #ef4444 !important;
-    }
-
-    .btn-logout:hover {
-        background: #fef2f2 !important;
-    }
-</style>
-
-<nav class="navbar navbar-expand-md navbar-light bg-white sticky-top shadow-sm navbar-premium">
-    <a class="navbar-brand navbar-brand-modern" href="{% if user.is_authenticated %}{% url 'homepage' %}{% else %}{% url 'index' %}{% endif %}">
-        Resume Parser
-    </a>
+<nav class="navbar navbar-expand-md navbar-premium sticky-top col-12">
+    <div class="container-fluid">
+        <a class="navbar-brand navbar-brand-text d-flex align-items-center" href="{% if user.is_authenticated %}{% url 'homepage' %}{% else %}{% url 'index' %}{% endif %}">
+            <i class="fas fa-file-alt mr-2 text-primary"></i>Resume Parser
+        </a>
+        
+        <button class="navbar-toggler border-0" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
     
-    <button class="navbar-toggler border-0" type="button" data-toggle="collapse" data-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="navbar-collapse collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto align-items-center">
+        <div class="navbar-collapse collapse" id="navbarNav">
             {% if user.is_authenticated %}
-                <li class="nav-item d-none d-md-block">
-                    <div class="user-pill">
-                        <i class="fas fa-user-circle mr-2"></i>{{ user.username }}
-                    </div>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill {% if request.resolver_match.url_name == 'homepage' %} active {% endif %}" href="{% url 'homepage'%}">
-                        <i class="fas fa-home"></i>Home
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill {% if request.resolver_match.url_name == 'resumes_list' %} active {% endif %}" href="{% url 'resumes_list'%}">
-                        <i class="fas fa-database"></i>Data
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill nav-link-ai {% if request.resolver_match.url_name == 'chat_view' %} active {% endif %}" href="{% url 'chat_view'%}">
-                        <i class="fas fa-robot"></i>Chat
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill nav-link-ai {% if request.resolver_match.url_name == 'jd_matcher' %} active {% endif %}" href="{% url 'jd_matcher'%}">
-                        <i class="fas fa-search-plus"></i>Matcher
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill nav-link-ai {% if request.resolver_match.url_name == 'resume_optimizer' %} active {% endif %}" href="{% url 'resume_optimizer'%}">
-                        <i class="fas fa-magic"></i>Optimizer
-                    </a>
-                </li>
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item mx-1">
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'homepage' %} active {% endif %}" href="{% url 'homepage'%}">
+                            <i class="fas fa-home mr-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'resumes_list' %} active {% endif %}" href="{% url 'resumes_list'%}">
+                            <i class="fas fa-database mr-1"></i>Data
+                        </a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'chat_view' %} active {% endif %}" href="{% url 'chat_view'%}">
+                            <i class="fas fa-robot mr-1"></i>Chat
+                        </a>
+                    </li>
+                     <li class="nav-item mx-1">
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'jd_matcher' %} active {% endif %}" href="{% url 'jd_matcher'%}">
+                            <i class="fas fa-search-plus mr-1"></i>Matcher
+                        </a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'resume_optimizer' %} active {% endif %}" href="{% url 'resume_optimizer'%}">
+                            <i class="fas fa-bolt mr-1"></i>Optimizer
+                        </a>
+                    </li>
+                </ul>
 
-                <li class="nav-item ml-md-2">
-                    <a class="nav-link nav-link-pill btn-logout" href="{% url 'logout' %}">
-                        <i class="fas fa-sign-out-alt"></i>Logout
-                    </a>
-                </li>
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item mr-3 d-none d-md-block">
+                        <span class="badge badge-pill badge-primary-soft">
+                            <i class="fas fa-user-circle mr-1"></i>{{ user.username }}
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-danger btn-sm border-0" href="{% url 'logout' %}" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </li>
+                </ul>
             {% else %}
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill" href="{% url 'login' %}">
-                        <i class="fas fa-sign-in-alt"></i>Login
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-link-pill active" href="{% url 'register' %}">
-                         Register
-                    </a>
-                </li>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item mr-2">
+                        <a class="nav-link nav-link-custom" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm shadow-sm" href="{% url 'register' %}">Get Started</a>
+                    </li>
+                </ul>
             {% endif %}
-        </ul>
+        </div>
     </div>
 </nav>

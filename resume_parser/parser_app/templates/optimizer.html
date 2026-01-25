@@ -4,162 +4,23 @@
 {% block title %}Resume Parser | Resume Optimizer{% endblock %}
 
 {% block content %}
-<style>
-    :root {
-        --glass-bg: rgba(255, 255, 255, 0.95);
-        --glass-border: rgba(255, 255, 255, 0.4);
-        --accent-indigo: #6366f1;
-        --accent-emerald: #10b981;
-        --accent-rose: #f43f5e;
-        --accent-amber: #f59e0b;
-        --text-slate: #334155;
-    }
-
-    /* Dashboard Layout Utilities */
-    .dashboard-container {
-        height: calc(100vh - 100px); /* Adjust based on navbar height */
-        overflow: hidden;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    
-    .h-100-scroll {
-        height: 100%;
-        overflow-y: auto;
-        scrollbar-width: thin;
-    }
-
-    .glass-card {
-        background: var(--glass-bg);
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .card-header-sm {
-        padding: 1rem;
-        border-bottom: 1px solid #f1f5f9;
-        font-weight: 700;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #64748b;
-        background: rgba(248, 250, 252, 0.5);
-        border-radius: 16px 16px 0 0;
-    }
-
-    .card-body-scroll {
-        flex: 1;
-        overflow-y: auto;
-        padding: 1rem;
-        scrollbar-width: thin;
-    }
-
-    .modern-form-control {
-        border: 1px solid #e2e8f0;
-        background-color: #f8fafc;
-        border-radius: 8px;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.9rem;
-        transition: all 0.2s;
-    }
-
-    .modern-form-control:focus {
-        background-color: #fff;
-        border-color: var(--accent-indigo);
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-    }
-
-    .premium-btn {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-        border: none;
-        border-radius: 10px;
-        padding: 0.75rem;
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: white;
-        transition: transform 0.2s;
-        margin-top: auto; /* Push to bottom */
-    }
-
-    .premium-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-    }
-
-    .score-compact {
-        width: 80px;
-        height: 80px;
-    }
-
-    .insight-pill {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-left: 4px solid transparent;
-        border-radius: 8px;
-        padding: 0.75rem;
-        margin-bottom: 0.75rem;
-        font-size: 0.85rem;
-        line-height: 1.4;
-    }
-    
-    .insight-pill.strength { border-left-color: var(--accent-emerald); }
-    .insight-pill.gap { border-left-color: var(--accent-rose); }
-    .insight-pill.suggestion { border-left-color: var(--accent-indigo); }
-    .insight-pill.action { border-left-color: var(--accent-amber); }
-
-    .chart-container {
-        position: relative;
-        display: inline-block;
-    }
-    .score-value {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-weight: 800;
-        font-size: 1.2rem;
-        color: #1e293b;
-    }
-</style>
-
-<div class="container-fluid dashboard-container">
+<div class="container-fluid dashboard-container" style="padding: 1rem 1.5rem; height: calc(100vh - 70px); overflow: hidden;">
     <div class="row h-100">
         <!-- Col 1: Input -->
         <div class="col-lg-3 h-100 mb-2">
-            <div class="glass-card h-100">
-                <style>
-                    /* Premium Gradients & Effects */
-                    .text-gradient-primary {
-                        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                    }
-                    .score-glow {
-                        filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3));
-                    }
-                    /* Full height form tweaks */
-                    .config-card-body {
-                        flex: 1;
-                        display: flex;
-                        flex-direction: column;
-                        overflow: hidden;
-                        padding: 1.25rem;
-                    }
-                </style>
-                <div class="card-header-sm">
-                    <i class="fas fa-sliders-h mr-2 text-primary"></i>Configuration
+            <div class="glass-card h-100 d-flex flex-column">
+                <div class="p-3 border-bottom bg-subtle rounded-top">
+                    <h6 class="mb-0 text-primary text-uppercase small font-weight-bold">
+                        <i class="fas fa-sliders-h mr-2"></i>Configuration
+                    </h6>
                 </div>
-                <div class="config-card-body">
+                <div class="p-3 flex-grow-1 d-flex flex-column overflow-hidden">
                     <form method="POST" id="optimize-form" class="h-100 d-flex flex-column">
                         {% csrf_token %}
                         
                         <div class="form-group mb-3">
-                            <label class="small font-weight-bold text-muted mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Target Profile</label>
-                            <select name="resume_id" class="form-control modern-form-control shadow-sm" required>
+                            <label class="small font-weight-bold text-muted text-uppercase mb-2">Target Profile</label>
+                            <select name="resume_id" class="form-control" required>
                                 <option value="" disabled selected>Select Resume...</option>
                                 {% for resume in resumes %}
                                     <option value="{{ resume.id }}" {% if selected_resume_id == resume.id %}selected{% endif %}>
@@ -169,14 +30,14 @@
                             </select>
                         </div>
 
-                        <div class="form-group mb-3 flex-grow-1 d-flex flex-column">
-                            <label class="small font-weight-bold text-muted mb-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Job Requirement</label>
-                            <textarea name="job_description" class="form-control modern-form-control shadow-sm flex-grow-1" 
-                                      style="resize: none; font-size: 0.9rem; line-height: 1.5; min-height: 50vh;" 
+                        <div class="form-group mb-3 flex-grow-1 d-flex flex-column" style="height: 60vh;">
+                            <label class="small font-weight-bold text-muted text-uppercase mb-2">Job Requirement</label>
+                            <textarea name="job_description" class="form-control flex-grow-1" 
+                                      style="font-size: 0.9rem; height: 60vh;" 
                                       placeholder="Paste the full Job Description here..." required>{{ job_description }}</textarea>
                         </div>
 
-                        <button type="submit" id="optimize-btn" class="btn premium-btn w-100 shadow-sm mt-2">
+                        <button type="submit" id="optimize-btn" class="btn btn-primary w-100 mt-2">
                             <span id="btn-text"><i class="fas fa-bolt mr-2"></i>Analyze</span>
                             <span id="btn-loader" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
                         </button>
@@ -188,15 +49,15 @@
         {% if results %}
         <!-- Col 2: Metrics -->
         <div class="col-lg-5 h-100 mb-2 d-flex flex-column">
-            <!-- Match Score Section (Auto height based on content, but weighted) -->
-            <div class="glass-card mb-3 flex-shrink-0" style="min-height: 220px; background: linear-gradient(to bottom right, #ffffff, #f8fafc);">
+            <!-- Match Score Section -->
+            <div class="card mb-3 flex-shrink-0 border-0 shadow-md" style="min-height: 220px; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);">
                 <div class="card-body d-flex align-items-center justify-content-between p-4">
                     <div style="flex: 1; margin-right: 1.5rem;">
                         <div class="d-flex align-items-center mb-2">
-                            <span class="badge badge-pill badge-light border px-3 py-1 font-weight-bold text-muted text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.05em;">Match Score</span>
+                            <span class="badge badge-pill badge-primary-soft text-uppercase">Match Score</span>
                         </div>
-                        <h1 class="mb-2 font-weight-bolder display-4 text-gradient-primary" style="line-height: 1;">{{ results.match_score }}%</h1>
-                        <p class="text-secondary mb-0 font-weight-normal" style="font-size: 0.95rem; line-height: 1.6;">
+                        <h1 class="mb-2 display-4 text-gradient" style="line-height: 1;">{{ results.match_score }}%</h1>
+                        <p class="text-secondary mb-0" style="font-size: 0.95rem;">
                             {% if results.score_reasoning %}
                                 {{ results.score_reasoning }}
                             {% else %}
@@ -204,40 +65,42 @@
                             {% endif %}
                         </p>
                     </div>
-                    <div class="chart-container ml-2">
+                    <div>
                         <div style="position: relative; width: 130px; height: 130px;">
-                            <svg width="130" height="130" viewBox="0 0 130 130" class="score-glow">
+                            <svg width="130" height="130" viewBox="0 0 130 130" style="filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.2));">
+                                <circle cx="65" cy="65" r="58" fill="none" stroke="#e2e8f0" stroke-width="10"/>
+                                <circle class="score-progress" cx="65" cy="65" r="58" fill="none" stroke="url(#primaryGradient)" stroke-width="10"
+                                        stroke-dasharray="364.42" stroke-dashoffset="364.42" stroke-linecap="round" transform="rotate(-90 65 65)"/>
                                 <defs>
-                                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                         <stop offset="0%" stop-color="#6366f1"/>
-                                        <stop offset="100%" stop-color="#a855f7"/>
+                                        <stop offset="100%" stop-color="#8b5cf6"/>
                                     </linearGradient>
                                 </defs>
-                                <circle cx="65" cy="65" r="58" fill="none" stroke="#f1f5f9" stroke-width="10"/>
-                                <circle class="score-progress" cx="65" cy="65" r="58" fill="none" stroke="url(#scoreGradient)" stroke-width="10"
-                                        stroke-dasharray="364.42" stroke-dashoffset="364.42" stroke-linecap="round" transform="rotate(-90 65 65)"/>
                             </svg>
                             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                                <i class="fas fa-bullseye fa-2x" style="color: #e2e8f0;"></i>
+                                <i class="fas fa-bullseye fa-2x text-muted" style="opacity: 0.3;"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Gap Analysis Section (Fills remaining space) -->
-            <div class="glass-card flex-grow-1" style="min-height: 0; overflow: hidden;">
-                <div class="card-header-sm bg-white top-0">
-                    <i class="fas fa-chart-pie mr-2 text-success"></i>Gap Analysis
+            <!-- Gap Analysis Section -->
+            <div class="glass-card flex-grow-1 d-flex flex-column overflow-hidden">
+                <div class="p-3 border-bottom bg-subtle rounded-top">
+                    <h6 class="mb-0 text-success text-uppercase small font-weight-bold">
+                        <i class="fas fa-chart-pie mr-2"></i>Gap Analysis
+                    </h6>
                 </div>
-                <div class="card-body-scroll">
+                <div class="p-3 overflow-auto" style="scrollbar-width: thin;">
                     <div class="mb-4">
-                        <h6 class="text-uppercase small font-weight-bold mb-3 text-muted" style="letter-spacing: 0.05em;">Match Highlights</h6>
+                        <label class="small font-weight-bold text-muted text-uppercase mb-3">Match Highlights</label>
                         {% if results.strengths %}
                             {% for strength in results.strengths %}
-                                <div class="insight-pill strength py-2 px-3 mb-2 d-flex align-items-center bg-light border-0">
-                                    <i class="fas fa-check-circle text-emerald mr-3 fa-lg"></i>
-                                    <span class="font-weight-500 text-dark">{{ strength }}</span>
+                                <div class="alert alert-light border d-flex align-items-center py-2 px-3 mb-2 rounded shadow-sm">
+                                    <i class="fas fa-check-circle text-success mr-3"></i>
+                                    <span class="font-weight-600 text-dark" style="font-size: 0.9rem;">{{ strength }}</span>
                                 </div>
                             {% endfor %}
                         {% else %}
@@ -246,12 +109,12 @@
                     </div>
                     
                     <div>
-                        <h6 class="text-uppercase small font-weight-bold mb-3 text-muted" style="letter-spacing: 0.05em;">Critical Gaps</h6>
+                        <label class="small font-weight-bold text-muted text-uppercase mb-3">Critical Gaps</label>
                         {% if results.gaps %}
                             {% for gap in results.gaps %}
-                                <div class="insight-pill gap py-2 px-3 mb-2 d-flex align-items-center bg-light border-0">
-                                    <i class="fas fa-exclamation-triangle text-rose mr-3 fa-lg"></i>
-                                    <span class="font-weight-500 text-dark">{{ gap }}</span>
+                                <div class="alert alert-light border d-flex align-items-center py-2 px-3 mb-2 rounded shadow-sm">
+                                    <i class="fas fa-exclamation-triangle text-danger mr-3"></i>
+                                    <span class="font-weight-600 text-dark" style="font-size: 0.9rem;">{{ gap }}</span>
                                 </div>
                             {% endfor %}
                         {% else %}
@@ -264,20 +127,22 @@
 
         <!-- Col 3: Strategy -->
         <div class="col-lg-4 h-100 mb-2">
-             <div class="glass-card h-100">
-                <div class="card-header-sm">
-                    <i class="fas fa-road mr-2 text-warning"></i>Optimization Roadmap
+             <div class="glass-card h-100 d-flex flex-column">
+                <div class="p-3 border-bottom bg-subtle rounded-top">
+                    <h6 class="mb-0 text-warning text-uppercase small font-weight-bold">
+                        <i class="fas fa-road mr-2"></i>Roadmap
+                    </h6>
                 </div>
-                <div class="card-body-scroll">
+                <div class="p-3 overflow-auto" style="scrollbar-width: thin;">
                     {% if results.action_items %}
                         <div class="mb-4">
-                            <h6 class="text-dark font-weight-bold mb-3">High Priority Actions</h6>
+                            <label class="small font-weight-bold text-dark mb-3">High Priority Actions</label>
                             {% for item in results.action_items %}
-                                <div class="insight-pill action d-flex align-items-start">
-                                    <div class="mr-2 mt-1 min-w-0">
-                                        <span class="badge badge-pill badge-warning text-white">{{ forloop.counter }}</span>
+                                <div class="d-flex align-items-start mb-3 p-3 border rounded bg-white shadow-sm">
+                                    <div class="mr-3">
+                                        <span class="badge badge-warning text-white rounded-circle p-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">{{ forloop.counter }}</span>
                                     </div>
-                                    <div>{{ item }}</div>
+                                    <div class="text-secondary font-weight-600" style="font-size: 0.9rem;">{{ item }}</div>
                                 </div>
                             {% endfor %}
                         </div>
@@ -285,11 +150,13 @@
 
                     {% if results.suggestions %}
                         <div>
-                            <h6 class="text-primary font-weight-bold mb-3">Editorial Suggestions</h6>
+                            <label class="small font-weight-bold text-primary mb-3">Editorial Suggestions</label>
                             {% for suggestion in results.suggestions %}
-                                <div class="insight-pill suggestion d-flex">
-                                    <i class="fas fa-lightbulb text-primary mt-1 mr-2"></i>
-                                    <div>{{ suggestion }}</div>
+                                <div class="d-flex mb-3 p-3 border rounded bg-white shadow-sm">
+                                    <div class="mr-3 text-primary">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </div>
+                                    <div class="text-secondary font-weight-600" style="font-size: 0.9rem;">{{ suggestion }}</div>
                                 </div>
                             {% endfor %}
                         </div>
@@ -301,11 +168,13 @@
         {% else %}
         <!-- Empty State in Col 2+3 -->
         <div class="col-lg-9 h-100">
-            <div class="glass-card d-flex align-items-center justify-content-center">
-                <div class="text-center p-5 opacity-50">
-                    <i class="fas fa-brain fa-4x text-muted mb-3"></i>
-                    <h4>Ready to Optimize</h4>
-                    <p class="text-muted">Select a resume and paste the JD to begin analysis.</p>
+            <div class="glass-card h-100 d-flex align-items-center justify-content-center">
+                <div class="text-center p-5">
+                    <div class="mb-4 text-muted" style="font-size: 4rem; opacity: 0.2;">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <h3 class="font-weight-bold text-dark mb-3">AI Optimization Engine</h3>
+                    <p class="text-secondary lead px-lg-5" style="max-width: 600px; margin: 0 auto;">Select a resume and paste the job description configurations on the left to begin the deep alignment analysis.</p>
                 </div>
             </div>
         </div>
@@ -327,10 +196,10 @@
         const progress = document.querySelector('.score-progress');
         if (progress) {
             const score = parseInt("{{ results.match_score|default:0 }}");
-            const circumference = 339.292; // 2 * pi * 54
+            const circumference = 364.42; 
             const offset = circumference - (score / 100) * circumference;
             setTimeout(() => {
-                progress.style.transition = 'stroke-dashoffset 1s ease-out';
+                progress.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1)';
                 progress.style.strokeDashoffset = offset;
             }, 300);
         }

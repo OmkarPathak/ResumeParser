@@ -4,368 +4,40 @@
 {% block title %}Resume List{% endblock %}
 
 {% block content %}
-<style>
-    .card-modern {
-        border: none;
-        border-radius: 16px;
-        background: #fff;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .card-modern:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
-    }
-
-    .card-modern::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, #4e73df, #224abe);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .card-modern:hover::before {
-        opacity: 1;
-    }
-
-    .icon-box {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background: rgba(78, 115, 223, 0.1);
-        color: #4e73df;
-        font-size: 1.1rem;
-        margin-right: 1rem;
-    }
-
-    .info-row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.5rem;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .info-row i {
-        width: 20px;
-        text-align: center;
-        margin-right: 8px;
-        color: #b7b9cc;
-    }
-
-    .badge-modern {
-        padding: 0.35em 0.8em;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-    }
-
-    .avatar-placeholder {
-        width: 42px;
-        height: 42px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    .action-btn-group .btn {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        margin-left: 6px;
-        transition: all 0.2s;
-    }
-
-    .action-btn-group .btn:hover {
-        transform: scale(1.1);
-    }
-    
-    .custom-control-label::before {
-        border-radius: 4px;
-        border: 2px solid #d1d3e2;
-    }
-
-    .custom-control-input:checked ~ .custom-control-label::before {
-        background-color: #4e73df;
-        border-color: #4e73df;
-    }
-
-    .metric-badge {
-        background: #f8f9fc;
-        padding: 4px 10px;
-        border-radius: 20px;
-        color: #858796;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-    }
-    
-    .summary-preview {
-        background: #f8f9fc;
-        border-radius: 12px;
-        padding: 12px;
-        font-size: 0.9rem;
-        line-height: 1.5;
-        color: #5a5c69;
-        border: 1px solid #eaecf4;
-    }
-
-    /* View Toggle Buttons */
-    .btn-view-toggle {
-        border-color: #4e73df !important;
-        color: #4e73df !important;
-        background-color: #fff !important;
-        transition: all 0.2s ease;
-    }
-
-    .btn-view-toggle:hover {
-        background-color: rgba(78, 115, 223, 0.1) !important;
-        border-color: #4e73df !important;
-        color: #4e73df !important;
-    }
-
-    .btn-view-toggle.active {
-        background-color: #4e73df !important;
-        border-color: #4e73df !important;
-        color: #fff !important;
-    }
-
-    .btn-view-toggle.active:hover {
-        background-color: #224abe !important;
-        border-color: #224abe !important;
-    }
-
-    /* Desktop styles for filter actions */
-    .filter-actions-wrapper {
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-end;
-    }
-
-    .filter-actions-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* Mobile Responsive Styles */
-    @media (max-width: 768px) {
-        /* Header adjustments */
-        .page-header {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 1rem;
-        }
-
-        .page-header > div:last-child {
-            width: 100%;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .page-header .btn {
-            flex: 1;
-            justify-content: center;
-            padding: 0.5rem 0.75rem !important;
-        }
-
-        /* Filter section mobile layout */
-        .filter-actions-wrapper {
-            flex-direction: column !important;
-            gap: 0.75rem;
-            width: 100%;
-        }
-
-        .filter-actions-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            width: 100%;
-        }
-
-        .view-toggle-mobile {
-            flex: 0 0 auto;
-        }
-
-        .action-btn-mobile {
-            flex: 1;
-            min-width: 80px;
-        }
-
-        /* Make buttons smaller on mobile */
-        .btn-sm {
-            font-size: 0.8rem;
-            padding: 0.4rem 0.8rem;
-        }
-
-        /* Card adjustments for mobile */
-        .col-xl-3, .col-lg-4, .col-md-6 {
-            -ms-flex: 0 0 100%;
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-
-        /* Reduce padding on mobile */
-        .container-fluid {
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-
-        .card-body {
-            padding: 1rem !important;
-        }
-
-        /* Title size adjustments */
-        h3 {
-            font-size: 1.5rem;
-        }
-
-        /* Filter controls full width on mobile */
-        .col-md-3, .col-md-2, .col-md-4 {
-            -ms-flex: 0 0 100%;
-            flex: 0 0 100%;
-            max-width: 100%;
-            margin-bottom: 1rem !important;
-        }
-
-        .col-md-4:last-child {
-            margin-bottom: 0 !important;
-        }
-
-        /* Stack filter actions vertically on very small screens */
-        @media (max-width: 480px) {
-            .filter-actions-row {
-                flex-direction: column;
-            }
-
-            .view-toggle-mobile {
-                width: 100%;
-            }
-
-            .btn-group {
-                width: 100%;
-            }
-
-            .btn-group .btn {
-                flex: 1;
-            }
-
-            .action-btn-mobile {
-                width: 100%;
-            }
-        }
-    }
-
-    /* Tablet adjustments */
-    @media (min-width: 769px) and (max-width: 992px) {
-        .col-md-3 {
-            -ms-flex: 0 0 50%;
-            flex: 0 0 50%;
-            max-width: 50%;
-        }
-
-        .col-md-2 {
-            -ms-flex: 0 0 50%;
-            flex: 0 0 50%;
-            max-width: 50%;
-        }
-    }
-</style>
-
-<div class="container-fluid" style="margin-top: 1.5rem;">
+<div class="container-fluid mt-4 mb-4">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
+    <div class="d-flex align-items-center justify-content-between mb-4 fade-in">
         <div>
-            <h3 class="font-weight-bold text-gray-800 mb-1">Resume Database</h3>
-            <p className="text-muted small mb-0">Manage and analyze uploaded resumes</p>
+            <h2 class="h2 font-weight-bold mb-1">Candidate Database</h2>
+            <p class="text-secondary small mb-0">Manage and analyze processed resumes.</p>
         </div>
         <div>
-            <a href="{% url 'homepage' %}" class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50 mr-2"></i> New Upload</a>
-            <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-light text-secondary border shadow-sm ml-2"><i class="fas fa-file-export fa-sm mr-2"></i> Export CSV</a>
+            <a href="{% url 'homepage' %}" class="btn btn-primary shadow-sm">
+                <i class="fas fa-plus mr-2"></i>Upload New
+            </a>
+            <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-secondary shadow-sm ml-2">
+                <i class="fas fa-file-export mr-2"></i>Export CSV
+            </a>
         </div>
     </div>
 
-    <style>
-        .filter-control {
-            height: 38px;
-            box-shadow: none !important;
-            border: 1px solid #e3e6f0;
-            background-color: #fff;
-            font-size: 0.85rem;
-            color: #6e707e;
-            border-radius: 0.35rem;
-            transition: all 0.2s ease;
-        }
-        
-        .filter-control:focus {
-            border-color: #4e73df;
-            background-color: #fff;
-        }
-    
-        .filter-select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e707e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.7rem center;
-            background-size: 1em;
-            padding-right: 2rem !important;
-        }
-        
-        .input-group-text-custom {
-            background-color: #fff;
-            border: 1px solid #e3e6f0;
-            border-right: none;
-        }
-        
-        /* Ensure input within group matches */
-        .input-group > .filter-control {
-            border-left: none;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-    </style>
-
     <!-- Filters Section -->
-    <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+    <div class="card border-0 mb-4 fade-in">
         <div class="card-body py-3">
             <form method="GET" action="." class="mb-0">
                 <div class="row align-items-end">
                     <div class="col-md-3 mb-2 mb-md-0">
-                        <label class="text-uppercase text-secondary font-weight-bold small mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Search</label>
+                        <label class="font-weight-600 text-uppercase small text-muted mb-2">Search</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <span class="input-group-text input-group-text-custom text-muted"><i class="fas fa-search"></i></span>
+                                <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-muted"></i></span>
                             </div>
-                            <input type="text" name="q" class="form-control filter-control" placeholder="Name, Email, Skills..." value="{{ search_query|default:'' }}">
+                            <input type="text" name="q" class="form-control filter-control border-left-0 pl-0" placeholder="Name, Email, Skills..." value="{{ search_query|default:'' }}">
                         </div>
                     </div>
                     <div class="col-md-3 mb-2 mb-md-0">
-                        <label class="text-uppercase text-secondary font-weight-bold small mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Filter by Tag</label>
-                        <select name="tag" class="form-control filter-control filter-select">
+                        <label class="font-weight-600 text-uppercase small text-muted mb-2">Filter by Tag</label>
+                        <select name="tag" class="form-select filter-control">
                             <option value="">All Tags</option>
                             {% for tag in tags %}
                             <option value="{{ tag }}" {% if selected_tag == tag %}selected{% endif %}>{{ tag }}</option>
@@ -373,30 +45,30 @@
                         </select>
                     </div>
                     <div class="col-md-2 mb-2 mb-md-0">
-                        <label class="text-uppercase text-secondary font-weight-bold small mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">Rows</label>
-                        <select name="per_page" class="form-control filter-control filter-select" onchange="this.form.submit()">
+                        <label class="font-weight-600 text-uppercase small text-muted mb-2">Rows</label>
+                        <select name="per_page" class="form-select filter-control" onchange="this.form.submit()">
                             <option value="10" {% if request.GET.per_page == '10' %}selected{% endif %}>10</option>
                             <option value="50" {% if request.GET.per_page == '50' %}selected{% endif %}>50</option>
                             <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>All</option>
                         </select>
                     </div>
-                    <div class="col-md-4 text-md-right filter-actions-wrapper">
-                        <div class="filter-actions-row">
-                            <div class="btn-group view-toggle-mobile" role="group" aria-label="View Mode">
-                                <button type="button" class="btn btn-sm btn-view-toggle active" id="btn-view-card" onclick="switchView('card')" title="Card View" style="height: 38px;">
+                    <div class="col-md-4 text-md-right">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <div class="btn-group mr-2">
+                                <button type="button" class="btn btn-sm view-toggle-btn active" id="btn-view-card" onclick="switchView('card')" title="Card View">
                                     <i class="fas fa-th-large"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-view-toggle" id="btn-view-table" onclick="switchView('table')" title="Table View" style="height: 38px;">
+                                <button type="button" class="btn btn-sm view-toggle-btn" id="btn-view-table" onclick="switchView('table')" title="Table View">
                                     <i class="fas fa-list"></i>
                                 </button>
                             </div>
-                            <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm d-flex align-items-center justify-content-center action-btn-mobile" style="height: 38px;">
-                                <i class="fas fa-check mr-2"></i> Apply
+                            <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm mr-2">
+                                Apply
                             </button>
-                            <a href="{% url 'resumes_list' %}" class="btn btn-sm btn-light px-3 border shadow-sm d-flex align-items-center justify-content-center action-btn-mobile" style="height: 38px;">
-                                <i class="fas fa-undo mr-2"></i> Clear
+                            <a href="{% url 'resumes_list' %}" class="btn btn-sm btn-light border px-3 shadow-sm mr-2">
+                                Clear
                             </a>
-                            <button type="submit" class="btn btn-sm btn-danger px-3 shadow-sm d-flex align-items-center justify-content-center action-btn-mobile" form="bulk-delete-form" onclick="return confirm('Delete selected?')" id="bulk-delete-btn" disabled style="height: 38px;">
+                            <button type="submit" class="btn btn-sm btn-danger px-3 shadow-sm" form="bulk-delete-form" onclick="return confirm('Delete selected?')" id="bulk-delete-btn" disabled>
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -423,7 +95,7 @@
             <div class="row">
                 {% for resume in resumes %}
                 <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                    <div class="card-modern h-100 p-3 d-flex flex-column">
+                    <div class="card h-100 p-3 d-flex flex-column hover-shadow-lg">
                         <!-- Card Top: Checkbox & Actions -->
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="custom-control custom-checkbox">
@@ -526,6 +198,7 @@
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Contact</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;"><i class="fas fa-magic mr-1"></i> AI Summary</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Metrics</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Skills</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Date</th>
                                 <th class="border-top-0 border-bottom-0 text-right font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Actions</th>
                             </tr>
@@ -549,36 +222,24 @@
                                 </td>
                                 <td>
                                     {% if resume.tag %}
-                                    <span class="badge badge-modern badge-light text-primary border border-light">{{ resume.tag }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column small">
-                                        <span class="text-muted mb-1"><i class="fas fa-envelope mr-2" style="width: 16px;"></i>{{ resume.email }}</span>
-                                        <span class="text-muted"><i class="fas fa-phone mr-2" style="width: 16px;"></i>{{ resume.mobile_number }}</span>
-                                    </div>
-                                </td>
-                                <td style="max-width: 300px;">
-                                    {% if resume.ai_summary %}
-                                    <div class="small">
-                                        <span class="text-muted">{{ resume.ai_summary|truncatewords:8 }}</span>
-                                        <a href="javascript:void(0);" 
-                                           onclick="openSummaryModal('{{ resume.id }}', '{{ resume.name|escapejs }}')"
-                                           class="text-primary font-weight-bold ml-1 text-decoration-none">View</a>
-                                    </div>
+                                        <span class="badge badge-modern badge-light text-primary border border-light">{{ resume.tag }}</span>
                                     {% else %}
-                                    <span class="text-muted small">N/A</span>
+                                        <span class="text-muted">-</span>
                                     {% endif %}
                                 </td>
+                                <td>{{ resume.email }}</td>
+                                <td>{{ resume.mobile_number }}</td>
                                 <td>
-                                    <div class="d-flex flex-column">
-                                        {% if resume.processing_time %}
-                                        <span class="badge badge-light border mb-1" style="width: fit-content;">{{ resume.processing_time }}s</span>
-                                        {% endif %}
-                                        {% if resume.remark and resume.remark != 'None' %}
-                                        <small class="text-muted text-truncate" style="max-width: 100px;" title="{{ resume.remark }}">{{ resume.remark }}</small>
-                                        {% endif %}
-                                    </div>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ resume.education }}">
+                                        {{ resume.education|default:"-" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if resume.skills %}
+                                        <span class="badge badge-primary-soft">{{ resume.skills|length }} Skills</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
                                 </td>
                                 <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
                                 <td class="text-right">
@@ -728,7 +389,29 @@
         
         if (strengthsText && strengthsText.trim() !== '') {
             $('#modal-strengths-section').show();
-            $('#modal-strengths-text').text(strengthsText);
+            
+            // Try to parse the python list string style: ['Skill 1', 'Skill 2']
+            let formattedHtml = '';
+            try {
+                // simple cleanup to make it JSON compatible (replace single quotes with double, handle escaped quotes if any)
+                let jsonStr = strengthsText.replace(/'/g, '"');
+                let skills = JSON.parse(jsonStr);
+                
+                if (Array.isArray(skills)) {
+                    formattedHtml = '<ul class="pl-3 mb-0" style="list-style-type: disc;">';
+                    skills.forEach(skill => {
+                         formattedHtml += `<li class="mb-1">${skill}</li>`;
+                    });
+                    formattedHtml += '</ul>';
+                } else {
+                     formattedHtml = strengthsText;
+                }
+            } catch (e) {
+                // Fallback if parsing fails
+                formattedHtml = strengthsText;
+            }
+            
+            $('#modal-strengths-text').html(formattedHtml);
         } else {
             $('#modal-strengths-section').hide();
         }

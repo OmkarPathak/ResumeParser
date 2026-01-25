@@ -4,8 +4,8 @@
 {% block title %}Update Resume{% endblock %}
 
 {% block content %}
-<div class="row" style="margin-top: 2%">
-    <div class="col-lg-6 offset-lg-3">
+<div class="row justify-content-center mt-4 mb-4">
+    <div class="col-lg-6">
         <h2>Update Resume Details</h2>
         <form method="POST">
             {% csrf_token %}
@@ -63,7 +63,7 @@
                 <textarea name="remark" class="form-control" rows="3">{{ resume.remark|default_if_none:'' }}</textarea>
             </div>
 
-            <button type="submit" class="btn btn-success">Update</button>
+            <button type="submit" class="btn btn-primary">Update</button>
             <a href="{% url 'resumes_list' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>

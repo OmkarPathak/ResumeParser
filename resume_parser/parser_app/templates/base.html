@@ -42,15 +42,14 @@
   <title>{% block title %}{% endblock %}</title>
 </head>
 
-<body class="bg-light">
+<body style="background-color: var(--bg-body);">
   {% include 'navbar.html' %}
 
-  <div class="container-fluid">
+  <div class="container-fluid p-0">
     {% include 'messages.html' %}
 
     {% block content %}
     {% endblock %}
-  </div>
   </div>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->

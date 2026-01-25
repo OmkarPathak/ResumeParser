@@ -8,11 +8,11 @@
     <div class="col-lg-6 col-md-8">
         <div class="card shadow-md">
             <div class="card-body p-5">
-                <h2 class="text-center mb-4" style="color: var(--primary);">Upload Resume</h2>
+                <h2 class="text-center mb-4">Upload Resume</h2>
                 <p class="text-muted text-center mb-4">Upload CVs to extract entities and generate summaries instantly.</p>
 
                 {% if avg_processing_time > 0 %}
-                <div class="alert alert-secondary text-center mb-4 border-0" role="alert" style="background-color: #EEF2FF; color: var(--primary);">
+                <div class="alert alert-secondary text-center mb-4 border-0" role="alert" style="background-color: #EEF2FF;">
                     <i class="fas fa-bolt mr-2"></i> Average Processing Time: <strong>{{ avg_processing_time }}s</strong>
                 </div>
                 {% endif %}
