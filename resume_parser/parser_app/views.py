@@ -265,6 +265,17 @@ def delete_bulk_resumes(request):
     return redirect('resumes_list')
 
 @login_required
+def view_resume(request, pk):
+    try:
+        resume = Resume.objects.get(pk=pk, user=request.user)
+    except Resume.DoesNotExist:
+        messages.warning(request, 'Resume not found or access denied.')
+        return redirect('resumes_list')
+    
+    return render(request, 'pdf_viewer.html', {'resume': resume})
+
+
+@login_required
 def update_resume(request, pk):
     try:
         resume = Resume.objects.get(pk=pk, user=request.user)

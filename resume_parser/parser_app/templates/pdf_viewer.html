@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}View Resume: {{ resume.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3 h-100" style="min-height: 85vh; display: flex; flex-direction: column;">
+    <!-- Back Button Header -->
+    <div class="d-flex align-items-center mb-3">
+        <a href="{% url 'resumes_list' %}" class="btn btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Resumes
+        </a>
+        <h4 class="ml-3 mb-0 text-dark font-weight-bold">{{ resume.name }}</h4>
+        <span class="ml-2 text-muted small">({{ resume.resume.name }})</span>
+    </div>
+
+    <!-- PDF Container -->
+    <div class="card border-0 shadow-sm flex-grow-1" style="overflow: hidden; border-radius: 12px;">
+        <div class="card-body p-0 h-100">
+            <iframe src="{{ resume.resume.url }}" width="100%" height="100%" style="border: none; min-height: 75vh;">
+                Your browser does not support PDFs. 
+                <a href="{{ resume.resume.url }}">Download the PDF</a> to view it: {{ resume.resume.name }}.
+            </iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}

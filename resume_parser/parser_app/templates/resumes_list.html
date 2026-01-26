@@ -103,7 +103,7 @@
                                 <label class="custom-control-label" for="resume_card_{{ resume.id }}"></label>
                             </div>
                             <div class="action-btn-group">
-                                <a href="{{ resume.resume.url }}" target="_blank" class="btn btn-sm text-info bg-light" title="View PDF">
+                                <a href="{% url 'view_resume' resume.id %}" class="btn btn-sm text-info bg-light" title="View PDF">
                                     <i class="fas fa-eye fa-sm"></i>
                                 </a>
                                 <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary bg-light" title="Edit">
@@ -244,7 +244,7 @@
                                 <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
                                 <td class="text-right">
                                     <div class="btn-group">
-                                        <a href="{{ resume.resume.url }}" target="_blank" class="btn btn-sm text-info" title="View PDF"><i class="fas fa-eye"></i></a>
+                                        <a href="{% url 'view_resume' resume.id %}" class="btn btn-sm text-info" title="View PDF"><i class="fas fa-eye"></i></a>
                                         <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary" title="Edit"><i class="fas fa-pen"></i></a>
                                         <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm text-danger" onclick="return confirm('Delete?')" title="Delete"><i class="fas fa-trash"></i></a>
                                     </div>

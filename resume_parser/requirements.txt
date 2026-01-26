@@ -78,3 +78,4 @@ urllib3==2.6.2
 whitenoise==6.11.0
 wrapt==2.0.1
 zipp==3.23.0
+pywebview==5.3.2

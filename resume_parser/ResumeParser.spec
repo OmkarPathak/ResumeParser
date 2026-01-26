@@ -39,6 +39,7 @@ hiddenimports=[
     'llama_cpp', 
     'huggingface_hub',
     'crispy_forms.templatetags.crispy_forms_tags', 
+    'webview',
 ]
 
 # Packages to specifically handle
@@ -60,7 +61,7 @@ for pkg in packages_to_collect:
         print(f"Warning: Could not collect {pkg}: {e}")
 
 a = Analysis(
-    ['manage.py'],
+    ['desktop_main.py'],
     pathex=[],
     binaries=binaries,
     datas=datas,
