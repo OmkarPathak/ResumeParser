@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Jobs - Resume Parser{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>Jobs</h1>
+    </div>
+    <div class="col-md-4 text-right">
+        {% if user.role == 'RECRUITER' or user.role == 'ADMIN' or user.role == 'CLIENT' %}
+        <a href="{% url 'job_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create Job
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="form-inlin justify-content-center">
+            <div class="row w-100">
+                <div class="col-md-6 mb-2">
+                    {{ form.q }}
+                </div>
+                <div class="col-md-4 mb-2">
+                    {{ form.status }}
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-secondary w-100">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-premium table-hover">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Created By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td><strong>{{ job.title }}</strong></td>
+                <td>{{ job.client.name }}</td>
+                <td>
+                    {% if job.status == 'ACTIVE' %}
+                        <span class="badge badge-success-soft">{{ job.get_status_display }}</span>
+                    {% elif job.status == 'DRAFT' %}
+                        <span class="badge badge-secondary">{{ job.get_status_display }}</span>
+                    {% else %}
+                        <span class="badge badge-warning">{{ job.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ job.location|default:"-" }}</td>
+                <td>{{ job.created_by.username }}</td>
+                <td>
+                    {% if user.role != 'CANDIDATE' %}
+                    <a href="{% url 'job_update' job.pk %}" class="btn btn-sm btn-secondary" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% else %}
+                    <form action="{% url 'candidates:apply_to_job' job.pk %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">Apply</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-4">No jobs found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

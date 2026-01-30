@@ -12,7 +12,7 @@
             <p class="text-secondary small mb-0">Manage and analyze processed resumes.</p>
         </div>
         <div>
-            <a href="{% url 'homepage' %}" class="btn btn-primary shadow-sm">
+            <a href="{% url 'candidates:upload_candidate' %}" class="btn btn-primary shadow-sm">
                 <i class="fas fa-plus mr-2"></i>Upload New
             </a>
             <a href="{% url 'export_resumes' %}?{{ request.GET.urlencode }}" class="btn btn-secondary shadow-sm ml-2">
@@ -109,10 +109,10 @@
                                 <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary bg-light" title="Edit">
                                     <i class="fas fa-pen fa-sm"></i>
                                 </a>
-                                <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm text-danger bg-light" 
-                                   onclick="return confirm('Delete this resume?')" title="Delete">
+                                <button type="button" class="btn btn-sm text-danger bg-light" 
+                                   onclick="confirmDelete('{{ resume.id }}')" title="Delete">
                                     <i class="fas fa-trash fa-sm"></i>
-                                </a>
+                                </button>
                             </div>
                         </div>
 
@@ -246,7 +246,7 @@
                                     <div class="btn-group">
                                         <a href="{% url 'view_resume' resume.id %}" class="btn btn-sm text-info" title="View PDF"><i class="fas fa-eye"></i></a>
                                         <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary" title="Edit"><i class="fas fa-pen"></i></a>
-                                        <a href="{% url 'delete_resume' resume.id %}" class="btn btn-sm text-danger" onclick="return confirm('Delete?')" title="Delete"><i class="fas fa-trash"></i></a>
+                                        <button type="button" class="btn btn-sm text-danger" onclick="confirmDelete('{{ resume.id }}')" title="Delete"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -263,43 +263,7 @@
 
     </form>
     
-    <!-- Shared Hidden Content for Modals -->
-    {% for resume in resumes %}
-        {% if resume.ai_summary %}
-        <div id="summary-content-{{ resume.id }}" class="d-none">{{ resume.ai_summary }}</div>
-        <div id="strengths-content-{{ resume.id }}" class="d-none">{{ resume.ai_strengths|default:'' }}</div>
-        {% endif %}
-    {% endfor %}
 
-    <!-- Summary Modal -->
-    <div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header border-bottom-0 bg-light" style="border-radius: 20px 20px 0 0;">
-                    <h5 class="modal-title font-weight-bold text-dark" id="summaryModalLabel"><i class="fas fa-robot mr-2"></i> AI Analysis</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body p-4">
-                    <h6 class="text-uppercase text-primary font-weight-bold small mb-3" style="letter-spacing: 1px;"><i class="fas fa-magic mr-1"></i> AI Professional Summary</h6>
-                    <div class="bg-light p-4 rounded-lg mb-4">
-                        <p id="modal-summary-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
-                    </div>
-                    
-                    <div id="modal-strengths-section" style="display: none;">
-                        <h6 class="text-uppercase text-success font-weight-bold small mb-3" style="letter-spacing: 1px;"><i class="fas fa-star-of-life mr-1"></i> AI Key Strengths</h6>
-                        <div class="bg-soft-success p-4 rounded-lg">
-                            <p id="modal-strengths-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-top-0 bg-light" style="border-radius: 0 0 20px 20px;">
-                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
 
@@ -342,6 +306,69 @@
         </ul>
     </nav>
     {% endif %}
+</div>
+
+<!-- Shared Hidden Content for Modals -->
+{% for resume in resumes %}
+    {% if resume.ai_summary %}
+    <div id="summary-content-{{ resume.id }}" class="d-none">{{ resume.ai_summary }}</div>
+    <div id="strengths-content-{{ resume.id }}" class="d-none">{{ resume.ai_strengths|default:'' }}</div>
+    {% endif %}
+{% endfor %}
+
+<!-- Summary Modal -->
+<div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-bottom-0 bg-light" style="border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title font-weight-bold text-dark" id="summaryModalLabel"><i class="fas fa-robot mr-2"></i> AI Analysis</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <h6 class="text-uppercase text-primary font-weight-bold small mb-3" style="letter-spacing: 1px;"><i class="fas fa-magic mr-1"></i> AI Professional Summary</h6>
+                <div class="bg-light p-4 rounded-lg mb-4">
+                    <p id="modal-summary-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
+                </div>
+                
+                <div id="modal-strengths-section" style="display: none;">
+                    <h6 class="text-uppercase text-success font-weight-bold small mb-3" style="letter-spacing: 1px;"><i class="fas fa-star-of-life mr-1"></i> AI Key Strengths</h6>
+                    <div class="bg-soft-success p-4 rounded-lg">
+                        <p id="modal-strengths-text" class="text-dark mb-0" style="white-space: pre-wrap; line-height: 1.6;"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top-0 bg-light" style="border-radius: 0 0 20px 20px;">
+                <button type="button" class="btn btn-secondary px-4 rounded-pill" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-3">
+                    <span class="fa-stack fa-2x text-danger animate__animated animate__pulse">
+                        <i class="fas fa-circle fa-stack-2x" style="opacity: 0.2;"></i>
+                        <i class="fas fa-trash-alt fa-stack-1x"></i>
+                    </span>
+                </div>
+                <h5 class="font-weight-bold text-dark mb-2">Delete Candidate?</h5>
+                <p class="text-muted mb-4">This action is <strong>irreversible</strong>. The candidate profile and all related data will be permanently removed.</p>
+                
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-light rounded-pill px-4 mr-2" data-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirm-delete-btn" class="btn btn-danger rounded-pill px-4 shadow-sm">
+                        Delete Permanently
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -417,6 +444,14 @@
         }
         
         $('#summaryModal').modal('show');
+    }
+
+    // Confirm Delete Logic
+    function confirmDelete(id) {
+        // Hardcoded URL to avoid reversal issues in JS
+        var url = "/candidates/" + id + "/delete/";
+        $('#confirm-delete-btn').attr('href', url);
+        $('#deleteModal').modal('show');
     }
 
     // Checkbox Synchronization Logic

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Resume Parser{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-lg">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4 font-weight-bold">{{ title }}</h2>
+                <p class="text-muted text-center mb-4">Upload a resume to automatically parse details and create a candidate profile.</p>
+                
+                <form method="post" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+                    
+                    <!-- Drag & Drop Zone -->
+                    <div class="upload-area p-5 text-center mb-4" id="drop-zone" style="border: 2px dashed #E0E7FF; border-radius: 12px; background-color: #F8FAFC; cursor: pointer; transition: all 0.3s;">
+                        <!-- Hidden Input matching field name 'resume_file' -->
+                        <input type="file" name="resume_file" id="id_resume_file" class="d-none" accept=".pdf,.docx,.doc">
+                        
+                        <div id="drop-zone-content">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: #4F46E5;"></i>
+                            <h5 class="font-weight-bold" style="color: #475569;">Drag & Drop resume here</h5>
+                            <p class="text-muted small mb-0">or click to browse</p>
+                            <p class="text-muted small mt-2">Supports PDF, DOCX</p>
+                        </div>
+                        
+                        <div id="file-preview" style="display: none;">
+                            <i class="fas fa-file-alt fa-3x mb-3" style="color: #4F46E5;"></i>
+                            <h5 class="font-weight-bold text-dark" id="file-name">filename.pdf</h5>
+                            <p class="text-success small mb-0"><i class="fas fa-check-circle mr-1"></i> Ready to upload</p>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-3" id="clear-file">Change File</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-sm" id="submit-btn" disabled>
+                            <i class="fas fa-magic mr-2"></i> Upload & Parse
+                        </button>
+                        <a href="{% url 'candidates:candidate_list' %}" class="btn btn-link btn-block text-muted">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Drag & Drop Logic
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('id_resume_file');
+    const submitBtn = document.getElementById('submit-btn');
+    const dropContent = document.getElementById('drop-zone-content');
+    const filePreview = document.getElementById('file-preview');
+    const fileNameDisplay = document.getElementById('file-name');
+    const clearBtn = document.getElementById('clear-file');
+
+    // Trigger file input
+    dropZone.addEventListener('click', () => {
+        if(fileInput.value === '') fileInput.click();
+    });
+
+    // Clear file
+    clearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.value = '';
+        handleFiles([]);
+    });
+
+    // Drag Events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.style.backgroundColor = '#EEF2FF', false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.style.backgroundColor = '#F8FAFC', false);
+    });
+
+    // Handle Drop
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFiles(files);
+        }
+    }
+
+    // Handle Input Change
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            dropContent.style.display = 'none';
+            filePreview.style.display = 'block';
+            fileNameDisplay.innerText = file.name;
+            
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+        } else {
+            dropContent.style.display = 'block';
+            filePreview.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+        }
+    }
+
+    // Loader Logic
+    const form = document.getElementById('upload-form');
+    form.addEventListener('submit', function() {
+        // Show processing state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Parsing...';
+        submitBtn.style.opacity = '0.8';
+    });
+</script>
+{% endblock %}

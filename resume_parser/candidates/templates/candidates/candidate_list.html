@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Candidates - Resume Parser{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>Candidates</h1>
+    </div>
+    <div class="col-md-4 text-right">
+        {% if user.role == 'RECRUITER' or user.role == 'ADMIN' %}
+        <a href="{% url 'candidates:upload_candidate' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Add Candidate
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-premium table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Created By</th>
+                <th>Uploaded On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for candidate in candidates %}
+            <tr>
+                <td><strong><a href="{% url 'candidates:candidate_detail' candidate.pk %}">{{ candidate.name }}</a></strong></td>
+                <td>{{ candidate.email|default:"-" }}</td>
+                <td>
+                    {% if candidate.status == 'ACTIVE' %}
+                        <span class="badge badge-success-soft">{{ candidate.get_status_display }}</span>
+                    {% else %}
+                        <span class="badge badge-secondary">{{ candidate.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ candidate.created_by.username }}</td>
+                <td>{{ candidate.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <a href="{% url 'candidates:candidate_detail' candidate.pk %}" class="btn btn-sm btn-secondary" title="View Profile">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-4">No candidates found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

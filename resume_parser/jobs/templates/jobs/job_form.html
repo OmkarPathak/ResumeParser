@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Resume Parser{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">{{ title }}</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                        {% if field.name == 'client' and user.role != 'CLIENT' %}
+                            <div class="form-group">
+                                {{ field|as_crispy_field }} 
+                                <small class="form-text text-muted">
+                                    Don't see your client? <a href="#" data-toggle="modal" data-target="#addClientModal">Add New Client</a>
+                                </small>
+                            </div>
+                        {% else %}
+                            {{ field|as_crispy_field }}
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Save Job</button>
+                        <a href="{% url 'job_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Client Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1" role="dialog" aria-labelledby="addClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addClientModalLabel">Add New Client</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <div id="modal-alert" class="alert alert-danger" style="display:none;"></div>
+          <form id="addClientForm">
+              {% csrf_token %}
+              {{ client_form|crispy }}
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveClientBtn">Save Client</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('saveClientBtn').addEventListener('click', function() {
+    var form = document.getElementById('addClientForm');
+    var formData = new FormData(form);
+    
+    fetch("{% url 'client_create_ajax' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Add new option to select
+            var select = document.getElementById('id_client');
+            var option = new Option(data.name, data.id);
+            option.selected = true;
+            select.add(option);
+            
+            // Close modal
+            $('#addClientModal').modal('hide');
+            form.reset();
+        } else {
+            var alert = document.getElementById('modal-alert');
+            alert.innerText = data.error;
+            alert.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+</script>
+{% endblock %}

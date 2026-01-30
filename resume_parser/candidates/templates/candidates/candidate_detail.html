@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ candidate.name }} - Resume Parser{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-12">
+        {% if user.role != 'CANDIDATE' %}
+        <a href="{% url 'candidates:candidate_list' %}" class="btn btn-secondary mb-3">&larr; Back to List</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <div class="avatar-placeholder mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                    {{ candidate.name|slice:":1" }}
+                </div>
+                <h3 class="card-title">{{ candidate.name }}</h3>
+                <p class="text-muted">{{ candidate.email }}</p>
+                <p class="text-muted">{{ candidate.phone }}</p>
+                <div class="mt-3">
+                    {% if candidate.resume_file %}
+                    <a href="{{ candidate.resume_file.url }}" class="btn btn-primary btn-sm mb-2" target="_blank">
+                        <i class="fas fa-file-pdf"></i> View Resume
+                    </a>
+                    {% endif %}
+                    
+                    {% if user == candidate.created_by or user.role == 'ADMIN' %}
+                    <a href="{% url 'candidates:candidate_update' candidate.pk %}" class="btn btn-outline-secondary btn-sm mb-2">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Status</h5>
+                <span class="badge badge-pill badge-primary-soft">{{ candidate.get_status_display }}</span>
+                <hr>
+                <small class="text-muted">Added by</small>
+                <p>{{ candidate.created_by.username }}</p>
+                <small class="text-muted">Uploaded on</small>
+                <p>{{ candidate.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Profile</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Skills</h5>
+                <p>{{ candidate.skills|default:"No skills parsed." }}</p>
+                
+                <h5 class="card-title mt-4">Experience</h5>
+                <p>{{ candidate.experience_years }} Years</p>
+                
+                <h5 class="card-title mt-4">Education</h5>
+                <p>{{ candidate.education|default:"No education details parsed." }}</p>
+            </div>
+        </div>
+
+        <!-- Submissions Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Job Submissions</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'candidates:submit_candidate' candidate.pk %}" class="form-inline mb-4">
+                    {% csrf_token %}
+                    <select name="job_id" class="form-control mr-2" required>
+                        <option value="">Select Job to Submit...</option>
+                        {% for job in available_jobs %}
+                        <option value="{{ job.pk }}">{{ job.title }} ({{ job.client.name }})</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Submit Candidate</button>
+                </form>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Job / Client</th>
+                            <th>Status Application</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>
+                                <strong>{{ app.job.title }}</strong><br>
+                                <small class="text-muted">{{ app.job.client.name }}</small>
+                            </td>
+                            <td>
+                                <span class="badge badge-info">{{ app.get_status_display }}</span>
+                            </td>
+                            <td>{{ app.created_at|date:"M d" }}</td>
+                            <td>
+                                <a href="{% url 'candidates:schedule_interview' app.pk %}" class="btn btn-xs btn-outline-primary btn-sm">
+                                    <i class="fas fa-calendar-plus"></i> Schedule
+                                </a>
+                            </td>
+                        </tr>
+                        {% if app.interviews.all %}
+                        <tr>
+                            <td colspan="4" class="bg-light p-3">
+                                <h6 class="text-muted mb-2"><small>INTERVIEW SCHEDULE</small></h6>
+                                <div class="list-group list-group-flush">
+                                    {% for interview in app.interviews.all %}
+                                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0 py-1">
+                                        <div>
+                                            <span class="badge badge-secondary badge-pill mr-2">{{ interview.get_round_name_display }}</span>
+                                            <small>{{ interview.date_time|date:"M d, H:i" }}</small>
+                                            {% if interview.link %}
+                                                <a href="{{ interview.link }}" target="_blank" class="text-primary ml-2"><i class="fas fa-video"></i> Link</a>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <span class="badge {% if interview.status == 'PASSED' %}badge-success{% elif interview.status == 'FAILED' %}badge-danger{% else %}badge-warning{% endif %}">
+                                                {{ interview.get_status_display }}
+                                            </span>
+                                            <a href="{% url 'candidates:update_interview' interview.pk %}" class="btn btn-sm btn-link text-muted p-0 ml-2"><i class="fas fa-pencil-alt"></i></a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No submissions yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -13,37 +13,64 @@
         <div class="navbar-collapse collapse" id="navbarNav">
             {% if user.is_authenticated %}
                 <ul class="navbar-nav mx-auto">
+                    <!-- Common for Logged In -->
                     <li class="nav-item mx-1">
                         <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'homepage' %} active {% endif %}" href="{% url 'homepage'%}">
                             <i class="fas fa-home mr-1"></i>Home
                         </a>
                     </li>
+
+                    <!-- Recruiter / Admin Links -->
+                    {% if user.role == 'RECRUITER' or user.role == 'ADMIN' %}
                     <li class="nav-item mx-1">
-                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'resumes_list' %} active {% endif %}" href="{% url 'resumes_list'%}">
-                            <i class="fas fa-database mr-1"></i>Data
-                        </a>
-                    </li>
-                    <li class="nav-item mx-1">
-                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'chat_view' %} active {% endif %}" href="{% url 'chat_view'%}">
-                            <i class="fas fa-robot mr-1"></i>Chat
-                        </a>
-                    </li>
-                     <li class="nav-item mx-1">
-                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'jd_matcher' %} active {% endif %}" href="{% url 'jd_matcher'%}">
-                            <i class="fas fa-search-plus mr-1"></i>Matcher
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'candidate_list' %} active {% endif %}" href="{% url 'candidates:candidate_list' %}">
+                            <i class="fas fa-users mr-1"></i>Candidates
                         </a>
                     </li>
                     <li class="nav-item mx-1">
-                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'resume_optimizer' %} active {% endif %}" href="{% url 'resume_optimizer'%}">
-                            <i class="fas fa-bolt mr-1"></i>Optimizer
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'job_list' %} active {% endif %}" href="{% url 'job_list'%}">
+                            <i class="fas fa-briefcase mr-1"></i>Jobs
                         </a>
                     </li>
+                    {% endif %}
+
+                    <!-- Client Links -->
+
+
+                    <!-- Client & Candidate Links -->
+                    {% if user.role == 'CLIENT' or user.role == 'CANDIDATE' %}
+                    <li class="nav-item mx-1">
+                        <a class="nav-link nav-link-custom {% if request.resolver_match.url_name == 'job_list' %} active {% endif %}" href="{% url 'job_list'%}">
+                            <i class="fas fa-briefcase mr-1"></i>{% if user.role == 'CLIENT' %}My Jobs{% else %}Jobs{% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Tools (Recruiter/Admin) -->
+                    {% if user.role == 'RECRUITER' or user.role == 'ADMIN' %}
+                    <li class="nav-item dropdown mx-1">
+                        <a class="nav-link nav-link-custom dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
+                            <i class="fas fa-tools mr-1"></i>AI Tools
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'resumes_list' %}">Legacy Data</a>
+                            <a class="dropdown-item" href="{% url 'chat_view' %}">Chat with Resumes</a>
+                            <a class="dropdown-item" href="{% url 'jd_matcher' %}">JD Matcher</a>
+                            <a class="dropdown-item" href="{% url 'resume_optimizer' %}">Resume Optimizer</a>
+                        </div>
+                    </li>
+                    {% endif %}
                 </ul>
 
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item mr-3 d-none d-md-block">
                         <span class="badge badge-pill badge-primary-soft">
-                            <i class="fas fa-user-circle mr-1"></i>{{ user.username }}
+                            <i class="fas fa-user-circle mr-1"></i>
+                            {% if user.role == 'CANDIDATE' and user.candidate_profile %}
+                                <a href="{% url 'candidates:candidate_detail' user.candidate_profile.id %}" class="text-inherit" style="color: inherit; text-decoration: none;">{{ user.username }}</a>
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
                         </span>
                     </li>
                     <li class="nav-item">

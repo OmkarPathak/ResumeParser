@@ -43,13 +43,19 @@
 </head>
 
 <body style="background-color: var(--bg-body);">
-  {% include 'navbar.html' %}
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      {% include 'sidebar.html' %} 
 
-  <div class="container-fluid p-0">
-    {% include 'messages.html' %}
-
-    {% block content %}
-    {% endblock %}
+      <!-- Main Content -->
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4 {% block container_class %}py-4{% endblock %}">
+        {% include 'messages.html' %}
+        
+        {% block content %}
+        {% endblock %}
+      </main>
+    </div>
   </div>
 
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->

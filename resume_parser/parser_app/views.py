@@ -17,20 +17,23 @@ from django.db.models import Avg
 import time
 
 from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
+from users.forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
-from .agents.optimization_agent import OptimizationAgent
 
 def register_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             messages.success(request, 'Registration successful. Welcome!')
+            
+            if user.role == 'CANDIDATE':
+                return redirect('candidates:candidate_onboarding')
+            
             return redirect('homepage')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
 def process_single_resume(file, tag):
@@ -120,60 +123,26 @@ def jd_matcher(request):
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='login')
+@login_required(login_url='login')
 def homepage(request):
-    if request.method == 'POST':
-        # Removed Resume.objects.all().delete() to maintain history
-        file_form = UploadResumeModelForm(request.POST, request.FILES)
-        files = request.FILES.getlist('resume')
-        
-        # Check if it's an AJAX request
-        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.is_ajax()
-
-        if file_form.is_valid():
-            resume_ids = []
-            
-            # Step 1: Fast Serial Save (Disk I/O)
-            for file in files:
-                try:
-                    resume = Resume(resume=file)
-                    resume.tag = request.POST.get('tag')
-                    resume.user = request.user
-                    resume.save()
-                    resume_ids.append(resume.id)
-                except IntegrityError:
-                    if is_ajax:
-                        return JsonResponse({'status': 'error', 'message': f'Duplicate resume found: {file.name}'}, status=400)
-                    messages.warning(request, f'Duplicate resume found: {file.name}')
-            
-            # Step 2: Parallel Processing (Text Extraction + AI)
-            with ThreadPoolExecutor(max_workers=2) as executor:
-                futures = {executor.submit(process_single_resume, r_id, request.POST.get('tag')): r_id for r_id in resume_ids}
-                # Wait for completion implemented implicitly by view return? No, we should wait if we want to show updated list.
-                # But for UX, we might want to return immediately or wait. 
-                # Given user asked for parallel, they usually expect faster turnaround.
-                # Let's wait for results to ensure list is updated.
-                for future in as_completed(futures):
-                    pass
-            
-            if is_ajax:
-                return JsonResponse({'status': 'success', 'message': 'Resumes processed successfully'})
-
-            messages.success(request, 'Resumes processed in background!')
-
-            return redirect('resumes_list')
-    else:
-        file_form = UploadResumeModelForm()
-        
-    # Calculate Average Processing Time (Global or User specific? Let's make it global for now or user specific if preferred)
-    # Let's filter by user if logged in
-    if request.user.is_authenticated:
-        avg_time = Resume.objects.filter(user=request.user).aggregate(Avg('processing_time'))['processing_time__avg']
-    else:
-        avg_time = 0 # Or global average
-        
-    avg_time = round(avg_time, 2) if avg_time else 0
+    """
+    Redirects users to their appropriate dashboard based on role.
+    """
+    user = request.user
     
-    return render(request, 'home.html', {'form': file_form, 'avg_processing_time': avg_time})
+    if user.role == 'CANDIDATE':
+        if hasattr(user, 'candidate_profile'):
+            return redirect('candidates:candidate_detail', pk=user.candidate_profile.id)
+        return redirect('candidates:candidate_onboarding')
+        
+    elif user.role in ['ADMIN', 'RECRUITER']:
+        return redirect('resumes_list')
+        
+    elif user.role == 'CLIENT':
+        return redirect('job_list')
+        
+    # Default fallback
+    return redirect('resumes_list')
 
 def landing_page(request):
     if request.user.is_authenticated:
@@ -194,33 +163,51 @@ def index(request):
     else:
         return landing_page(request)
 
+from candidates.models import Candidate
+
 @login_required
 def resumes_list(request):
-    resumes = Resume.objects.filter(user=request.user).order_by('-uploaded_on')
+    # Query Candidate Model
+    if request.user.role in ['ADMIN', 'RECRUITER']:
+        candidates = Candidate.objects.all().order_by('-created_at')
+    else:
+        candidates = Candidate.objects.filter(created_by=request.user).order_by('-created_at')
     
-    # Get distinct tags for filter dropdown
-    tags = Resume.objects.filter(user=request.user).exclude(tag__isnull=True).exclude(tag__exact='').values_list('tag', flat=True).distinct()
-    
-    # Filter by tag
-    selected_tag = request.GET.get('tag')
-    if selected_tag:
-        resumes = resumes.filter(tag=selected_tag)
-    
-    # Search by keyword
+    # Map Candidate fields to what template expects (Adapter pattern)
+    resumes = []
+    for cand in candidates:
+        # Create a dynamic object or simple adapter class
+        # Ideally, we should update the template, but adapting objects is faster for now to test visibility
+        class Adapter:
+            def __init__(self, c):
+                self.id = c.id
+                self.name = c.name
+                self.tag = c.status # Using status as tag
+                self.email = c.email
+                self.mobile_number = c.phone
+                self.education = c.education
+                self.skills = c.skills
+                self.uploaded_on = c.created_at
+                self.ai_summary = c.ai_summary
+                self.ai_strengths = c.ai_strengths
+                self.processing_time = 0 # Not tracked in Candidate yet
+                self.remark = 'None'
+                
+        resumes.append(Adapter(cand))
+
+    # Search Logic (Client side or simple python filter since list is small)
     search_query = request.GET.get('q')
     if search_query:
-        resumes = resumes.filter(
-            Q(name__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(skills__icontains=search_query) |
-            Q(designation__icontains=search_query) |
-            Q(education__icontains=search_query)
-        )
+        search_query = search_query.lower()
+        resumes = [r for r in resumes if 
+                   search_query in (r.name or '').lower() or 
+                   search_query in (r.email or '').lower() or 
+                   search_query in (r.skills or '').lower()]
 
     # Pagination
     per_page = request.GET.get('per_page', '10')
     if per_page == 'all':
-        paginator = Paginator(resumes, resumes.count())
+        paginator = Paginator(resumes, len(resumes) if resumes else 1)
     else:
         try:
             paginator = Paginator(resumes, int(per_page))
@@ -229,16 +216,16 @@ def resumes_list(request):
             
     page_number = request.GET.get('page')
     try:
-        resumes = paginator.page(page_number)
+        page_obj = paginator.page(page_number)
     except PageNotAnInteger:
-        resumes = paginator.page(1)
+        page_obj = paginator.page(1)
     except EmptyPage:
-        resumes = paginator.page(paginator.num_pages)
+        page_obj = paginator.page(paginator.num_pages)
 
     context = {
-        'resumes': resumes,
-        'tags': tags,
-        'selected_tag': selected_tag,
+        'resumes': page_obj,
+        'tags': ['ACTIVE', 'PAUSED', 'PLACED'], # Static tags from choices
+        'selected_tag': '',
         'search_query': search_query,
     }
     return render(request, 'resumes_list.html', context)
@@ -267,8 +254,16 @@ def delete_bulk_resumes(request):
 @login_required
 def view_resume(request, pk):
     try:
-        resume = Resume.objects.get(pk=pk, user=request.user)
-    except Resume.DoesNotExist:
+        if request.user.role in ['ADMIN', 'RECRUITER']:
+             resume = Candidate.objects.get(pk=pk)
+        else:
+             resume = Candidate.objects.get(pk=pk, created_by=request.user)
+             
+        # Adapter for template compatibility (template expects resume.resume.url)
+        # Candidate has resume_file
+        resume.resume = resume.resume_file
+        
+    except Candidate.DoesNotExist:
         messages.warning(request, 'Resume not found or access denied.')
         return redirect('resumes_list')
     

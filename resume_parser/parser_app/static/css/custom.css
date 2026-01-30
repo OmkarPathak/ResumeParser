@@ -379,6 +379,105 @@ label {
     border-color: var(--primary-start);
 }
 
-.feature-card:hover .feature-icon-circle {
-    transform: scale(1.1) rotate(5deg);
+
+/* --- Sidebar --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100; /* Behind the navbar toggle if needed */
+    padding: 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    height: 100vh; /* Fixed height to ensure children can use h-100 reliably */
+    overflow: hidden; /* Prevent sidebar itself from scrolling, inner div handles it */
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        min-height: auto;
+    }
+}
+
+/* Sidebar Nav Links */
+.nav-link-custom {
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s;
+}
+
+.nav-link-custom:hover {
+    color: var(--primary-start) !important;
+    background-color: var(--bg-subtle);
+}
+
+.nav-link-custom.active {
+    color: var(--primary-start) !important;
+    background-color: #eef2ff;
+    font-weight: 600;
+}
+
+.nav-link-custom i {
+    transition: color 0.2s;
+}
+.nav-link-custom:hover i,
+.nav-link-custom.active i {
+    color: var(--primary-start) !important;
+}
+
+/* Main Content Adjustment */
+main[role="main"] {
+    padding-top: 1rem;
+}
+
+/* Sidebar User Profile */
+.user-profile-link {
+    transition: background-color 0.2s;
+}
+
+.user-profile-link:hover, .user-profile-link[aria-expanded="true"] {
+    background-color: var(--bg-subtle);
+}
+
+.user-profile-link:after {
+    display: none; /* Hide default bootstrap caret */
+}
+
+.avatar-sm {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+}
+
+.dropdown-menu-top {
+    top: auto !important;
+    bottom: 100% !important;
+    transform: translateY(-10px) !important;
+}
+
+.dropdown-item {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-subtle);
+}
+
+.dropdown-item:active {
+    background-color: #eef2ff;
+    color: var(--primary-start);
 }

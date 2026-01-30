@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Complete Profile - Resume Parser{% endblock %}
+
+{% block content %}
+<div class="container-premium" style="max-width: 800px;">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <div class="feature-icon-circle bg-primary-soft text-primary mb-3 mx-auto" style="width: 80px; height: 80px; background-color: #eef2ff; color: #4f46e5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            <i class="fas fa-user-astronaut"></i>
+                        </div>
+                        <h2 class="font-weight-bold mb-2">Welcome, {{ user.first_name|default:user.username }}!</h2>
+                        <p class="text-muted">Let's build your profile. Upload your resume and we'll handle the rest.</p>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data" id="onboarding-form">
+                        {% csrf_token %}
+                        
+                        <!-- Hidden default file input -->
+                        <input type="file" name="resume_file" id="id_resume_file" class="d-none" accept=".pdf,.docx,.doc,.txt" required>
+
+                        <!-- Custom Drag & Drop Zone -->
+                        <div class="upload-area p-5 text-center mb-4" id="drop-zone" style="border: 2px dashed #e0e7ff; border-radius: 16px; background-color: #f8fafc; cursor: pointer; transition: all 0.3s ease;">
+                            <div id="drop-zone-content">
+                                <div class="mb-3">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-primary" style="opacity: 0.8;"></i>
+                                </div>
+                                <h5 class="font-weight-bold" style="color: #475569;">Drag & Drop your resume here</h5>
+                                <p class="text-muted small mb-0">or click to browse from your computer</p>
+                                <div class="mt-3">
+                                    <span class="badge badge-pill badge-primary-soft mr-1">PDF</span>
+                                    <span class="badge badge-pill badge-primary-soft mr-1">DOCX</span>
+                                    <span class="badge badge-pill badge-primary-soft">TXT</span>
+                                </div>
+                            </div>
+                            
+                            <!-- File Preview State -->
+                            <div id="file-preview" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-center flex-column">
+                                    <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                                    <h5 class="font-weight-bold text-dark" id="file-name">filename.pdf</h5>
+                                    <p class="text-muted small" id="file-size">1.2 MB</p>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="remove-file">
+                                        Remove File
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-md" id="submit-btn" disabled style="opacity: 0.6; cursor: not-allowed; transition: all 0.3s;">
+                            <i class="fas fa-magic mr-2"></i> Create Profile & Parse Resume
+                        </button>
+                        
+                        <div class="text-center mt-4">
+                            <p class="small text-muted mb-0">
+                                <i class="fas fa-shield-alt mr-1"></i> Your data is secure and will only be used for job matching.
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('id_resume_file');
+        const dropContent = document.getElementById('drop-zone-content');
+        const filePreview = document.getElementById('file-preview');
+        const fileNameEl = document.getElementById('file-name');
+        const fileSizeEl = document.getElementById('file-size');
+        const removeBtn = document.getElementById('remove-file');
+        const submitBtn = document.getElementById('submit-btn');
+        const form = document.getElementById('onboarding-form');
+
+        // Click to upload
+        dropZone.addEventListener('click', function(e) {
+            if (e.target !== removeBtn) {
+                fileInput.click();
+            }
+        });
+
+        // Drag & Drop effects
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.backgroundColor = '#eef2ff';
+                dropZone.style.borderColor = '#6366f1';
+                dropZone.style.transform = 'scale(1.02)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.backgroundColor = '#f8fafc';
+                dropZone.style.borderColor = '#e0e7ff';
+                dropZone.style.transform = 'scale(1)';
+            }, false);
+        });
+
+        // Handle File Drop
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Handle File Input Select
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                
+                // Update Preview
+                fileNameEl.textContent = file.name;
+                fileSizeEl.textContent = formatBytes(file.size);
+                
+                // Show Preview, Hide Default
+                dropContent.style.display = 'none';
+                filePreview.style.display = 'block';
+                
+                // Enable Submit
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+                
+                // Sync with input (if from drop)
+                if (fileInput.files.length === 0 || fileInput.files[0] !== file) {
+                    // Note: You can't programmatically set file input value for security, 
+                    // but we can rely on the change event or DataTransfer if needed.
+                    // For drop, we need to assign to input
+                     if (files instanceof FileList) {
+                        fileInput.files = files;
+                     }
+                }
+            }
+        }
+
+        // Remove File
+        removeBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent opening file dialog
+            fileInput.value = '';
+            dropContent.style.display = 'block';
+            filePreview.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+            submitBtn.style.cursor = 'not-allowed';
+        });
+
+        // Form Submit Loading State
+        form.addEventListener('submit', function() {
+            // Check if file is selected one last time
+            if (fileInput.files.length === 0) {
+                 // Prevent submission if no file (though button should be disabled)
+                 e.preventDefault();
+                 return;
+            }
+
+            // Save original dimensions to prevent layout shift
+            const width = submitBtn.offsetWidth;
+            const height = submitBtn.offsetHeight;
+
+            submitBtn.style.width = `${width}px`;
+            submitBtn.style.height = `${height}px`;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true" style="width: 1.2rem; height: 1.2rem; border-width: 0.2em;"></span> Parsing Resume...';
+            
+            // Ensure styles for disabled state look good (Force Primary Colors)
+            submitBtn.style.opacity = '0.9'; 
+            submitBtn.style.pointerEvents = 'none';
+            submitBtn.style.backgroundColor = '#4e73df'; // Force Primary Blue
+            submitBtn.style.borderColor = '#4e73df';
+            submitBtn.style.color = '#ffffff';
+        });
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+    });
+</script>
+{% endblock %}

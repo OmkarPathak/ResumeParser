@@ -71,7 +71,25 @@ class BaseAgent:
                 kwargs["response_format"] = response_format
 
             response = self.model.create_chat_completion(**kwargs)
-            return response['choices'][0]['message']['content']
+            content = response['choices'][0]['message']['content']
+            
+            if response_format and response_format.get("type") == "json_object":
+                return self._clean_json_response(content)
+                
+            return content
         except Exception as e:
             print(f"Agent Inference Error: {e}")
             return None
+
+    def _clean_json_response(self, content):
+        """
+        Helper to strip markdown code blocks (```json ... ```) from the response.
+        """
+        clean_content = content.strip()
+        if clean_content.startswith("```json"):
+            clean_content = clean_content[7:]
+        if clean_content.startswith("```"):
+            clean_content = clean_content[3:]
+        if clean_content.endswith("```"):
+            clean_content = clean_content[:-3]
+        return clean_content.strip()

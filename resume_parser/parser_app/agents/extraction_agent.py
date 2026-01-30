@@ -40,7 +40,8 @@ class ExtractionAgent(BaseAgent):
         if response_content:
             try:
                 return json.loads(response_content)
-            except json.JSONDecodeError:
-                print("ExtractionAgent: Failed to decode JSON")
+            except json.JSONDecodeError as e:
+                print(f"ExtractionAgent: Failed to decode JSON. Error: {e}")
+                print(f"RAW CONTENT: {repr(response_content)}")
                 return {}
         return {}
