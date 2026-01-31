@@ -7,8 +7,8 @@ This document defines the standard operating procedures and workflows for each u
 Recruiters are the primary operators of the system, acting as the bridge between candidates and clients.
 
 ### A. Onboarding a New Candidate
-1.  **Navigate to Candidates**: Click on the **Candidates** link in the sidebar.
-2.  **Add Candidate**: Click the **+ Add Candidate** button in the top right.
+1.  **Navigate to Candidates**: Click on the **Candidate Data** link in the sidebar.
+2.  **Add Candidate**: Click the **Upload New** button in the top right.
 3.  **Upload Resume**: 
     -   Fill in potential basic details (Name, Email) if known.
     -   Upload the candidate's Resume (PDF/DOCX).

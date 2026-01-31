@@ -1,47 +1,84 @@
-# User Roles & Access Control Guide
+# User Role Guide
 
-This system uses a Role-Based Access Control (RBAC) model with four primary roles.
+This document outlines the capabilities and workflows for each user role in the Resume Parser system.
 
-## 1. Consultant / Admin (Owner)
-- **Role Code**: `ADMIN`
-- **Access**: Full system access.
-- **Responsibilities**:
-    - Manage all users (Recruiters, Clients, Candidates).
-    - Configure system settings.
-    - View global reports and analytics.
-    - Oversee all jobs and submissions.
+## 1. Candidate
+*The job seeker.*
+
+**Capabilities:**
+*   **Registration**: Sign up with "Candidate" role.
+*   **Profile Management**:
+    *   Upload Resume (Drag & Drop).
+    *   Automatic Profile Creation from Resume (Parsing).
+    *   View/Edit Profile Details.
+    *   View AI Summary and Strengths.
+*   **Job Application**:
+    *   Browse Open Jobs.
+    *   Apply to jobs (Tracking status: Applied, Interviewing, Hired, etc).
+*   **Onboarding**: 
+    *   If a Recruiter uploaded their resume previously, the system attempts to "Claim" the existing profile based on email match during onboarding.
+
+**Workflow:**
+1.  Register -> Login -> Dashboard (Onboarding if no profile).
+2.  Upload Resume -> Review Parsed Data.
+3.  Go to "Open Jobs" -> Click "Apply".
+
+---
 
 ## 2. Recruiter
-- **Role Code**: `RECRUITER`
-- **Access**: Execution-level access.
-- **Responsibilities**:
-    - **Client Management**: Create and manage client profiles.
-    - **Job Management**: Create jobs, post them, and manage their lifecycle.
-    - **Candidate Sourcing**: Add candidates, parse resumes, and screen profiles.
-    - **Submissions**: Submit candidates to clients and track interviews.
-    - **Dashboard**: View personal performance metrics.
+*The primary operator managing candidates and jobs.*
+
+**Capabilities:**
+*   **Candidate Management**:
+    *   View full "Candidate Database" (Table/Card view).
+    *   Upload Candidates (individually).
+    *   Edit Candidate details.
+    *   *Delete Candidates* (Permission granted).
+    *   Search/Filter Candidates (by name, skill, tag).
+*   **Job Management**:
+    *   Create Jobs for Clients.
+    *   View/Edit Jobs.
+    *   Track Applications per Job.
+*   **Interview Management**:
+    *   Schedule Interviews (upcoming feature).
+*   **Dashboard**:
+    *   View key metrics (Total Candidates, Open Jobs).
+
+**Workflow:**
+1.  Login -> Dashboard (Resume List).
+2.  "Upload New" -> Add candidate manually.
+3.  "Create Job" -> Define job specs for a Client.
+
+---
 
 ## 3. Client
-- **Role Code**: `CLIENT`
-- **Access**: Restricted access to their own jobs and candidates.
-- **Responsibilities**:
-    - **Job Requests**: Create new job requisitions (require approval).
-    - **Candidate Review**: View screened candidate profiles submitted by recruiters.
-    - **Feedback**: Provide feedback on candidates (Shortlist, Reject, Interview).
-    - **Transparency**: View status of open positions.
+*The external company hiring for positions.*
 
-## 4. Candidate
-- **Role Code**: `CANDIDATE`
-- **Access**: Limited personal profile.
-- **Responsibilities**:
-    - **Profile Management**: Update resume and personal details.
-    - **Job Application**: Apply to open positions (if public portal enabled).
-    - **Status Tracking**: View application status.
+**Capabilities:**
+*   **Job Viewing**:
+    *   View *only* jobs associated with their Client account.
+    *   View Applications for their jobs.
+*   **Status Tracking**:
+    *   See which candidates are "Shortlisted" or "Hired".
+*   **Invoicing**:
+    *   View Invoices (upcoming feature).
 
-## Workflow Overview
-1.  **Admin/Recruiter** adds a **Client**.
-2.  **Client** or **Recruiter** creates a **Job**.
-3.  **Recruiter** sources a **Candidate** (adds resume).
-4.  **Recruiter** screens and **Submits** candidate to **Job**.
-5.  **Client** reviews and provides feedback.
-6.  **Admin** oversees the process and handles **Invoicing**.
+**Workflow:**
+1.  Login -> Dashboard (Job List).
+2.  Click Job -> View Applicants.
+
+---
+
+## 4. Admin
+*System administrator.*
+
+**Capabilities:**
+*   **Full Access**:
+    *   Manage Users (Create/Delete Recruiters, Clients).
+    *   Manage all Candidates and Jobs.
+    *   Access Django Admin Panel.
+*   **Configuration**:
+    *   Manage System Settings.
+
+**Workflow:**
+*   Standard Admin operations via `/admin/` or the main dashboard.

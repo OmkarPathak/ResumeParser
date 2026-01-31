@@ -243,10 +243,16 @@
                                 </td>
                                 <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
                                 <td class="text-right">
-                                    <div class="btn-group">
-                                        <a href="{% url 'view_resume' resume.id %}" class="btn btn-sm text-info" title="View PDF"><i class="fas fa-eye"></i></a>
-                                        <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm text-primary" title="Edit"><i class="fas fa-pen"></i></a>
-                                        <button type="button" class="btn btn-sm text-danger" onclick="confirmDelete('{{ resume.id }}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{% url 'view_resume' resume.id %}" class="btn btn-sm btn-icon-only text-info bg-light mr-1" title="View PDF">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'update_resume' resume.id %}" class="btn btn-sm btn-icon-only text-primary bg-light mr-1" title="Edit">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-icon-only text-danger bg-light" onclick="confirmDelete('{{ resume.id }}')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

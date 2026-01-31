@@ -4,18 +4,35 @@
 {% block title %}Register - Resume Parser{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
+<div class="row justify-content-center mt-2">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0" style="border-radius: 12px;">
             <div class="card-body">
-                <h3 class="card-title text-center">Register</h3>
+                <h3 class="card-title text-center font-weight-bold mb-4">Register</h3>
                 <form method="post">
                     {% csrf_token %}
-                    {{ form|crispy }}
-                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.username|as_crispy_field }}
+                        </div>
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.role|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    {{ form.email|as_crispy_field }}
+                    
+                    {% for field in form %}
+                        {% if field.name != 'username' and field.name != 'role' and field.name != 'email' %}
+                            {{ field|as_crispy_field }}
+                        {% endif %}
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg mt-3 shadow-sm" style="border-radius: 50px;">Register</button>
                 </form>
-                <div class="mt-3 text-center">
-                    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+                <div class="mt-4 text-center">
+                    <p class="text-muted">Already have an account? <a href="{% url 'login' %}" class="font-weight-bold">Login here</a></p>
                 </div>
             </div>
         </div>
