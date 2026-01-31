@@ -65,6 +65,10 @@
                             <button type="submit" class="btn btn-sm btn-primary px-3 shadow-sm mr-2">
                                 Apply
                             </button>
+                            <button type="submit" class="btn btn-sm btn-info px-3 shadow-sm mr-2" form="bulk-delete-form" 
+                                    formaction="{% url 'compare_candidates' %}" id="compare-btn" title="Compare Selected (Max 5)" disabled>
+                                <i class="fas fa-balance-scale mr-1"></i> Compare
+                            </button>
                             <a href="{% url 'resumes_list' %}" class="btn btn-sm btn-light border px-3 shadow-sm mr-2">
                                 Clear
                             </a>
@@ -506,6 +510,12 @@
         
         const count = selectedIds.size;
         document.getElementById('bulk-delete-btn').disabled = count === 0;
+        
+        // Toggle Compare Button (Min 2, Max 5)
+        const compareBtn = document.getElementById('compare-btn');
+        if (compareBtn) {
+            compareBtn.disabled = count < 2 || count > 5;
+        }
     }
 
     function updateSelectionCount() {

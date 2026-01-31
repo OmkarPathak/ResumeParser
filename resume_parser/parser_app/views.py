@@ -123,7 +123,6 @@ def jd_matcher(request):
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='login')
-@login_required(login_url='login')
 def homepage(request):
     """
     Redirects users to their appropriate dashboard based on role.
@@ -409,3 +408,62 @@ def resume_optimizer(request):
         'selected_resume_id': selected_resume_id,
         'job_description': job_description
     })
+
+from .agents.comparison_agent import ComparisonAgent
+
+@login_required
+def compare_candidates(request):
+    """
+    View to compare selected candidates using AI.
+    """
+    # 1. Permission Check
+    if request.user.role not in ['ADMIN', 'RECRUITER']:
+         messages.error(request, "Access Denied: Only Recruiters can compare candidates.")
+         return redirect('resumes_list')
+
+    if request.method == 'POST':
+        # 2. Get Selected IDs
+        candidate_ids = request.POST.getlist('bulk_delete') # Reusing the checkbox name from the list view
+        
+        if not candidate_ids or len(candidate_ids) < 2:
+            messages.warning(request, "Please select at least 2 candidates to compare.")
+            return redirect('resumes_list')
+            
+        # Limit to reasonable number to avoid token limits
+        if len(candidate_ids) > 5:
+             messages.warning(request, "You can compare a maximum of 2 candidates at a time.")
+             return redirect('resumes_list')
+
+        # 3. Fetch Data
+        candidates = Candidate.objects.filter(id__in=candidate_ids)
+        
+        # Prepare data for agent
+        candidates_data = []
+        for cand in candidates:
+            candidates_data.append({
+                'name': cand.name,
+                'skills': cand.skills,
+                'experience': f"{cand.experience_years} Years", # Formatted as string
+                'education': cand.education,
+                'ai_summary': cand.ai_summary
+            })
+            
+        # 4. Call Agent
+        try:
+            agent = ComparisonAgent()
+            comparison_result = agent.compare_candidates(candidates_data)
+            
+            if 'error' in comparison_result:
+                 messages.error(request, f"AI Error: {comparison_result['error']}")
+                 return redirect('resumes_list')
+                 
+            return render(request, 'comparison_report.html', {
+                'comparison': comparison_result,
+                'candidates': candidates
+            })
+            
+        except Exception as e:
+            messages.error(request, f"System Error: {e}")
+            return redirect('resumes_list')
+            
+    return redirect('resumes_list')
