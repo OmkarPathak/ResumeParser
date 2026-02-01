@@ -15,7 +15,7 @@ class Candidate(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='candidate_profile')
     name = models.CharField(max_length=255)
-    email = models.EmailField(blank=True, null=True)
+    email = models.EmailField(blank=True, null=True, db_index=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     resume_file = models.FileField(upload_to='resumes/')
     
@@ -26,13 +26,34 @@ class Candidate(models.Model):
     ai_summary = models.TextField(blank=True, null=True, help_text="AI Generated Summary")
     ai_strengths = models.TextField(blank=True, null=True, help_text="Key Strengths")
     
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE, db_index=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='added_candidates')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    # Compatibility Properties for Template (Adapter Removal)
+    @property
+    def tag(self):
+        return self.status
+        
+    @property
+    def mobile_number(self):
+        return self.phone
+        
+    @property
+    def uploaded_on(self):
+        return self.created_at
+
+    @property
+    def processing_time(self):
+        return 0
+
+    @property
+    def remark(self):
+        return None
 
 class Application(models.Model):
     APPLIED = 'APPLIED'
@@ -53,7 +74,7 @@ class Application(models.Model):
 
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name='applications')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=APPLIED)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=APPLIED, db_index=True)
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

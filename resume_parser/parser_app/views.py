@@ -166,52 +166,34 @@ from candidates.models import Candidate
 
 @login_required
 def resumes_list(request):
-    # Query Candidate Model
+    # 1. Base QuerySet
     if request.user.role in ['ADMIN', 'RECRUITER']:
         candidates = Candidate.objects.all().order_by('-created_at')
     else:
         candidates = Candidate.objects.filter(created_by=request.user).order_by('-created_at')
     
-    # Map Candidate fields to what template expects (Adapter pattern)
-    resumes = []
-    for cand in candidates:
-        # Create a dynamic object or simple adapter class
-        # Ideally, we should update the template, but adapting objects is faster for now to test visibility
-        class Adapter:
-            def __init__(self, c):
-                self.id = c.id
-                self.name = c.name
-                self.tag = c.status # Using status as tag
-                self.email = c.email
-                self.mobile_number = c.phone
-                self.education = c.education
-                self.skills = c.skills
-                self.uploaded_on = c.created_at
-                self.ai_summary = c.ai_summary
-                self.ai_strengths = c.ai_strengths
-                self.processing_time = 0 # Not tracked in Candidate yet
-                self.remark = 'None'
-                
-        resumes.append(Adapter(cand))
-
-    # Search Logic (Client side or simple python filter since list is small)
-    search_query = request.GET.get('q')
+    # 2. Filtering (DB Level)
+    search_query = request.GET.get('q', '').strip()
     if search_query:
-        search_query = search_query.lower()
-        resumes = [r for r in resumes if 
-                   search_query in (r.name or '').lower() or 
-                   search_query in (r.email or '').lower() or 
-                   search_query in (r.skills or '').lower()]
+        candidates = candidates.filter(
+            Q(name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(skills__icontains=search_query)
+        )
 
-    # Pagination
+    selected_tag = request.GET.get('tag', '')
+    if selected_tag:
+        candidates = candidates.filter(status=selected_tag)
+
+    # 3. Pagination
     per_page = request.GET.get('per_page', '10')
     if per_page == 'all':
-        paginator = Paginator(resumes, len(resumes) if resumes else 1)
+        paginator = Paginator(candidates, max(len(candidates), 1))
     else:
         try:
-            paginator = Paginator(resumes, int(per_page))
+            paginator = Paginator(candidates, int(per_page))
         except ValueError:
-            paginator = Paginator(resumes, 10)
+            paginator = Paginator(candidates, 10)
             
     page_number = request.GET.get('page')
     try:
@@ -223,8 +205,8 @@ def resumes_list(request):
 
     context = {
         'resumes': page_obj,
-        'tags': ['ACTIVE', 'PAUSED', 'PLACED'], # Static tags from choices
-        'selected_tag': '',
+        'tags': ['ACTIVE', 'PAUSED', 'PLACED'], 
+        'selected_tag': selected_tag,
         'search_query': search_query,
     }
     return render(request, 'resumes_list.html', context)
@@ -244,8 +226,9 @@ def delete_bulk_resumes(request):
     if request.method == 'POST':
         resume_ids = request.POST.getlist('bulk_delete')
         if resume_ids:
-            Resume.objects.filter(id__in=resume_ids, user=request.user).delete()
-            messages.success(request, f'{len(resume_ids)} resumes deleted successfully!')
+            # Bug fix: Use Candidate model, not Resume
+            deleted_count, _ = Candidate.objects.filter(id__in=resume_ids).delete()
+            messages.success(request, f'{deleted_count} candidates deleted successfully!')
         else:
             messages.warning(request, 'No resumes selected for deletion.')
     return redirect('resumes_list')
