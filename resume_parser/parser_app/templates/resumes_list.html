@@ -83,7 +83,7 @@
     </div>
 
     <!-- Cards Grid & Table View -->
-    <form method="POST" action="{% url 'delete_bulk_resumes' %}" id="bulk-delete-form">
+    <form method="POST" action="{% url 'delete_bulk_resumes' %}" id="bulk-delete-form" data-loader-action="deleting">
         {% csrf_token %}
         
         <!-- Card View Container -->
@@ -121,18 +121,24 @@
                         </div>
 
                         <div class="d-flex align-items-center mb-4">
-                            <div class="avatar-placeholder mr-3 flex-shrink-0">
+                            <div class="avatar-placeholder mr-3">
                                 {{ resume.name|slice:":1"|upper }}
                             </div>
-                            <div style="min-width: 0;">
+                            <div style="min-width: 0;" class="flex-grow-1">
                                 <div class="d-flex align-items-center mb-1">
-                                    <h5 class="font-weight-bold text-dark mb-0 text-truncate" title="{{ resume.name }}">{{ resume.name }}</h5>
+                                    <h5 class="font-weight-bold text-dark mb-0 text-truncate" style="max-width: 150px;" title="{{ resume.name }}">{{ resume.name }}</h5>
                                     {% if resume.tag %}
-                                    <span class="badge badge-modern badge-light text-primary border border-light ml-2">{{ resume.tag }}</span>
+                                    <span class="badge badge-modern badge-primary-soft ml-2" style="font-size: 0.65rem; padding: 0.3em 0.8em; transform: translateY(-1px);">{{ resume.tag }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <small class="text-muted text-truncate">{{ resume.uploaded_on|date:"M d, Y" }}</small>
+                                    {% with latest=resume.latest_experience %}
+                                        {% if latest %}
+                                            <small class="text-primary font-weight-bold text-truncate">{{ latest.designation }} @ {{ latest.company }}</small>
+                                        {% else %}
+                                            <small class="text-muted text-truncate">{{ resume.uploaded_on|date:"M d, Y" }}</small>
+                                        {% endif %}
+                                    {% endwith %}
                                 </div>
                             </div>
                         </div>
@@ -166,9 +172,13 @@
                             {% endif %}
 
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="metric-badge">
-                                    <i class="fas fa-clock mr-1" style="color: #4e73df;"></i>
-                                    {% if resume.processing_time %}{{ resume.processing_time }}s{% else %}N/A{% endif %}
+                                <div class="metric-badge" title="Processed on {{ resume.uploaded_on|date:'M d, Y H:i' }}">
+                                    <i class="fas fa-calendar-check mr-1" style="color: var(--primary);"></i>
+                                    {{ resume.uploaded_on|date:"M d, Y" }}
+                                </div>
+                                <div class="metric-badge" title="Processing Time">
+                                    <i class="fas fa-clock mr-1" style="color: var(--primary);"></i>
+                                    {{ resume.processing_time|default:"0" }}s
                                 </div>
                                 {% if resume.remark and resume.remark != 'None' %}
                                 <div class="metric-badge" title="{{ resume.remark }}" style="max-width: 140px;">
@@ -198,7 +208,8 @@
                                     </div>
                                 </th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Name</th>
-                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Tag</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Latest Role</th>
+                                <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Status</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Contact</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;"><i class="fas fa-magic mr-1"></i> AI Summary</th>
                                 <th class="border-top-0 border-bottom-0 font-weight-bold small text-uppercase" style="letter-spacing: 1px;">Metrics</th>
@@ -218,11 +229,21 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="avatar-placeholder mr-3" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                        <div class="avatar-placeholder avatar-sm mr-3">
                                             {{ resume.name|slice:":1"|upper }}
                                         </div>
                                         <span class="font-weight-bold text-dark">{{ resume.name }}</span>
                                     </div>
+                                </td>
+                                <td>
+                                    {% with latest=resume.latest_experience %}
+                                        {% if latest %}
+                                            <span class="font-weight-bold text-primary">{{ latest.designation }}</span><br>
+                                            <small class="text-muted">{{ latest.company }}</small>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                                 <td>
                                     {% if resume.tag %}
@@ -245,7 +266,12 @@
                                         <span class="text-muted">-</span>
                                     {% endif %}
                                 </td>
-                                <td><small class="text-muted">{{ resume.uploaded_on|date:"M d, Y" }}</small></td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <small class="text-muted"><i class="fas fa-calendar-alt mr-1"></i>{{ resume.uploaded_on|date:"M d, Y" }}</small>
+                                        <small class="text-primary"><i class="fas fa-clock mr-1"></i>{{ resume.processing_time|default:"0" }}s</small>
+                                    </div>
+                                </td>
                                 <td class="text-right">
                                     <div class="d-flex justify-content-end">
                                         <a href="{% url 'view_resume' resume.id %}" class="btn btn-sm btn-icon-only text-info bg-light mr-1" title="View PDF">

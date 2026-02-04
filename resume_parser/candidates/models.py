@@ -47,13 +47,12 @@ class Candidate(models.Model):
     def uploaded_on(self):
         return self.created_at
 
-    @property
-    def processing_time(self):
-        return 0
+    processing_time = models.FloatField(default=0.0, help_text="Time taken to parse in seconds")
+    remark = models.CharField(max_length=1000, blank=True, null=True)
 
     @property
-    def remark(self):
-        return None
+    def latest_experience(self):
+        return self.experiences.first()
 
 class Application(models.Model):
     APPLIED = 'APPLIED'
@@ -115,3 +114,19 @@ class Interview(models.Model):
 
     def __str__(self):
         return f"{self.round_name} - {self.application.candidate.name}"
+
+class Experience(models.Model):
+    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name='experiences')
+    designation = models.CharField(max_length=255)
+    company = models.CharField(max_length=255)
+    job_description = models.TextField(blank=True, null=True)
+    start_date = models.CharField(max_length=100, blank=True, null=True)
+    end_date = models.CharField(max_length=100, blank=True, null=True)
+    is_current = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return f"{self.designation} at {self.company}"

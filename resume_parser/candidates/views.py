@@ -1,14 +1,58 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Candidate, Application, Interview
+from .models import Candidate, Application, Interview, Experience
 from jobs.models import Job
 from .forms import CandidateUploadForm, InterviewForm
 from django.conf import settings
+from django.db.models import Q
 import os
+import re
+import time
 from parser_app.utils import extract_text
 from parser_app.ai_service import get_resume_insights
-from parser_app.ai_service import get_resume_insights
+
+def update_candidate_from_data(candidate, data):
+    """Update candidate fields and structured experiences from parsed AI data."""
+    if not data:
+        return
+        
+    candidate.name = data.get('name') or candidate.name
+    email_val = data.get('email') or candidate.email or ''
+    candidate.email = email_val.strip().lower()
+    candidate.phone = data.get('mobile_number') or candidate.phone
+    candidate.skills = ', '.join(data.get('skills')) if isinstance(data.get('skills'), list) else data.get('skills')
+    candidate.education = ', '.join(data.get('education')) if isinstance(data.get('education'), list) else data.get('education')
+    candidate.ai_summary = data.get('ai_summary')
+    candidate.ai_strengths = data.get('ai_strengths')
+    
+    # Clean experience string to int
+    exp_raw = data.get('total_experience')
+    exp_years = 0
+    if isinstance(exp_raw, (int, float)):
+        exp_years = int(exp_raw)
+    elif isinstance(exp_raw, str):
+        match = re.search(r'\d+', exp_raw)
+        if match:
+            exp_years = int(match.group())
+    
+    candidate.experience_years = exp_years
+    candidate.save()
+
+    # Clear and update experiences
+    experiences_data = data.get('experiences', [])
+    if experiences_data:
+        Experience.objects.filter(candidate=candidate).delete()
+        for exp in experiences_data:
+            Experience.objects.create(
+                candidate=candidate,
+                designation=exp.get('designation', ''),
+                company=exp.get('company', ''),
+                job_description=exp.get('job_description', ''),
+                start_date=exp.get('start_date', ''),
+                end_date=exp.get('end_date', ''),
+                is_current=((exp.get('end_date') or '').lower() == 'present')
+            )
 
 @login_required
 def candidate_list(request):
@@ -38,52 +82,40 @@ def upload_candidate(request):
             
             # --- Trigger Parsing Logic (Synchronous for now) ---
             try:
+                start_time = time.time()
                 file_path = os.path.join(settings.MEDIA_ROOT, candidate.resume_file.name)
                 ext = os.path.splitext(file_path)[1]
-                
-                # 1. Extract Text
                 text = extract_text(file_path, ext)
-                
-                # 2. Extract Info via AI
                 data = get_resume_insights(text)
                 
+                # Calculate processing time
+                processing_time = round(time.time() - start_time, 2)
+                candidate.processing_time = processing_time
+                
                 if data:
-                    candidate.name = data.get('name') or candidate.name
-                    candidate.email = data.get('email')
+                    email = (data.get('email') or '').strip().lower()
                     
                     # --- DUPLICATE CHECK ---
-                    if candidate.email:
-                        candidate.email = candidate.email.strip().lower()
-                        existing_candidate = Candidate.objects.filter(email__iexact=candidate.email).exclude(id=candidate.id).first()
+                    if email:
+                        existing_candidate = Candidate.objects.filter(email__iexact=email).exclude(id=candidate.id).first()
                         if existing_candidate:
-                            messages.warning(request, f"Candidate with email {candidate.email} already exists. Redirected to existing profile.")
-                            # Delete the temporary record we just created
-                            candidate.delete()
+                            # Update existing candidate with new data and file
+                            update_candidate_from_data(existing_candidate, data)
+                            existing_candidate.resume_file = candidate.resume_file
+                            existing_candidate.processing_time = processing_time # Store time for duplicate update as well
+                            existing_candidate.save()
+                            
+                            messages.success(request, f"Existing profile for {email} updated with new resume!")
+                            candidate.delete() # Remove temp entry
                             return redirect('candidates:candidate_detail', pk=existing_candidate.id)
                     # -----------------------
 
-                    candidate.phone = data.get('mobile_number')
-                    candidate.skills = ', '.join(data.get('skills')) if isinstance(data.get('skills'), list) else data.get('skills')
-                    candidate.education = ', '.join(data.get('education')) if isinstance(data.get('education'), list) else data.get('education')
-                    candidate.ai_summary = data.get('ai_summary')
-                    candidate.ai_strengths = data.get('ai_strengths')
-                    
-                    # Clean experience string to int
-                    exp_raw = data.get('total_experience')
-                    exp_years = 0
-                    if isinstance(exp_raw, (int, float)):
-                        exp_years = int(exp_raw)
-                    elif isinstance(exp_raw, str):
-                        # Extract first number found
-                        import re
-                        match = re.search(r'\d+', exp_raw)
-                        if match:
-                            exp_years = int(match.group())
-                    
-                    candidate.experience_years = exp_years
-                    candidate.save()
+                    # No duplicate, update the new candidate
+                    update_candidate_from_data(candidate, data)
+                    candidate.save() # Save the processing_time too
                     messages.success(request, f"Candidate {candidate.name} uploaded and parsed successfully!")
                 else:
+                    candidate.save() # Even if parsing failed, save the time and candidate
                     messages.warning(request, "Resume uploaded but AI parsing failed to return data.")
             except Exception as e:
                 print(f"Parsing Error: {e}")
@@ -92,7 +124,7 @@ def upload_candidate(request):
             return redirect('resumes_list')
     else:
         form = CandidateUploadForm()
-    return render(request, 'candidates/candidate_form.html', {'form': form, 'title': 'Upload Candidate'})
+    return render(request, 'candidates/candidate_form.html', {'form': form, 'title': 'Upload Candidate', 'candidate': None})
 
 @login_required
 def candidate_detail(request, pk):
@@ -205,8 +237,8 @@ def candidate_onboarding(request):
         form = CandidateUploadForm(request.POST, request.FILES)
         if form.is_valid():
             candidate = form.save(commit=False)
-            candidate.user = request.user  # Link the specific user account
             candidate.created_by = request.user
+            # Do NOT set candidate.user yet to avoid OneToOne conflict during duplicate check
             candidate.save()
             
             # --- Trigger Parsing Logic ---
@@ -218,58 +250,38 @@ def candidate_onboarding(request):
                 data = get_resume_insights(resume_text)
                 
                 if data:
-                    candidate.name = data.get('name') or request.user.first_name or request.user.username
-                    candidate.email = data.get('email') or request.user.email
+                    email = (data.get('email') or '').strip().lower()
                     
                     # --- DUPLICATE / CLAIM CHECK ---
-                    if candidate.email:
-                        candidate.email = candidate.email.strip().lower()
-                        existing_candidate = Candidate.objects.filter(email__iexact=candidate.email).exclude(id=candidate.id).first()
+                    if email:
+                        existing_candidate = Candidate.objects.filter(email__iexact=email).exclude(id=candidate.id).first()
                         
                         if existing_candidate:
-                            # Case 1: Existing profile has no user (uploaded by recruiter) -> CLAIM IT
+                            # Update existing profile with new data and file
+                            update_candidate_from_data(existing_candidate, data)
+                            existing_candidate.resume_file = candidate.resume_file
+                            
+                            # Case 1: Claim if unowned
                             if existing_candidate.user is None:
                                 existing_candidate.user = request.user
-                                # Optional: Update other fields if empty? For now, trust existing data or overwrite?
-                                # Let's assume existing data is good, but we link the user.
-                                existing_candidate.save()
-                                
-                                messages.info(request, f"We found an existing profile for {candidate.email} and linked it to your account!")
-                                candidate.delete() # Delete the temp one
-                                return redirect('candidates:candidate_detail', pk=existing_candidate.id)
+                                messages.info(request, f"We found and updated your existing profile ({email})!")
                             
-                            # Case 2: Existing profile ALREADY has a user -> CONFLICT
+                            # Case 2: Owned by someone else
                             elif existing_candidate.user != request.user:
-                                messages.error(request, f"A profile with email {candidate.email} already exists and is owned by another user.")
-                                candidate.delete() 
+                                messages.error(request, f"Profile with email {email} belongs to another user.")
+                                candidate.delete()
                                 return redirect('candidates:candidate_onboarding')
                             
-                            # Case 3: existing_candidate.user == request.user (Shouldn't happen if check at top works, but safe to handle)
-                            else:
-                                candidate.delete()
-                                return redirect('candidates:candidate_detail', pk=existing_candidate.id)
+                            existing_candidate.save()
+                            candidate.delete()
+                            return redirect('candidates:candidate_detail', pk=existing_candidate.id)
                     # --------------------------------
 
-                    candidate.phone = data.get('mobile_number')
-                    candidate.skills = ', '.join(data.get('skills')) if isinstance(data.get('skills'), list) else data.get('skills')
-                    
-                    # Clean experience string to int
-                    exp_raw = data.get('total_experience')
-                    exp_years = 0
-                    if isinstance(exp_raw, (int, float)):
-                        exp_years = int(exp_raw)
-                    elif isinstance(exp_raw, str):
-                        # Extract first number found
-                        import re
-                        match = re.search(r'\d+', exp_raw)
-                        if match:
-                            exp_years = int(match.group())
-                    
-                    candidate.experience_years = exp_years
-                    candidate.education = ', '.join(data.get('education')) if isinstance(data.get('education'), list) else data.get('education')
-                    candidate.ai_summary = data.get('ai_summary')
-                    candidate.ai_strengths = data.get('ai_strengths')
+                    # No duplicate found, finish creating new
+                    update_candidate_from_data(candidate, data)
+                    candidate.user = request.user
                     candidate.save()
+                    messages.success(request, "Profile created and resume parsed successfully!")
                     
                     messages.success(request, "Profile created and resume parsed successfully!")
             except Exception as e:
@@ -292,6 +304,32 @@ def candidate_update(request, pk):
         return redirect('candidates:candidate_detail', pk=candidate.id)
 
     if request.method == 'POST':
+        # Check if a file was uploaded (re-parsing)
+        if 'resume_file' in request.FILES:
+            from .forms import CandidateUploadForm
+            form = CandidateUploadForm(request.POST, request.FILES, instance=candidate)
+            if form.is_valid():
+                candidate = form.save()
+                
+                # Trigger Parsing
+                try:
+                    file_path = os.path.join(settings.MEDIA_ROOT, candidate.resume_file.name)
+                    ext = os.path.splitext(file_path)[1]
+                    text = extract_text(file_path, ext)
+                    data = get_resume_insights(text)
+                    
+                    if data:
+                        update_candidate_from_data(candidate, data)
+                        messages.success(request, "Profile updated and re-parsed successfully!")
+                        return redirect('candidates:candidate_detail', pk=candidate.id)
+                    else:
+                        messages.warning(request, "File uploaded but AI parsing failed.")
+                except Exception as e:
+                    messages.error(request, f"Error during re-parsing: {e}")
+                
+                return redirect('candidates:candidate_detail', pk=candidate.id)
+        
+        # Otherwise, handle regular text update
         from .forms import CandidateUpdateForm
         form = CandidateUpdateForm(request.POST, instance=candidate)
         if form.is_valid():
@@ -299,10 +337,12 @@ def candidate_update(request, pk):
             messages.success(request, "Profile updated successfully.")
             return redirect('candidates:candidate_detail', pk=candidate.id)
     else:
-        from .forms import CandidateUpdateForm
-        form = CandidateUpdateForm(instance=candidate)
+        # For GET, if it's a re-parse request or just normal edit
+        # The current template is for upload, so we use CandidateUploadForm
+        from .forms import CandidateUploadForm
+        form = CandidateUploadForm(instance=candidate)
     
-    return render(request, 'candidates/candidate_form.html', {'form': form, 'title': 'Edit Profile'})
+    return render(request, 'candidates/candidate_form.html', {'form': form, 'title': 'Edit Profile', 'candidate': candidate})
 
 @login_required
 def delete_candidate(request, pk):

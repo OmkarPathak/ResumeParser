@@ -21,7 +21,7 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Email</th>
+                <th>Latest Role</th>
                 <th>Status</th>
                 <th>Created By</th>
                 <th>Uploaded On</th>
@@ -32,7 +32,15 @@
             {% for candidate in candidates %}
             <tr>
                 <td><strong><a href="{% url 'candidates:candidate_detail' candidate.pk %}">{{ candidate.name }}</a></strong></td>
-                <td>{{ candidate.email|default:"-" }}</td>
+                <td>
+                    {% with latest=candidate.latest_experience %}
+                        {% if latest %}
+                            {{ latest.designation }} at {{ latest.company }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    {% endwith %}
+                </td>
                 <td>
                     {% if candidate.status == 'ACTIVE' %}
                         <span class="badge badge-success-soft">{{ candidate.get_status_display }}</span>

@@ -1,4 +1,5 @@
 import os
+import datetime
 from django.conf import settings
 
 # Global variable for Singleton Pattern
@@ -36,12 +37,15 @@ class BaseAgent:
                 print(f"Loading Base AI Model: {os.path.basename(model_path)}...")
                 
                 # Load Model
-                # Qwen 1.5B is light enough for CPU or GPU
-                # Using n_gpu_layers=0 for Max Stability on user's Mac as requested
+                # Qwen 1.5B is light enough for CPU
+                # GPU (Metal) remains unstable for this environment/model combo.
+                # Optimized CPU setup: High threads + balanced batching for 1.5B model.
                 LLM_MODEL = Llama(
                     model_path=model_path,
-                    n_ctx=4096, # Increased context for multi-agent flow
-                    n_gpu_layers=0, 
+                    n_ctx=4096, 
+                    n_gpu_layers=0,
+                    n_threads=10,     # Targeting physical + some performance cores
+                    n_batch=512,      # Large batch for fast prefill on CPU
                     verbose=False 
                 )
                 print("Base AI Model Loaded Successfully")

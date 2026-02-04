@@ -11,7 +11,7 @@
                 <h2 class="card-title text-center mb-4 font-weight-bold">{{ title }}</h2>
                 <p class="text-muted text-center mb-4">Upload a resume to automatically parse details and create a candidate profile.</p>
                 
-                <form method="post" enctype="multipart/form-data" id="upload-form">
+                <form method="post" enctype="multipart/form-data" id="upload-form" data-loader-action="parsing">
                     {% csrf_token %}
                     
                     <!-- Drag & Drop Zone -->
@@ -38,7 +38,7 @@
                         <button type="submit" class="btn btn-primary btn-block btn-lg shadow-sm" id="submit-btn" disabled>
                             <i class="fas fa-magic mr-2"></i> Upload & Parse
                         </button>
-                        <a href="{% url 'candidates:candidate_list' %}" class="btn btn-link btn-block text-muted">Cancel</a>
+                        <a href="{% if candidate %}{% url 'candidates:candidate_detail' candidate.pk %}{% else %}{% url 'candidates:candidate_list' %}{% endif %}" class="btn btn-link btn-block text-muted">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -119,14 +119,5 @@
             submitBtn.style.opacity = '0.6';
         }
     }
-
-    // Loader Logic
-    const form = document.getElementById('upload-form');
-    form.addEventListener('submit', function() {
-        // Show processing state
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Parsing...';
-        submitBtn.style.opacity = '0.8';
-    });
 </script>
 {% endblock %}

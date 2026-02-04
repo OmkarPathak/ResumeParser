@@ -63,8 +63,32 @@
                 <h5 class="card-title">Skills</h5>
                 <p>{{ candidate.skills|default:"No skills parsed." }}</p>
                 
-                <h5 class="card-title mt-4">Experience</h5>
-                <p>{{ candidate.experience_years }} Years</p>
+                <h5 class="card-title mt-4">Professional Experience</h5>
+                {% if candidate.experiences.all %}
+                    <div class="experience-timeline mt-3">
+                        {% for exp in candidate.experiences.all %}
+                        <div class="experience-item mb-4 pb-3 border-bottom-light">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="font-weight-bold mb-1 text-primary">{{ exp.designation }}</h6>
+                                    <h6 class="text-dark mb-2">{{ exp.company }}</h6>
+                                </div>
+                                <div class="text-right">
+                                    <span class="badge badge-light border">{{ exp.start_date }} - {{ exp.end_date }}</span>
+                                    {% if exp.is_current %}
+                                    <br><span class="badge badge-success-soft mt-1">Current</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="experience-desc mt-2 text-muted small" style="line-height: 1.5;">
+                                {{ exp.job_description|linebreaks }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No detailed experience parsed. (Total Experience: {{ candidate.experience_years }} Years)</p>
+                {% endif %}
                 
                 <h5 class="card-title mt-4">Education</h5>
                 <p>{{ candidate.education|default:"No education details parsed." }}</p>

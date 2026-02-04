@@ -39,6 +39,87 @@
     media="all" />
   <link rel="stylesheet" href="{% static 'css/custom.css' %}">
   <link rel="shortcut icon" href="{% static 'images/logomarkv2.ico' %}">
+  <script>
+    // --- GLOBAL LOADER LOGIC ---
+    (function() {
+        const loaderMessages = {
+            'parsing': ["Parsing resume contents", "Reading resume contents", "Parsing and extracting different sections from resume", "Finalising the extraction", "Saving results"],
+            'matching': ["Analyzing Job Description", "Scanning recruiter database", "Calculating match scores", "Ranking candidates", "Finalizing results"],
+            'chatting': ["Connecting to AI Agent", "Searching through resumes", "Analyzing content", "Generating response", "Finalizing answer"],
+            'deleting': ["Deleting records...", "Cleaning up database...", "Removing associated files...", "Refreshing state..."],
+            'default': ["Processing...", "Hold on a moment...", "Almost there...", "Wrapping up..."]
+        };
+
+        let messageInterval = null;
+
+        function showLoader(action = 'default') {
+            const loader = document.getElementById('global-loader');
+            const container = document.getElementById('loader-msg-container');
+            if (!loader || !container) return;
+            
+            action = (action || 'default').toLowerCase();
+            if (loader.getAttribute('data-loader-running') === action) return;
+            loader.setAttribute('data-loader-running', action);
+            
+            const messages = loaderMessages[action] || loaderMessages['default'];
+            
+            // Rebuild container children
+            container.innerHTML = messages.map(m => `<div class="loader-msg">${m.toUpperCase()}</div>`).join('');
+            
+            // Clear old classes and add new ones
+            container.className = 'loader-msg-container';
+            if (messages.length === 5) {
+                container.classList.add('rotate-5');
+            } else if (messages.length === 4) {
+                container.classList.add('rotate-4');
+            }
+            
+            // Show visually
+            loader.style.display = 'flex';
+            loader.classList.add('visible');
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('global-loader');
+            const container = document.getElementById('loader-msg-container');
+            if (loader) {
+                loader.style.display = 'none';
+                loader.classList.remove('visible');
+                loader.removeAttribute('data-loader-running');
+            }
+            if (container) {
+                container.className = 'loader-msg-container';
+                container.innerHTML = '';
+            }
+    
+        }
+
+        window.showLoader = showLoader;
+        window.hideLoader = hideLoader;
+
+        // Auto-attach listeners
+        document.addEventListener('submit', function(e) {
+    
+            const action = e.target.getAttribute('data-loader-action') || 'default';
+            showLoader(action);
+        }, true);
+
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link) {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:') && !link.target && !link.hasAttribute('data-toggle')) {
+                    if (href.includes('://') && !href.startsWith(window.location.origin)) return;
+            
+                    showLoader(link.getAttribute('data-loader-action') || 'default');
+                }
+            }
+        }, true);
+
+        window.addEventListener('pageshow', (e) => { if (e.persisted) hideLoader(); });
+        window.addEventListener('load', hideLoader);
+    })();
+  </script>
   <title>{% block title %}{% endblock %}</title>
 </head>
 
@@ -46,7 +127,11 @@
   <!-- Global Loader -->
   <div id="global-loader">
       <div class="spinner-ring"></div>
-      <div class="loader-text">PROCESSING...</div>
+      <div class="loader-text">
+          <div class="loader-msg-container" id="loader-msg-container">
+              <div class="loader-msg">INITIALIZING...</div>
+          </div>
+      </div>
   </div>
 
   <div class="container-fluid">
@@ -69,42 +154,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   
-  <script>
-    // Global Loader Logic
-    document.addEventListener("DOMContentLoaded", function() {
-        const loader = document.getElementById('global-loader');
-        
-        function showLoader() {
-            loader.classList.add('visible');
-        }
-        
-        function hideLoader() {
-            loader.classList.remove('visible');
-        }
-
-        // Show on link clicks (internal only)
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (href && href.startsWith('/') && !href.startsWith('#') && !this.hasAttribute('data-toggle') && !this.target) {
-                   showLoader();
-                }
-            });
-        });
-
-        // Show on form submit
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function() {
-                showLoader();
-            });
-        });
-        
-        // Hide on page show (bfcache support)
-        window.addEventListener('pageshow', function(event) {
-            hideLoader();
-        });
-    });
-  </script>
   
   {% block javascript %}{% endblock %}
 </body>

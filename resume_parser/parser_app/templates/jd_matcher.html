@@ -7,7 +7,7 @@
         <h2 class="mb-4 font-weight-bold">
             Job Description Matcher
         </h2>
-        <form method="POST">
+        <form method="POST" data-loader-action="matching">
             {% csrf_token %}
             <div class="form-group">
                 <label for="job_description" class="text-muted font-weight-bold display-6">Paste Job Description Here:</label>
