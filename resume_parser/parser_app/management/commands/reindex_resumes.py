@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
-from parser_app.models import Resume
+from candidates.models import Candidate
 from parser_app.agents.vector_store import VectorStore
 
 class Command(BaseCommand):
-    help = 'Re-indexes all resumes into the VectorStore for RAG'
+    help = 'Re-indexes all candidates into the VectorStore for RAG'
 
     def handle(self, *args, **options):
         self.stdout.write("Starting indexing process...")
@@ -11,27 +11,28 @@ class Command(BaseCommand):
         vector_store = VectorStore()
         vector_store.clear_index() # Reset index
         
-        resumes = Resume.objects.all()
-        count = resumes.count()
+        # Use Candidate model instead of Resume
+        candidates = Candidate.objects.all()
+        count = candidates.count()
         
-        self.stdout.write(f"Found {count} resumes to index.")
+        self.stdout.write(f"Found {count} candidates to index.")
         
-        for resume in resumes:
+        for candidate in candidates:
             # Construct text for embedding
-            # We combine key fields to create a semantic representation
-            text = f"{resume.skills or ''} {resume.experience or ''} {resume.ai_summary or ''}"
+            text = f"{candidate.skills or ''} {candidate.experience_years or ''} years {candidate.ai_summary or ''}"
             
             # Metadata to store
             metadata = {
-                'id': resume.id,
-                'name': resume.name,
-                'email': resume.email,
-                'skills': resume.skills,
-                'ai_summary': resume.ai_summary,
-                'file_url': resume.resume.url if resume.resume else ''
+                'id': candidate.id,
+                'name': candidate.name,
+                'email': candidate.email,
+                'skills': candidate.skills,
+                'ai_summary': candidate.ai_summary,
+                'file_url': candidate.resume_file.url if candidate.resume_file else '',
+                'user_id': candidate.created_by.id if candidate.created_by else None
             }
             
             vector_store.add_document(text, metadata)
-            self.stdout.write(f"Indexed: {resume.name}")
+            self.stdout.write(f"Indexed: {candidate.name}")
             
-        self.stdout.write(self.style.SUCCESS(f"Successfully indexed {count} resumes!"))
+        self.stdout.write(self.style.SUCCESS(f"Successfully indexed {count} candidates!"))

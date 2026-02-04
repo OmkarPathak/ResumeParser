@@ -11,8 +11,8 @@
             {% csrf_token %}
             <div class="form-group">
                 <label for="job_description" class="text-muted font-weight-bold display-6">Paste Job Description Here:</label>
-                <textarea class="form-control" id="job_description" name="job_description" rows="10" 
-                    style="border: 1px solid #e2e8f0; border-radius: 12px; font-size: 1rem; padding: 1.5rem;"
+                <textarea class="form-control" id="job_description" name="job_description" rows="15" 
+                    style="border: 1px solid #e2e8f0; border-radius: 12px; font-size: 1rem; padding: 1.5rem; min-height: 400px;"
                     placeholder="e.g. We are looking for a Senior Python Developer..." required>{{ job_description }}</textarea>
             </div>
             <div class="mt-4">
@@ -25,7 +25,7 @@
 </div>
 
 {% if results %}
-<div class="container-fluid">
+<!-- <div class="container-fluid"> -->
     <div class="row mt-4 justify-content-center">
         <div class="col-md-10">
             <h4 class="mb-4 font-weight-bold mt-5" style="color: var(--text-main);">
@@ -85,8 +85,8 @@
                             </div>
                         </td>
                         <td class="pr-4 py-3 text-right">
-                            <a href="{{ result.file_url }}" target="_blank" class="font-weight-bold text-primary small text-uppercase" style="letter-spacing: 0.5px; text-decoration: none;">
-                                View Resume <i class="fas fa-chevron-right ml-1" style="font-size: 0.8em;"></i>
+                            <a href="{% url 'view_resume' result.id %}?next=jd_matcher" class="font-weight-bold text-primary small text-uppercase" style="letter-spacing: 0.5px; text-decoration: none;">
+                                Resume <i class="fas fa-chevron-right ml-1" style="font-size: 0.8em;"></i>
                             </a>
                         </td>
                     </tr>
@@ -96,7 +96,16 @@
         </div>
     </div>
     </div>
+<!-- </div> -->
+{% elif job_description %}
+<div class="container mt-4">
+    <div class="alert alert-warning text-center shadow-sm" role="alert" style="border-radius: 12px;">
+        <i class="fas fa-search-minus fa-2x mb-3 text-warning"></i>
+        <h5 class="alert-heading font-weight-bold">No Candidates Found</h5>
+        <p class="mb-0">We couldn't find any resumes that match your job description closely enough.</p>
+        <hr>
+        <p class="mb-0 small text-muted">Try using different keywords or reducing specific requirements.</p>
+    </div>
 </div>
-
 {% endif %}
 {% endblock %}

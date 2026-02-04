@@ -113,7 +113,8 @@ def jd_matcher(request):
             try:
                 from .agents.vector_store import VectorStore
                 vector_store = VectorStore()
-                results = vector_store.search(job_description, top_k=50, user_id=request.user.id) # Get top 50 matches
+                # Pass user_id=None to search ALL candidates (Recruiter Mode)
+                results = vector_store.search(job_description, top_k=50, user_id=None) 
                 return render(request, 'jd_matcher.html', {'results': results, 'job_description': job_description})
             except Exception as e:
                 messages.error(request, f"Error during matching: {e}")
@@ -226,9 +227,13 @@ def delete_bulk_resumes(request):
     if request.method == 'POST':
         resume_ids = request.POST.getlist('bulk_delete')
         if resume_ids:
-            # Bug fix: Use Candidate model, not Resume
-            deleted_count, _ = Candidate.objects.filter(id__in=resume_ids).delete()
-            messages.success(request, f'{deleted_count} candidates deleted successfully!')
+            # Fix: Iterate and delete to trigger signals
+            resumes = Resume.objects.filter(id__in=resume_ids, user=request.user)
+            deleted_count = 0
+            for resume in resumes:
+                resume.delete() # This triggers post_delete signal for each
+                deleted_count += 1
+            messages.success(request, f'{deleted_count} resumes deleted successfully!')
         else:
             messages.warning(request, 'No resumes selected for deletion.')
     return redirect('resumes_list')
@@ -249,7 +254,15 @@ def view_resume(request, pk):
         messages.warning(request, 'Resume not found or access denied.')
         return redirect('resumes_list')
     
-    return render(request, 'pdf_viewer.html', {'resume': resume})
+    # Determine back link
+    back_url = 'resumes_list' # Default
+    back_label = 'Back to Resumes'
+    next_param = request.GET.get('next')
+    if next_param == 'jd_matcher':
+        back_url = 'jd_matcher'
+        back_label = 'Back to Matches'
+    
+    return render(request, 'pdf_viewer.html', {'resume': resume, 'back_url': back_url, 'back_label': back_label})
 
 
 @login_required
@@ -328,13 +341,17 @@ def chat_view(request):
             return JsonResponse({'error': 'No query provided'}, status=400)
         
         try:
+            print(f"Chat View: Received query - {query}")
             # 1. Get History from Session
             history = request.session.get('chat_history', [])
             
+            print("Chat View: Initializing Agent...")
             agent = RAGAgent()
             
             # 2. Pass History to Agent & User ID
+            print("Chat View: Calling chat()...")
             answer = agent.chat(query, history=history, user_id=request.user.id)
+            print(f"Chat View: Response received - {answer[:50]}...")
             
             # 3. Update History
             history.append({'role': 'User', 'content': query})
@@ -346,6 +363,8 @@ def chat_view(request):
             return JsonResponse({'answer': answer})
         except Exception as e:
             print(f"Chat Error: {e}")
+            import traceback
+            traceback.print_exc()
             return JsonResponse({'error': str(e)}, status=500)
             
     return render(request, 'chat.html')

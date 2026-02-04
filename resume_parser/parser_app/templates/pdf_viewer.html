@@ -4,24 +4,23 @@
 {% block title %}View Resume: {{ resume.name }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-3 h-100" style="min-height: 85vh; display: flex; flex-direction: column;">
-    <!-- Back Button Header -->
-    <div class="d-flex align-items-center mb-3">
-        <a href="{% url 'resumes_list' %}" class="btn btn-secondary shadow-sm">
-            <i class="fas fa-arrow-left mr-2"></i>Back to Resumes
+<div class="d-flex flex-column h-100 fade-in" style="padding-bottom: 2rem;">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{% url back_url %}" class="btn btn-secondary shadow-sm mr-3">
+            <i class="fas fa-arrow-left mr-2"></i>{{ back_label }}
         </a>
-        <h4 class="ml-3 mb-0 text-dark font-weight-bold">{{ resume.name }}</h4>
-        <span class="ml-2 text-muted small">({{ resume.resume.name }})</span>
+        <div>
+            <h4 class="mb-0 font-weight-bold text-dark d-inline-block align-middle">{{ resume.name }}</h4>
+            <span class="text-muted small ml-2 align-middle" style="opacity: 0.7;">{{ resume.resume.name }}</span>
+        </div>
     </div>
 
-    <!-- PDF Container -->
-    <div class="card border-0 shadow-sm flex-grow-1" style="overflow: hidden; border-radius: 12px;">
-        <div class="card-body p-0 h-100">
-            <iframe src="{{ resume.resume.url }}" width="100%" height="100%" style="border: none; min-height: 75vh;">
-                Your browser does not support PDFs. 
-                <a href="{{ resume.resume.url }}">Download the PDF</a> to view it: {{ resume.resume.name }}.
-            </iframe>
-        </div>
+    <!-- PDF Viewer Frame -->
+    <div class="card border-0 shadow-lg flex-grow-1" style="border-radius: 16px; overflow: hidden; background: #525659;">
+        <iframe src="{{ resume.resume.url }}" width="100%" height="800px" style="border: none; display: block; height: 85vh;">
+            Your browser does not support PDFs. 
+            <a href="{{ resume.resume.url }}">Download the PDF</a>.
+        </iframe>
     </div>
 </div>
 {% endblock %}

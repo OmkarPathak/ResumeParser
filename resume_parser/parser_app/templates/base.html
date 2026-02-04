@@ -43,6 +43,12 @@
 </head>
 
 <body style="background-color: var(--bg-body);">
+  <!-- Global Loader -->
+  <div id="global-loader">
+      <div class="spinner-ring"></div>
+      <div class="loader-text">PROCESSING...</div>
+  </div>
+
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
@@ -62,6 +68,43 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
+  <script>
+    // Global Loader Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        const loader = document.getElementById('global-loader');
+        
+        function showLoader() {
+            loader.classList.add('visible');
+        }
+        
+        function hideLoader() {
+            loader.classList.remove('visible');
+        }
+
+        // Show on link clicks (internal only)
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('/') && !href.startsWith('#') && !this.hasAttribute('data-toggle') && !this.target) {
+                   showLoader();
+                }
+            });
+        });
+
+        // Show on form submit
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                showLoader();
+            });
+        });
+        
+        // Hide on page show (bfcache support)
+        window.addEventListener('pageshow', function(event) {
+            hideLoader();
+        });
+    });
+  </script>
   
   {% block javascript %}{% endblock %}
 </body>

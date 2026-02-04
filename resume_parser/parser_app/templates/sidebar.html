@@ -1,10 +1,10 @@
 {% load static %}
-<nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse shadow-sm pl-0 pr-0" style="transition: all 0.3s; padding: 0;">
+<nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse shadow-sm pl-0 pr-0" style="transition: all 0.3s; padding: 0;">
     <div class="d-flex flex-column h-100">
         <!-- Brand (Fixed Top) -->
         <div class="pt-4 px-4 pb-2">
             <a class="navbar-brand navbar-brand-text d-flex align-items-center mb-0" href="{% if user.is_authenticated %}{% url 'homepage' %}{% else %}{% url 'index' %}{% endif %}">
-                <i class="fas fa-file-alt mr-2 text-primary"></i>
+                <i class="fas fa-file-alt mr-2"></i>
                 <span class="h5 mb-0 font-weight-bold">Resume Parser</span>
             </a>
         </div>
@@ -20,35 +20,35 @@
                 {% if user.role == 'RECRUITER' or user.role == 'ADMIN' %}
                 <li class="nav-item mb-2">
                     <a class="nav-link nav-link-custom d-flex align-items-center {% if request.resolver_match.url_name == 'resumes_list' %} active {% endif %}" href="{% url 'resumes_list' %}">
-                        <i class="fas fa-database mr-3 text-muted" style="width: 20px;"></i>
+                        <i class="fas fa-database mr-3" style="width: 20px;"></i>
                         Candidates Data
                     </a>
                 </li>
                 <li class="nav-item mb-2">
                     <a class="nav-link nav-link-custom d-flex align-items-center {% if request.resolver_match.url_name == 'job_list' %} active {% endif %}" href="{% url 'job_list'%}">
-                        <i class="fas fa-briefcase mr-3 text-muted" style="width: 20px;"></i>
+                        <i class="fas fa-briefcase mr-3" style="width: 20px;"></i>
                         Jobs
                     </a>
                 </li>
                 
                 <!-- AI Tools Dropdown -->
-                <li class="nav-item mt-3 mb-2 px-3 text-uppercase text-muted" style="font-size: 0.75rem; letter-spacing: 1px; font-weight: 700;">
+                <li class="nav-item mt-3 mb-2 px-3 text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px; font-weight: 700; color: rgba(255,255,255,0.4);">
                     AI Tools
                 </li>
 
                 <li class="nav-item mb-1">
-                    <a class="nav-link nav-link-custom d-flex align-items-center" href="{% url 'chat_view' %}">
-                        <i class="fas fa-comments mr-3 text-muted" style="width: 20px;"></i> Chat w/ Resumes
+                    <a class="nav-link nav-link-custom d-flex align-items-center {% if request.resolver_match.url_name == 'chat_view' %} active {% endif %}" href="{% url 'chat_view' %}">
+                        <i class="fas fa-comments mr-3" style="width: 20px;"></i> Chat w/ Resumes
                     </a>
                 </li>
                 <li class="nav-item mb-1">
-                    <a class="nav-link nav-link-custom d-flex align-items-center" href="{% url 'jd_matcher' %}">
-                        <i class="fas fa-check-double mr-3 text-muted" style="width: 20px;"></i> JD Matcher
+                    <a class="nav-link nav-link-custom d-flex align-items-center {% if request.resolver_match.url_name == 'jd_matcher' %} active {% endif %}" href="{% url 'jd_matcher' %}">
+                        <i class="fas fa-check-double mr-3" style="width: 20px;"></i> JD Matcher
                     </a>
                 </li>
                 <li class="nav-item mb-1">
-                    <a class="nav-link nav-link-custom d-flex align-items-center" href="{% url 'resume_optimizer' %}">
-                        <i class="fas fa-magic mr-3 text-muted" style="width: 20px;"></i> Resume Optimizer
+                    <a class="nav-link nav-link-custom d-flex align-items-center {% if request.resolver_match.url_name == 'resume_optimizer' %} active {% endif %}" href="{% url 'resume_optimizer' %}">
+                        <i class="fas fa-magic mr-3" style="width: 20px;"></i> Resume Optimizer
                     </a>
                 </li>
                 {% endif %}
@@ -57,7 +57,7 @@
                 {% if user.role == 'CLIENT' or user.role == 'CANDIDATE' %}
                 <li class="nav-item mb-2">
                     <a class="nav-link nav-link-custom d-flex align-items-center {% if request.resolver_match.url_name == 'job_list' %} active {% endif %}" href="{% url 'job_list'%}">
-                        <i class="fas fa-briefcase mr-3 text-muted" style="width: 20px;"></i>
+                        <i class="fas fa-briefcase mr-3" style="width: 20px;"></i>
                         {% if user.role == 'CLIENT' %}My Jobs{% else %}Jobs{% endif %}
                     </a>
                 </li>
@@ -78,17 +78,17 @@
 
         <!-- User Profile (Fixed Bottom) -->
         {% if user.is_authenticated %}
-        <div class="mt-auto p-3 border-top custom-border-light bg-white" style="z-index: 101;">
+        <div class="mt-auto p-3 border-top custom-border-light" style="z-index: 101;">
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-decoration-none user-profile-link p-2 rounded" id="dropdownUser1" data-toggle="dropdown" aria-expanded="false">
                     <div class="avatar-placeholder avatar-sm rounded-circle mr-3">
                         {{ user.username|slice:":1"|upper }}
                     </div>
                     <div class="d-flex flex-column" style="line-height: 1.2;">
-                        <span class="font-weight-bold text-dark text-truncate" style="max-width: 110px;">{{ user.username }}</span>
-                        <small class="text-muted" style="font-size: 0.75rem;">{{ user.role|title }}</small>
+                        <span class="font-weight-bold text-truncate" style="max-width: 110px;">{{ user.username }}</span>
+                        <small style="font-size: 0.75rem; opacity: 0.7;">{{ user.role|title }}</small>
                     </div>
-                    <i class="fas fa-chevron-up ml-auto text-muted small"></i>
+                    <i class="fas fa-chevron-up ml-auto small opacity-50"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-top shadow-lg border-0 rounded-lg p-1 mb-2" aria-labelledby="dropdownUser1" style="min-width: 200px;">
                     {% if user.role == 'CANDIDATE' and user.candidate_profile %}

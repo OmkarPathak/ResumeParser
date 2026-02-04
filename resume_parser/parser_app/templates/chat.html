@@ -63,115 +63,136 @@
 
 {% block javascript %}
 <script>
-    const chatHistory = document.getElementById('chat-history');
-    const chatForm = document.getElementById('chat-form');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    const newChatBtn = document.getElementById('new-chat-btn');
+    document.addEventListener("DOMContentLoaded", function() {
+        const chatHistory = document.getElementById('chat-history');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const newChatBtn = document.getElementById('new-chat-btn');
 
-    function appendMessage(role, text) {
-        const div = document.createElement('div');
-        div.className = `chat-message ${role}-message mb-3`;
-        
-        let contentHtml = text;
-        // Simple Markdown bold replacement
-        contentHtml = contentHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        // Replaces [Link Text](URL) with Anchor tags
-        // Changed anchor color to be white-ish for user, purple for bot
-        const linkColor = role === 'user' ? 'text-white' : 'text-purple';
-        contentHtml = contentHtml.replace(/\[(.*?)\]\((.*?)\)/g, `<a href="$2" target="_blank" class="font-weight-bold ${linkColor}" style="text-decoration: underline;">$1 <i class="fas fa-external-link-alt small ml-1"></i></a>`);
-        contentHtml = contentHtml.replace(/\n/g, '<br>');
-
-        const bgClass = role === 'user' ? 'bg-purple' : 'bg-white text-dark shadow-sm';
-        const alignStyle = role === 'user' ? 'margin-left: auto; border-top-right-radius: 0;' : 'margin-right: auto; border-top-left-radius: 0;';
-        const nameColor = role === 'user' ? 'text-white-50' : 'text-purple';
-        const name = role === 'user' ? 'You' : 'AI Assistant';
-
-        div.innerHTML = `
-            <div class="p-3 rounded-lg ${bgClass} chat-content" style="max-width: 80%; ${alignStyle}">
-                <span class="font-weight-bold ${nameColor} mb-1 d-block small">${name === 'AI Assistant' ? '<i class="fas fa-robot mr-1"></i> ' + name : name}</span>
-                ${contentHtml}
-            </div>
-        `;
-        chatHistory.appendChild(div);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-
-    // New Chat Button Logic
-    newChatBtn.addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to clear the chat history?')) return;
-
-        try {
-            const response = await fetch("{% url 'chat_view' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: 'reset=true'
-            });
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `chat-message ${role}-message mb-3`;
             
-            const data = await response.json();
-            if (data.status === 'success') {
-                // Clear UI (except welcome message if preferred, or just reload)
-                // For simplicity, let's reload the page or clear valid chats
-                window.location.reload(); 
-            }
-        } catch (e) {
-            console.error(e);
-            alert('Failed to reset chat.');
+            let contentHtml = text;
+            // Simple Markdown bold replacement
+            contentHtml = contentHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Replaces [Link Text](URL) with Anchor tags
+            // Changed anchor color to be white-ish for user, purple for bot
+            const linkColor = role === 'user' ? 'text-white' : 'text-purple';
+            contentHtml = contentHtml.replace(/\[(.*?)\]\((.*?)\)/g, `<a href="$2" target="_blank" class="font-weight-bold ${linkColor}" style="text-decoration: underline;">$1 <i class="fas fa-external-link-alt small ml-1"></i></a>`);
+            contentHtml = contentHtml.replace(/\n/g, '<br>');
+
+            const bgClass = role === 'user' ? 'bg-purple' : 'bg-white text-dark shadow-sm';
+            const alignStyle = role === 'user' ? 'margin-left: auto; border-top-right-radius: 0;' : 'margin-right: auto; border-top-left-radius: 0;';
+            const nameColor = role === 'user' ? 'text-white-50' : 'text-purple';
+            const name = role === 'user' ? 'You' : 'AI Assistant';
+
+            div.innerHTML = `
+                <div class="p-3 rounded-lg ${bgClass} chat-content" style="max-width: 80%; ${alignStyle}">
+                    <span class="font-weight-bold ${nameColor} mb-1 d-block small">${name === 'AI Assistant' ? '<i class="fas fa-robot mr-1"></i> ' + name : name}</span>
+                    ${contentHtml}
+                </div>
+            `;
+            chatHistory.appendChild(div);
+            // safe scroll
+            if(chatHistory) chatHistory.scrollTop = chatHistory.scrollHeight;
         }
-    });
 
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const query = userInput.value.trim();
-        if (!query) return;
+        // New Chat Button Logic
+        if(newChatBtn) {
+            newChatBtn.addEventListener('click', async () => {
+                if (!confirm('Are you sure you want to clear the chat history?')) return;
 
-        // UI Updates
-        appendMessage('user', query);
-        userInput.value = '';
-        userInput.disabled = true;
-        sendBtn.disabled = true;
-
-        // Loading Indicator
-        const loadingDiv = document.createElement('div');
-        loadingDiv.id = 'loading';
-        loadingDiv.className = 'chat-message bot-message mb-3';
-        loadingDiv.innerHTML = `
-            <div class="p-3 rounded-lg bg-white shadow-sm" style="max-width: 80%; border-top-left-radius: 0;">
-                <span class="text-muted"><i class="fas fa-spinner fa-spin mr-2"></i>Thinking...</span>
-            </div>`;
-        chatHistory.appendChild(loadingDiv);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-
-        try {
-            const response = await fetch("{% url 'chat_view' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: `query=${encodeURIComponent(query)}`
+                try {
+                    const response = await fetch("{% url 'chat_view' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: 'reset=true'
+                    });
+                    
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        window.location.reload(); 
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Failed to reset chat.');
+                }
             });
+        }
 
-            const data = await response.json();
-            document.getElementById('loading').remove();
-            
-            if (data.answer) {
-                appendMessage('bot', data.answer);
-            } else {
-                appendMessage('bot', "Sorry, I encountered an error.");
-            }
+        if(chatForm) {
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Hide global loader if triggered by base.html
+                const globalLoader = document.getElementById('global-loader');
+                if (globalLoader) globalLoader.classList.remove('visible');
+                
+                const query = userInput.value.trim();
+                if (!query) return;
 
-        } catch (error) {
-            document.getElementById('loading').remove();
-            appendMessage('bot', "Error connecting to the server.");
-            console.error(error);
-        } finally {
-            userInput.disabled = false;
-            sendBtn.disabled = false;
-            userInput.focus();
+                // UI Updates
+                appendMessage('user', query);
+                userInput.value = '';
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+
+                // Loading Indicator
+                const loadingDiv = document.createElement('div');
+                loadingDiv.id = 'loading';
+                loadingDiv.className = 'chat-message bot-message mb-3';
+                loadingDiv.innerHTML = `
+                    <div class="p-3 rounded-lg bg-white shadow-sm" style="max-width: 80%; border-top-left-radius: 0;">
+                        <span class="text-muted"><i class="fas fa-spinner fa-spin mr-2"></i>Thinking...</span>
+                    </div>`;
+                chatHistory.appendChild(loadingDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+                    const response = await fetch("{% url 'chat_view' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: `query=${encodeURIComponent(query)}`,
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    const data = await response.json();
+                    
+                    // Safe removal
+                    const loader = document.getElementById('loading');
+                    if (loader) loader.remove();
+                    
+                    if (data.answer) {
+                        appendMessage('bot', data.answer);
+                    } else {
+                        appendMessage('bot', "Sorry, I encountered an error.");
+                    }
+
+                } catch (error) {
+                    console.error("Chat Error:", error);
+                    // Safe removal in catch
+                    const loader = document.getElementById('loading');
+                    if (loader) loader.remove();
+                    
+                    appendMessage('bot', "Error: " + (error.message || "Connecting to server"));
+                } finally {
+                    userInput.disabled = false;
+                    sendBtn.disabled = false;
+                    userInput.focus();
+                }
+            });
         }
     });
 </script>

@@ -42,6 +42,7 @@ class VectorStore:
             print(f"VectorStore: Removed document ID {doc_id}")
 
     def search(self, query, top_k=3, user_id=None):
+        self.load_index() # Ensure we have the latest index (e.g. after reindexing)
         self.load_model()
         if not self.index:
             return []
@@ -49,15 +50,14 @@ class VectorStore:
         # Filter index by user_id if provided
         filtered_index = []
         if user_id is not None:
-            filtered_index = [item for item in self.index if item['metadata'].get('user_id') == user_id]
+            # Include user's own resumes AND legacy resumes (user_id is None)
+            filtered_index = [
+                item for item in self.index 
+                if item['metadata'].get('user_id') == user_id or item['metadata'].get('user_id') is None
+            ]
         else:
-            # If no user_id, return empty or all? For security, should restrict. 
-            # But let's assume if None, it returns nothing to be safe, or we handle it upstream.
-            # In our case, we always pass user_id. 
-            # If we want to allow public search later, we can change this.
-            # For now, let's treat user_id=None as "no results" or "admin"? 
-            # Let's return empty list for safety if user_id is missing for now.
-            return []
+            # If no user_id provided (Admin/Recruiter Mode), return ALL resumes
+            filtered_index = self.index
 
         if not filtered_index:
             return []
@@ -75,9 +75,11 @@ class VectorStore:
         top_indices = np.argsort(similarities)[::-1][:top_k]
         
         results = []
+        print(f"DEBUG: Search UserID: {user_id} | Filtered Count: {len(filtered_index)}")
         for idx in top_indices:
             score = similarities[idx]
-            if score > 0.2: # Threshold to filter irrelevant results
+            print(f"DEBUG: Best Match: {filtered_index[idx]['metadata']['name']} | Score: {score}")
+            if score > 0.1: # Threshold lowered to 0.1 to include more results
                 result = filtered_index[idx]['metadata']
                 result['score'] = float(score)
                 results.append(result)
